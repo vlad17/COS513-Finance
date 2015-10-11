@@ -1,3 +1,5 @@
+""" file scraper """
+
 import urllib
 from os import getcwd
 import sys
