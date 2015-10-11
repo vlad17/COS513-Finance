@@ -30,7 +30,7 @@ weight_masks = np.random.dirichlet(np.ones(NUM_CENTROIDS), size=NUM_DAYS)
 # temp_daily_news = [random.sample(centroids, NUM_DAILY_NEWS_EVENTS) for x in range(NUM_DAYS)]
 daily_news = []
 for mask in weight_masks:
-    weighted_centroids = zip(np.multiply(mask, centroids_x), np.multiply(mask, centroids_y))
+    weighted_centroids = [x for y in zip(np.multiply(mask, centroids_x), np.multiply(mask, centroids_y) for x for y]
     daily_news.append(weighted_centroids)
 
     # temp = []
@@ -53,7 +53,7 @@ model5 = LogisticRegression()
 for x in set(prob_states):
     this_prob_states = news_df[news_df['prob_states'] == x]
     
-model.fit(this_prob_states.ix[:-1,1:], this_prob_states.ix[:,0])
+model1.fit(this_prob_states.ix[:, 1:][1:], this_prob_states.ix[:, 0][:-1])
 
 print model.coef_
 
