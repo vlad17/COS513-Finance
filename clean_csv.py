@@ -60,9 +60,9 @@ def clean_row(row):
 
 def main():
 
-    input_dir = getcwd() + '/' + sys.argv[1]
-    output_dir = getcwd() + '/' + sys.argv[2]
-
+    input_dir = sys.argv[1]
+    output_dir = sys.argv[2]
+    
     output_file = open(output_dir + '/all_days.csv', 'w+')
     csv_writer = csv.writer(output_file, delimiter='\t')
 
