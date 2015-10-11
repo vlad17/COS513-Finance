@@ -69,7 +69,7 @@ def clean_row(row):
     days_since_epoch = (parsed_sql_date - unix_epoch).days
 
     # format url
-    domain = tldextract.extract(url).domain
+    domain = hash_string(tldextract.extract(url).domain)
 
     # add other fields
     new_row.extend([days_since_epoch, event_code, quad_class, goldstein, actor_1_name, actor_2_name, root_event, num_mentions, num_sources, num_articles, tone, actor_1_geo_full_name, actor_2_geo_full_name, domain])
