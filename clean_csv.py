@@ -6,6 +6,7 @@ from os import getcwd
 import csv
 from datetime import datetime
 import tldextract
+import sys
 
 
 NUM_FIELDS = 58
@@ -59,8 +60,8 @@ def clean_row(row):
 
 def main():
 
-    input_dir = getcwd() + '/../data/2015-03'
-    output_dir = getcwd() + '/../data/2015-03/cleaned'
+    input_dir = getcwd() + '/' + sys.argv[1]
+    output_dir = getcwd() + '/' + sys.argv[2]
 
     output_file = open(output_dir + '/all_days.csv', 'w+')
     csv_writer = csv.writer(output_file, delimiter='\t')

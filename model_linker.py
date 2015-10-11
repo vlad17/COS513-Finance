@@ -53,7 +53,7 @@ model5 = LogisticRegression()
 for x in set(prob_states):
     this_prob_states = news_df[news_df['prob_states'] == x]
     
-model.fit(this_prob_states.ix[:,1:], this_prob_states.ix[:,0])
+model.fit(this_prob_states.ix[:-1,1:], this_prob_states.ix[:,0])
 
 print model.coef_
 
