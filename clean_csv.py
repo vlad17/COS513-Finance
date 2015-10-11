@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """ Clean and merge csv files """
 
 from __future__ import division
