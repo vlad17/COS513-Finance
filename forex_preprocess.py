@@ -138,8 +138,8 @@ def preprocess(raw_data):
 
         # normalize by the day
         norm_NumArticles = int(row[_INDICES["NumArticles"]])/running_average_data[current_day][0]
-        norm_NumArticles = int(row[_INDICES["NumMentions"]])/running_average_data[current_day][1]
-        norm_NumArticles = int(row[_INDICES["NumSources"]])/running_average_data[current_day][2]
+        norm_NumMentions = int(row[_INDICES["NumMentions"]])/running_average_data[current_day][1]
+        norm_NumSources = int(row[_INDICES["NumSources"]])/running_average_data[current_day][2]
 
 
         # Heuristic 1: NumArticles * Goldstein scale
