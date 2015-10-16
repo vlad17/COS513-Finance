@@ -1,3 +1,39 @@
 
+As mentioned in the sections above, there is a need to reduce the dimensionality of the GDELT event dataset. Because this contains a mix of categorical and numerical variables, it is difficult to apply standard methods.
+
+Recall our event space set $R$. Suppose we may define a metric $\rho:R\times R\rightarrow \R_+$ and an inner product $\Innercpy{\cdot}:R\times R\rightarrow\R$, inducing the similarity matrix $G\in\R^{M\times M}$.
+
+Suppose $\dim R = D$, and we are reducing to $d$ dimensions.
+
+\subsubsection{Linear Approaches}
+
+Approaches which find a linear projection onto a reduced-dimensions space are incompatible when dealing directly with categorical data. Even if we are equipped with $G$, the resulting projection generated, a mapping $R\rightarrow \mathbb{R}^d$, would still require a data matrix $X\in\mathbb{R}^D$.
+
+As such, common approaches such as PCA and classical MDS do not apply \cite{cunningham2015linear}.
+
+\subsubsection{Locally Linear Embedding}
+
+LLE preserves local structure by finding a low-dimensional embedding that maximally preserves high-dimensional linear neighborhood properties such as translation, rotation, and scaling \cite{roweis2000nonlinear}. In particular, it first finds and expression for each high-dimensional point as the weighted sum of its neighbors, and then performs an optimization in the low dimensional space which finds nontrivial embeddings that respect the neighbor-based reconstruction.
+
+Unfortunately, implicit in this algorithm is a vector space structure in $R$, which categories are not equipped with. 
+
+\subsubsection{Dealing with Categorical Variables}
+
+Typical approaches for dealing with categorical variables include utilizing a one-hot representation of categorical labels - for each unique value in each column, we introduce a new dimension which contains the indicator for that category. This approach embeds it into a space with as many dimensions as unique categorical values.
+
+Unfortunately, this approach is not tractable. Analyzing just one day (March 1, 2015), we found there to be several tens of thousands of unique categorical values. 
+
+\subsubsection{Neighborhood Embedding}
+
+General info (find a paper)
+
+tsne high level + runtime + discuss hypers
 
 tsne \cite{van2008visualizing}.
+
+Purpose is dimensionality reduction for clustering.
+
+\subsubsection{K-medoid Clustering}
+
+TODO: related work
+
