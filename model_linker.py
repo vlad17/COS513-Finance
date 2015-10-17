@@ -15,10 +15,12 @@ fake_hmm = np.random.dirichlet(np.ones(NUM_CATEGORIES), size=NUM_DAYS)
 # transform probabilistic markov states into max likelihood
 prob_states = [max(enumerate(x), key=operator.itemgetter(1))[0] for x in fake_hmm]
 
+# TODO: use wc -l on the cleaned data to get the day-splits
+# binary read pairs of doubles from cleaned/*.out directory
+news = []
 
 # generate random global new topic centroids
-NUM_CENTROIDS = 100000
-CENTROID_RANGE_RADIUS = 1000
+
 centroids = [(random.uniform(-CENTROID_RANGE_RADIUS, CENTROID_RANGE_RADIUS), random.uniform(-CENTROID_RANGE_RADIUS, CENTROID_RANGE_RADIUS)) for x in range(0,NUM_CENTROIDS)]
 centroids_x = [centroid[0] for centroid in centroids]
 centroids_y = [centroid[1] for centroid in centroids]
