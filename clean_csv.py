@@ -67,6 +67,7 @@ def clean_row(row):
     unix_epoch = datetime(1970, 1, 1)
     parsed_sql_date = datetime(int(sql_date[:4]), int(sql_date[4:6]), int(sql_date[6:8]))
     days_since_epoch = (parsed_sql_date - unix_epoch).days
+    print days_since_epoch
 
     # format url
     domain = hash_string(tldextract.extract(url).domain)
@@ -83,7 +84,7 @@ def main():
     input_dir = sys.argv[1]
     output_dir = sys.argv[2]
     
-    output_file = open(output_dir + '/all_days.csv', 'w+')
+    output_file = open(output_dir, 'w+')
     csv_writer = csv.writer(output_file, delimiter='\t')
 
     for csv_filename in find_csv_filenames(input_dir):

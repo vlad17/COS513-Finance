@@ -11,6 +11,10 @@ from sklearn.cluster import AgglomerativeClustering
 import random
 from scipy.cluster.vq import kmeans2, whiten
 import pickle
+import csv
+from os import getcwd
+
+import ipdb
 
 
 def chunkwise(t, size=2):
@@ -25,37 +29,63 @@ NUM_CATEGORIES = 5
 
 # D = sys.argv[0]  # number of dimensions of each news event
 D = 2
-# tsne_filename = sys.argv[1]
-tsne_filename = 'all_days.out'
+tsne_filename = sys.argv[0]
+# tsne_filename = 'all_days.out'
 # hmm_filename = sys.argv[2]
 # output_filename = sys.argv[3]
-price_filename = ''
-output_filename = all_days_models.json
+# price_filename = ''
+output_filename = 'all_days_models.json'
+all_days_file = 'all_days.csv'
+
+# get day counts
+date_counts = []
+with open(all_days_file, 'r') as all_days:
+    reader = csv.reader(all_days, delimiter='\t')
+
+    last_date = -1
+    date_count = 1
+    for row in reader:
+        date = row[0]
+
+        if last_date == date:
+            date_count += 1
+        else:
+            date_counts.append(date_count)
+            date_count = 1
+
+        last_date = date
+
+ipdb.set_trace()
+
 
 
 # read price differences
-# prices = []
-# with open(price_filename, 'r') as prices_file:
-#     prices = prices_file.readlines()
-prices = [random.randint(-5,5) for i in range(100)]
-# prices_array = prices.split('\t')
-prices_array = prices
-price_delta = [x - y > 0 for x,y in zip(prices_array[1:], prices_array)]
-price_changes = np.array(price_delta, dtype=int)
+prices = []
+
+# with open(price_filename, 'r') as csv_file:
+#     reader = csv.reader(csv_file, delimiter=' ')
+#     for row in reader:
+price_filename = getcwd() + '/quote-download/XAG.csv'
+prices = pd.read_csv(price_filename, sep=' ')
+# filter prices
+dates = pd.date_range('4/1/2000', periods=15)
+
+price_range = prices[(prices.Index < '2015-04-15') & (prices.Index >= '2015-04-01')]['XAG.USD']
+
+price_diffs = price_range.diff()
+price_changes = np.array(price_diffs > 0, dtype=int)
 
 
 all_floats = []
-
 all_points = []
 
 # read tsne data
 with open(tsne_filename, 'rb') as fid:
     data_array = np.fromfile(fid, np.int16)
 
-all_points = zip(data_array[::2], data_array[1::2])
-data_array = data_array.reshape((-1, 2))
+data_array = data_array.reshape((-1, 3))
 
-
+# cluster data
 NUM_CLUSTERS = 100
 centroids, labels = kmeans2(whiten(data_array), NUM_CLUSTERS, iter=20)
 
@@ -64,11 +94,11 @@ centroids, labels = kmeans2(whiten(data_array), NUM_CLUSTERS, iter=20)
 #     data_array = np.fromfile(fid, np.int16).reshape((-1, 2)).T
 
 raw_news = pd.DataFrame()    # data frame holding each date's news. each column is new date
-num_events = 1306416
-num_days = 100
-date_counts = [num_events // 100] * 100
+# num_events = 1306416
+# num_days = 100
+# date_counts = [num_events // 100] * 100
 last_index = 0
-date = datetime.datetime(2015,03,01)
+date = datetime.datetime(2015,04,01)
 weighted_centroids = pd.DataFrame()
 for i, date_count in enumerate(date_counts):
     label_counts = np.array([0]*NUM_CLUSTERS, dtype=float)
@@ -93,39 +123,16 @@ for i in range(100):
 prob_states = [max(enumerate(x), key=operator.itemgetter(1))[0] for x in hmm_states]
 
 
-# generate random global new topic centroids
-# NUM_CENTROIDS = 100000
-# CENTROID_RANGE_RADIUS = 1000
-# centroids = [(random.uniform(-CENTROID_RANGE_RADIUS, CENTROID_RANGE_RADIUS), random.uniform(-CENTROID_RANGE_RADIUS, CENTROID_RANGE_RADIUS)) for x in range(0,NUM_CENTROIDS)]
-# centroids_x = [centroid[0] for centroid in centroids]
-# centroids_y = [centroid[1] for centroid in centroids]
-
-
-# generate news array of centroids
-# NUM_DAILY_NEWS_EVENTS = 100 # num news events per day
-# weight_masks = np.random.dirichlet(np.ones(NUM_CENTROIDS), size=NUM_DAYS)
-# # temp_daily_news = [random.sample(centroids, NUM_DAILY_NEWS_EVENTS) for x in range(NUM_DAYS)]
-# daily_news = []
-# for mask in weight_masks:
-#     weighted_centroids = [x for y in zip(np.multiply(mask, centroids_x), np.multiply(mask, centroids_y)) for x in y]
-#     daily_news.append(weighted_centroids)
-
-    # temp = []
-    # for news_event in day:
-    #     temp.append(news_event[0])
-    #     temp.append(news_event[1])
-    # daily_news.append(temp)
-
 # daily_news = pd.DataFrame(daily_news)
 prob_states = pd.Series(prob_states, name='prob_states')
 news_df = pd.DataFrame(pd.concat([prob_states, weighted_centroids], axis=1))
 
 # logistic regression
 model1 = LogisticRegression()
-model2 = LogisticRegression()
-model3 = LogisticRegression()
-model4 = LogisticRegression()
-model5 = LogisticRegression()
+# model2 = LogisticRegression()
+# model3 = LogisticRegression()
+# model4 = LogisticRegression()
+# model5 = LogisticRegression()
 
 # for x in set(prob_states):
 
