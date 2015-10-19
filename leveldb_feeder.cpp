@@ -6,10 +6,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <future>
+#include <sstream>
 #include <thread>
 #include <vector>
 #include "leveldb/db.h"
+#include "parallel_for.hpp"
 
 #define QCHECK_OK(status, tid) do {                 \
     if (!(status).ok()) { \
@@ -43,7 +44,8 @@ std::vector<std::string> read_all() {
   return ret;
 }
 
-bool read_rec(int tid, leveldb::DB* db, std::string line, int& ctr) {
+bool read_rec(leveldb::DB* db, std::string line, int& ctr) {
+  auto tid = std::this_thread::get_id();
   auto num_end = line.find('\t');
   if (num_end == std::string::npos) {
     std::cerr
@@ -55,22 +57,35 @@ bool read_rec(int tid, leveldb::DB* db, std::string line, int& ctr) {
   QCHECK_OK(status, tid);
   if (++ctr % 100000 == 0) {
     std::cout << "\ttid " << tid << ": read " << ctr / 1000
-              << "Krecords" << std::endl;
+              << " Krecords" << std::endl;
   }
   return !status.ok();
 }
 
 typedef std::vector<std::string>::const_iterator It;
-bool serial_read_files(int tid, It start, It end, leveldb::DB* db) {
+bool serial_read_files(It start, It end, leveldb::DB* db) {
+  auto tid = std::this_thread::get_id();
   bool had_errors = false;
   int ctr = 0;
   for (auto it = start; it != end; ++it) {
+    std::string filename;
+    {
+      std::stringstream cmd;
+      cmd << "/tmp/tmp-cleaned-" << tid << "-"
+          << std::distance(start, it) << ".tsv";
+      filename = cmd.str();
+      cmd.str("");
+      cmd << "python /n/fs/gcf/COS513-Finance/clean_single_csv.py ";
+      cmd << *it << " " << filename;
+      auto cmdstr = cmd.str();
+      std::cout << "tid " << tid << ": running " << cmdstr << std::endl;
+      system(cmdstr.c_str());
+    }
 
-
-    std::ifstream in(*it);
-    std::cout << "tid " << tid << ": started " << *it << std::endl;
-    iterate_lines([&had_errors, tid, db, &ctr](std::string str) {
-        had_errors |= read_rec(tid, db, std::move(str), ctr);
+    std::ifstream in(filename);
+    std::cout << "tid " << tid << ": started " << filename << std::endl;
+    iterate_lines([&had_errors, db, &ctr](std::string str) {
+        had_errors |= read_rec(db, std::move(str), ctr);
       }, in);
   }
   return had_errors;
@@ -78,21 +93,13 @@ bool serial_read_files(int tid, It start, It end, leveldb::DB* db) {
 
 void put_all_files(leveldb::DB* db, const std::vector<std::string>& files,
                    int concurrency) {
-  std::vector<std::future<bool>> futs;
-  int jump = files.size() / concurrency;
-  for (int i = 0; i < concurrency; ++i) {
-    auto start = files.begin() + i * jump;
-    auto end = i + 1 == concurrency ? files.end() : start + jump;
-    futs.push_back(std::async(std::launch::async, serial_read_files, i,
-                              start, end, db));
-  }
+  auto errors = parallel_for(concurrency, serial_read_files, files, db);
 
-  for (auto& fut : futs) {
-    if (fut.get()) {
+  for (bool err : errors)
+    if (err) {
       std::cerr << "Errors occured!" << std::endl;
       std::exit(1);
     }
-  }
 }
 
 int main(int argc, char* argv[]) {
