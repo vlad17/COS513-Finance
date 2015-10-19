@@ -29,7 +29,10 @@ NUM_CATEGORIES = 5
 
 # D = sys.argv[0]  # number of dimensions of each news event
 D = 2
-tsne_filename = sys.argv[0]
+# tsne_filename = sys.argv[0]
+tsne_filename = '../cleaned-data-0401-0414/theta-1.1-no_dims-3-perplexity-3-rand-73.out'
+date_start = '2015-04-01'
+date_end = '2015-04-15'
 # tsne_filename = 'all_days.out'
 # hmm_filename = sys.argv[2]
 # output_filename = sys.argv[3]
@@ -37,25 +40,23 @@ tsne_filename = sys.argv[0]
 output_filename = 'all_days_models.json'
 all_days_file = 'all_days.csv'
 
+epoch = datetime.datetime(1970,1,1)
+start_since_epoch = datetime.strptime(date_start, '%Y-%m-%d')
+end_since_epoch = datetime.strptime(date_end, '%Y-%m-%d')
+
 # get day counts
-date_counts = []
+date_counts = [0 for i in range(end_since_epoch - start_since_epoch)]
+
 with open(all_days_file, 'r') as all_days:
     reader = csv.reader(all_days, delimiter='\t')
 
-    last_date = -1
-    date_count = 1
     for row in reader:
         date = row[0]
+        diff_from_start = date - start_since_epoch
+        if diff_from_start in range(end_since_epoch - start_since_epoch):
+            date_counts[diff_from_start] += 1
 
-        if last_date == date:
-            date_count += 1
-        else:
-            date_counts.append(date_count)
-            date_count = 1
-
-        last_date = date
-
-ipdb.set_trace()
+# ipdb.set_trace()
 
 
 

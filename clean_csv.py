@@ -7,6 +7,7 @@ import csv
 from datetime import datetime
 import tldextract
 import sys
+import os
 
 
 NUM_FIELDS = 58
