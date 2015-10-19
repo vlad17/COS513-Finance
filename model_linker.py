@@ -30,7 +30,7 @@ NUM_CATEGORIES = 5
 # D = sys.argv[0]  # number of dimensions of each news event
 D = 2
 # tsne_filename = sys.argv[0]
-tsne_filename = '../cleaned-data-0401-0414/theta-1.1-no_dims-3-perplexity-3-rand-73.out'
+tsne_filename = 'data/theta-1.1-no_dims-3-perplexity-3-rand-73.out'
 date_start = '2015-04-01'
 date_end = '2015-04-15'
 # tsne_filename = 'all_days.out'
@@ -38,22 +38,22 @@ date_end = '2015-04-15'
 # output_filename = sys.argv[3]
 # price_filename = ''
 output_filename = 'all_days_models.json'
-all_days_file = 'all_days.csv'
+all_days_file = 'data/all_days.csv'
 
 epoch = datetime.datetime(1970,1,1)
-start_since_epoch = datetime.strptime(date_start, '%Y-%m-%d')
-end_since_epoch = datetime.strptime(date_end, '%Y-%m-%d')
+start_since_epoch = datetime.datetime.strptime(date_start, '%Y-%m-%d') - epoch
+end_since_epoch = datetime.datetime.strptime(date_end, '%Y-%m-%d') - epoch
 
 # get day counts
-date_counts = [0 for i in range(end_since_epoch - start_since_epoch)]
+date_counts = [0 for i in range((end_since_epoch - start_since_epoch).days)]
 
 with open(all_days_file, 'r') as all_days:
     reader = csv.reader(all_days, delimiter='\t')
 
     for row in reader:
-        date = row[0]
-        diff_from_start = date - start_since_epoch
-        if diff_from_start in range(end_since_epoch - start_since_epoch):
+        date = int(row[0])
+        diff_from_start = date - start_since_epoch.days
+        if diff_from_start in range((end_since_epoch - start_since_epoch).days):
             date_counts[diff_from_start] += 1
 
 # ipdb.set_trace()
@@ -130,29 +130,8 @@ news_df = pd.DataFrame(pd.concat([prob_states, weighted_centroids], axis=1))
 
 # logistic regression
 model1 = LogisticRegression()
-# model2 = LogisticRegression()
-# model3 = LogisticRegression()
-# model4 = LogisticRegression()
-# model5 = LogisticRegression()
 
-# for x in set(prob_states):
-
-
-# indices = news_df[news_df['prob_states'] == x].index.tolist()
-
-# if num_days-1 in indices:
-#     indices.remove(num_days-1)
-
-# indices_next = [x+1 for x in indices]
-
-# # features = news_df.ix[:, 1:][indices].T
-# features = news_df[:][indices].T
-# # output = news_df.ix[:, 0][indices_next]    
-# # model1.fit(features, output)
-# model1.fit(features, price_changes)
-
-
-model1.fit(news_df[1:], price_changes)
+model1.fit(news_df.T[1:], price_changes)
 
 with open(output_filename, 'ab+') as outf:
 
