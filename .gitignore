@@ -108,3 +108,12 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Latex
+*.bbl
+*.aux
+*.blg
+*.pdf
+*.run.xml
+*.synctex.gz
+*.bcf
