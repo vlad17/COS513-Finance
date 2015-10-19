@@ -29,7 +29,8 @@ NUM_CATEGORIES = 5
 
 # D = sys.argv[0]  # number of dimensions of each news event
 D = 2
-tsne_filename = sys.argv[0]
+# tsne_filename = sys.argv[0]
+tsne_filename = '../cleaned-data-0401-0414/theta-1.1-no_dims-3-perplexity-3-rand-73.out'
 date_start = '2015-04-01'
 date_end = '2015-04-15'
 # tsne_filename = 'all_days.out'
