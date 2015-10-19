@@ -6,6 +6,7 @@ import csv
 from datetime import datetime
 import tldextract
 import sys
+import os
 
 
 NUM_FIELDS = 58
@@ -85,7 +86,7 @@ def main():
     output_dir = sys.argv[2]
     
     output_file = open(output_dir, 'w+')
-    csv_writer = csv.writer(output_file, delimiter='\t')
+    csv_writer = csv.writer(os.getcwd() + '/' + output_file, delimiter='\t')
 
     for csv_filename in find_csv_filenames(input_dir):
         print csv_filename
