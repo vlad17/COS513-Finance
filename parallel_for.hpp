@@ -47,7 +47,7 @@ void parallel_for(int concurrency, F f, Container& v, Args&&... args) {
 }
 
 template<typename F, typename... Args>
-void parallel_ifor(int concurrency, F f, int lo, int hi, Args&&... args) {
+void parallel_ifor_range(int concurrency, F f, int lo, int hi, Args&&... args) {
   std::vector<std::future<void>> futs;
   int jump = (hi - lo) / concurrency;
   if (jump == 0) jump = 1;
@@ -55,6 +55,17 @@ void parallel_ifor(int concurrency, F f, int lo, int hi, Args&&... args) {
     auto start = lo + i * jump;
     auto end = i + 1 == concurrency ? hi : start + jump;
     futs.push_back(std::async(std::launch::async, f, start, end,
+                              std::forward<Args>(args)...));
+  }
+
+  for (auto& fut : futs) fut.get();
+}
+
+template<typename F, typename... Args>
+void parallel_ifor(int concurrency, F f, Args&&... args) {
+  std::vector<std::future<void>> futs;
+  for (int i = 0; i < concurrency; ++i) {
+    futs.push_back(std::async(std::launch::async, f, i,
                               std::forward<Args>(args)...));
   }
 

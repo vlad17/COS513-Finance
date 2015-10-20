@@ -26,6 +26,7 @@ void add_atomic_double(std::atomic<double>* d, double x) {
 
 typedef std::vector<double> vd;
 typedef std::vector<std::unique_ptr<std::atomic<double>>> vuad;
+typedef std::vector<std::unique_ptr<std::atomic<int>>> vuai;
 
 #define CHECK_OK(status) do {                   \
     if (!(status).ok()) { \
@@ -124,12 +125,100 @@ int main(int argc, char* argv[]) {
 
 static std::vector<std::string> uniform_init(const leveldb::Slice& begin,
                                              const leveldb::Slice& end,
-                                             int K) {
-  auto ibegin = std::stoull(begin.ToString());
-  auto iend = std::stoull(end.ToString());
-  std::vector<std::string> ret;
+                                             int K, int prefix_len = 0) {
+  auto ibegin = std::stoull(begin.ToString().substr(prefix_len));
+  auto iend = std::stoull(end.ToString().substr(prefix_len));
+  std::vector<std::string> ret(K);
   for (auto i = ibegin; i < iend; i += (iend - ibegin) / K) {
-    ret.push_back(std::to_string(i));
+    ret.push_back(begin.ToString().substr(0, prefix_len) + std::to_string(i));
+  }
+  return ret;
+}
+
+struct IterRange {
+  std::unique_ptr<leveldb::Iterator> it;
+  std::function<void(void)> reset;
+  std::function<bool()> should_continue;
+};
+
+std::vector<IterRange> get_par_ranges(
+    const std::vector<std::string>& splits, leveldb::DB* db,
+    const leveldb::Slice& end) {
+  std::vector<IterRange> ret(splits.size());
+  for (int i = 0; i < splits.size(); ++i) {
+    auto it = iter(db);
+    auto start = splits[i];
+    auto ptr = it.get();
+    auto reset = [=]() {
+      ptr->Seek(start);
+      CHECK(ptr->Valid());
+    };
+    if (i == splits.size() - 1) {
+      ret[i] = {std::move(it), std::move(reset), [=]() {
+            return ptr->Valid() && ptr->key().compare(end) <= 0; }};
+    } else {
+      ret[i] = {std::move(it), std::move(reset), [=]() {
+            return ptr->Valid() && ptr->key().compare(splits[i + 1]) < 0; }};
+    }
+  }
+  return ret;
+}
+
+static std::vector<IterRange> range_init(const leveldb::Slice& begin,
+                                         const leveldb::Slice& end,
+                                         int K, leveldb::DB* db) {
+  std::vector<IterRange> ret(K);
+  for (int i = 0; i < K; ++i) {
+    ret[i].it = iter(db);
+    auto ptr = ret[i].it.get();
+    ret[i].reset = [=]() {
+      ptr->Seek(begin);
+      CHECK(ptr->Valid());
+    };
+    ret[i].should_continue = [=]() {
+      return ptr->Valid() && ptr->key().compare(end) <= 0;
+    };
+  }
+  return ret;
+}
+
+static std::vector<IterRange> range_uniform(const leveldb::Slice& begin,
+                                            const leveldb::Slice& end,
+                                            int K, leveldb::DB* db,
+                                            int size) {
+  int jump = size / K;
+  std::vector<IterRange> ret(K);
+  if (jump == 0) {
+    jump = 1;
+    for (int i = size; i < K; ++i) {
+      ret[i].reset = []() {};
+      ret[i].should_continue = []() { return false; };
+    }
+    K = size;
+  }
+  auto it = iter(db);
+  it->Seek(begin);
+  CHECK(it->Valid());
+  int i = 0;
+  for (; i < K; ++i) {
+    CHECK(it->Valid());
+    CHECK(it->key().compare(end) < 0);
+    ret[i].it = iter(db);
+    std::string start = it->key().ToString();
+    auto ptr = ret[i].it.get();
+    ret[i].reset = [=]() {
+      ptr->Seek(start);
+      CHECK(ptr->Valid());
+    };
+    for (int j = 0; j < jump; ++j) {
+      it->Next();
+      CHECK(it->Valid());
+    }
+    std::string lend = it->key().ToString();
+    if (i == K - 1) lend = end.ToString();
+    ret[i].should_continue = [=]() {
+      return ptr->Valid() && ptr->key().compare(lend) < 0;
+    };
   }
   return ret;
 }
@@ -190,16 +279,10 @@ void set_centroid(leveldb::DB* work_db, const leveldb::Slice& key,
   CHECK_OK(work_db->Put({}, get_centroid_prefix(newc, K) + rawkey, key));
 }
 
-struct IterRange {
-  std::unique_ptr<leveldb::Iterator> it;
-  std::function<void(void)> reset;
-  std::function<bool()> should_continue;
-};
-
 typedef std::vector<IterRange>::iterator It;
 void assign_closest_serial(It begin, It end, int K, leveldb::DB* work_db,
                            const std::vector<GDELTMini>& centroids,
-                           vuad& totals) {
+                           vuad& totals, vuai& cluster_sizes) {
   GDELTMini current_row;
   for (auto itit = begin; itit != end; ++itit) {
     auto& range = *itit;
@@ -216,6 +299,7 @@ void assign_closest_serial(It begin, It end, int K, leveldb::DB* work_db,
       }
       CHECK(min >= 0);
       add_atomic_double(totals[min].get(), min_dist);
+      auto i = cluster_sizes[min]->fetch_add(1) + 1;
       int prev = get_centroid(work_db, range.it->key(), K);
       set_centroid(work_db, range.it->key(), prev, min, K);
     }
@@ -227,43 +311,34 @@ void assign_closest(std::vector<IterRange>& parvec,
                     int K,
                     leveldb::DB* work_db,
                     const std::vector<GDELTMini>& centroids,
-                    int concurrency) {
+                    int concurrency,
+                    vuai& cluster_sizes) {
+  for (auto& i : cluster_sizes) i->store(0);
   for (auto& d : totals) d->store(0);
   parallel_for(concurrency, assign_closest_serial,
                parvec, K, work_db, std::cref(centroids),
-               std::ref(totals));
+               std::ref(totals), std::ref(cluster_sizes));
 }
 
-void update_medoids_serial(int lo, int hi, int K, leveldb::DB* db,
-                           leveldb::DB* work_db,
-                           std::vector<GDELTMini>& val_centroids,
-                           std::vector<std::string>& key_centroids,
-                           std::atomic<bool>& change,
-                           const vuad& distances) {
-  auto i = iter(work_db);
-  auto j = iter(work_db);
+typedef std::pair<std::string, GDELTMini> KV;
+void update_medoids_serial(int idx, std::vector<IterRange>& its,
+                           std::vector<IterRange>& jts,
+                           std::vector<KV>& thread_best,
+                           std::vector<double> thread_best_dist,
+                           leveldb::DB* db) {
+  auto& i = its[idx];
+  auto& j = jts[idx];
   GDELTMini current, other;
-
-  for (int cluster = lo; cluster < hi; ++cluster) {
-    double min_dist = distances[cluster]->load();
-    auto current_key = get_centroid_prefix(cluster, K);
-    auto next_key = get_centroid_prefix(cluster + 1, K);
-    auto in_cluster = [&](const std::unique_ptr<leveldb::Iterator>& p) {
-      return p->Valid() && p->key().compare(next_key) < 0;
-    };
-    for (i->Seek(current_key); in_cluster(i); i->Next()) {
-      lookup(db, i->value(), current);
-      double tot = 0;
-      for (j->Seek(current_key); in_cluster(j); j->Next()) {
-        lookup(db, j->value(), other);
+  for (i.reset(); i.should_continue(); i.it->Next()) {
+    lookup(db, i.it->value(), current);
+    double tot = 0;
+    for (j.reset(); j.should_continue(); j.it->Next()) {
+      lookup(db, j.it->value(), other);
         tot += Rho(current, other);
-      }
-      if (tot < min_dist) {
-        min_dist = tot;
-        change.store(true);
-        key_centroids[cluster] = i->value().ToString();
-        val_centroids[cluster] = current;
-      }
+    }
+    if (tot < thread_best_dist[idx]) {
+      thread_best_dist[idx] = tot;
+      thread_best[idx] = std::make_pair(i.it->value().ToString(), current);
     }
   }
 }
@@ -272,37 +347,42 @@ bool update_medoids(int concurrency, int K, leveldb::DB* db,
                     leveldb::DB* work_db,
                     std::vector<GDELTMini>& val_centroids,
                     std::vector<std::string>& key_centroids,
-                    const vuad& distances) {
-  std::atomic<bool> change;
-  change.store(false);
-  parallel_ifor(concurrency, update_medoids_serial, 0, K, K,
-                db, work_db, std::ref(val_centroids),
-                std::ref(key_centroids), std::ref(change),
-                std::cref(distances));
-  return change.load();
-}
+                    const vuad& distances,
+                    const vuai& cluster_sizes) {
+  std::vector<KV> thread_best(concurrency);
+  std::vector<double> thread_best_dist(concurrency);
 
-std::vector<IterRange> get_par_ranges(
-    const std::vector<std::string>& splits, leveldb::DB* db,
-    const leveldb::Slice& end) {
-  std::vector<IterRange> ret;
-  for (int i = 0; i < splits.size(); ++i) {
-    auto it = iter(db);
-    auto start = splits[i];
-    auto ptr = it.get();
-    auto reset = [=]() {
-      ptr->Seek(start);
-      CHECK(ptr->Valid());
-    };
-    if (i == splits.size() - 1) {
-      ret.push_back({std::move(it), std::move(reset), [=]() {
-            return ptr->Valid() && ptr->key().compare(end) <= 0; }});
-    } else {
-      ret.push_back({std::move(it), std::move(reset), [=]() {
-            return ptr->Valid() && ptr->key().compare(splits[i + 1]) < 0; }});
+  bool changed = false;
+
+  for (int cluster = 0; cluster < K; ++cluster) {
+    double min_dist = distances[cluster]->load();
+    auto current_key = get_centroid_prefix(cluster, K);
+    auto next_key = get_centroid_prefix(cluster + 1, K);
+
+    for (auto& d : thread_best_dist) d = min_dist;
+
+    auto parvec_i = range_uniform(current_key, next_key, concurrency,
+                                  work_db, cluster_sizes[cluster]->load());
+    auto parvec_j = range_init(current_key, next_key, concurrency, work_db);
+
+    parallel_ifor(concurrency, update_medoids_serial, std::ref(parvec_i),
+                  std::ref(parvec_j), std::ref(thread_best),
+                  std::ref(thread_best_dist), db);
+
+    auto min = std::distance(thread_best_dist.begin(),
+                            std::min_element(thread_best_dist.begin(),
+                                             thread_best_dist.end()));
+    if (thread_best_dist[min] < min_dist) {
+      key_centroids[cluster] = thread_best[min].first;
+      val_centroids[cluster] = thread_best[min].second;
+    }
+
+    if (true || (cluster + 1) % (K / 100) == 0) {
+      std::cout << "      Cluster update " << (cluster + 1.0) * 100.0 / K
+                << "% done" << std::endl;
     }
   }
-  return ret;
+  return changed;
 }
 
 void RunKMedoids(const leveldb::Slice& begin,
@@ -329,13 +409,16 @@ void RunKMedoids(const leveldb::Slice& begin,
   int i = 0;
   bool centers_changed = true;
   vuad totals(K);
+  vuai cluster_sizes(K);
   for (int i = 0; i < K; ++i) {
+    cluster_sizes[i].reset(new std::atomic<int>);
     totals[i].reset(new std::atomic<double>);
   }
 
   while (centers_changed) {
     auto start = std::chrono::system_clock::now();
-    assign_closest(parvec, totals, K, work_db, val_centroids, concurrency);
+    assign_closest(parvec, totals, K, work_db, val_centroids, concurrency,
+                   cluster_sizes);
     auto tot = std::accumulate(totals.begin(), totals.end(), 0.0,
                                [](double sum, typename vuad::value_type& d) {
                                  return sum + d->load();
@@ -358,7 +441,7 @@ void RunKMedoids(const leveldb::Slice& begin,
     start = std::chrono::system_clock::now();
     centers_changed = update_medoids(concurrency, K, db, work_db,
                                      val_centroids, key_centroids,
-                                     totals);
+                                     totals, cluster_sizes);
     end = std::chrono::system_clock::now();
     std::cout << "    Medoid update took " << secs(start, end)
               << " s" << std::endl;

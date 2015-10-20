@@ -117,3 +117,7 @@ target/
 *.run.xml
 *.synctex.gz
 *.bcf
+
+leveldb_compacter
+leveldb_feeder
+leveldb_kmedoids
