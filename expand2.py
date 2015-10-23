@@ -1,10 +1,7 @@
 import csv
 import sys
 import pickle
-import numpy as np
-from copy import copy
 import time
-import ipdb
 
 column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
@@ -72,54 +69,32 @@ categorical_total = {
     'Actor2Geo_Type': 5,
     'ActionGeo_Type': 1000,
 }
-# import ipdb
+
 def one_hot(number, total):
     one_hot_array = [0 for i in range(total)]
-    n = int(number)
-    if n:
-        one_hot_array[n - 1] = 1
+    one_hot_array[int(number)-1] = 1
 
     return one_hot_array
-
-def copy_slice(master_list, index, list_to_copy):
-    # ipdb.set_trace()
-    # print type(list_to_copy)
-    for i in range(len(list_to_copy)):
-        master_list[index + i] = list_to_copy[i]
-    new_index = index + len(list_to_copy)
-
-    return new_index
 
 
 input_filename = sys.argv[1]
 output_filename = sys.argv[2]
 
 input_file = open(input_filename, 'r')
-# output_file = open(output_filename, 'w')
-# output_writer = csv.writer(output_file, delimiter='\t')
-start = time.time()
+output_file = open(output_filename, 'w')
+output_writer = csv.writer(output_file, delimiter='\t')
+
+start_time = time.time()
 with open('models/word2vec', 'rb') as word2vec_file:
     full_model = pickle.load(word2vec_file)
 with open('models/word2vec_bigram', 'rb') as bigram_file:
     bigram = pickle.load(bigram_file)
-# print time.time() - start
+print time.time() - start_time
 
 start_time = time.time()
-all_lines = input_file.readlines()
-
-NUM_STRINGS = 2
-NUM_NUMERIC = 3
-NUM_IMPORTANCE = 8
-CATEGORICAL_TOTAL = sum(categorical_total.values())
-
-length_of_event = 100 * NUM_STRINGS + NUM_NUMERIC + CATEGORICAL_TOTAL + NUM_IMPORTANCE
-day_array = np.zeros((len(all_lines), length_of_event))
-
-for event in all_lines:
-
-    old_field_counter = 0
-    field_counter = old_field_counter
-    event_counter = 0
+for event in input_file.readlines():
+    expanded = []
+    importance = []
 
     fields = event.split('\t')
     for i, field in enumerate(fields):
@@ -128,12 +103,9 @@ for event in all_lines:
         combined_cameo = 0
 
         if field_type == 'importance':
-            # print 'importance'
-
-            field_counter = copy_slice(day_array[event_counter], field_counter, [field])
+            importance.append(field)
 
         elif field_type == 'categorical':
-            # print 'categorical'
             category = column_idx[i]
 
             if category == 'CAMEOCode2' or category == 'CAMEOCode3':
@@ -141,12 +113,10 @@ for event in all_lines:
 
             category_total = categorical_total[category]
             one_hot_array = one_hot(field, category_total)
-            # print len(one_hot_array)
 
-            field_counter = copy_slice(day_array[event_counter], field_counter, one_hot_array)
+            expanded.extend(one_hot_array)
 
         elif field_type == 'string':
-            # print 'string'
             split_field = field.split(' ')
             if len(split_field) == 1:
                 try:
@@ -160,16 +130,19 @@ for event in all_lines:
                     continue
             else: # TODO can add trigrams if needed
                 continue
-            # print word_vec
-            # ipdb.set_trace()
-            field_counter = copy_slice(day_array[event_counter], field_counter, word_vec.tolist()[0])
+
+            expanded.extend(word_vec)
 
         else:
-            # print 'else/numeric'
-            field_counter = copy_slice(day_array[event_counter], field_counter, [field])
+            expanded.append(field)
 
-np.savetxt(output_filename, day_array, delimiter='\t')
-# print time.time() - start_time
+    expanded.extend(importance)
+
+    output_writer.writerow(expanded)
+print time.time() - start_time
+
+input_file.close()
+output_file.close()
 
 
 
