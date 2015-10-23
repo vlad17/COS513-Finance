@@ -1,8 +1,6 @@
-from gensim.models import Word2Vec, Phrases
-from nltk.corpus import brown
-import gensim
 import csv
 import sys
+import pickle
 
 column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
@@ -78,23 +76,15 @@ def one_hot(number, total):
     return one_hot_array
 
 
-input_filename = sys.argv[0]
-output_filename = sys.argv[1]
+input_filename = sys.argv[1]
+output_filename = sys.argv[2]
 
 input_file = open(input_filename, 'r')
 output_file = open(output_filename, 'w')
 output_writer = csv.writer(output_file, delimiter='\t')
 
-# set up word2vec
-brown_sents = brown.sents()
-brown_lower = []
-for sentence in brown_sents:
-    sentence = [word.lower() for word in sentence]
-    brown_lower.append(sentence)
-
-bigram = Phrases(brown_lower)
-full_model = gensim.models.Word2Vec(bigram[brown_lower], min_count=1)
-
+full_model = pickle.load('models/word2vec')
+bigram = pickle.load('models/word2vec_bigram')
 
 for event in input_file.readlines():
     expanded = []
