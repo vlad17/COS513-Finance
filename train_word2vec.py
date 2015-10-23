@@ -12,8 +12,8 @@ for sentence in brown_sents:
 bigram = Phrases(brown_lower)
 full_model = Word2Vec(bigram[brown_lower], min_count=1)
 
-full_model_out = open('models/word2vec', 'w')
-bigram_out = open('models/word2vec_bigram', 'w')
+with open('models/word2vec', 'wb') as full_model_out:
+    pickle.dump(full_model, full_model_out)
 
-pickle.dump(full_model, full_model_out)
-pickle.dump(bigram, bigram_out)
+with open('models/word2vec_bigram', 'wb') as bigram_out:
+    pickle.dump(bigram, bigram_out)
