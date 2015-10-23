@@ -71,10 +71,11 @@ categorical_total = {
 
 def one_hot(number, total):
     one_hot_array = [0 for i in range(total)]
-    one_hot_array[number-1] = 1
+    n = int(number)
+    if n:
+        one_hot_array[n - 1] = 1
 
     return one_hot_array
-
 
 input_filename = sys.argv[1]
 output_filename = sys.argv[2]
@@ -88,7 +89,9 @@ with open('models/word2vec', 'rb') as word2vec_file:
 with open('models/word2vec_bigram', 'rb') as bigram_file:
     bigram = pickle.load(bigram_file)
 
-for event in input_file.readlines():
+all_lines = input_file.readlines()
+# TODO numpy array prealloc
+for line in all_lines:
     expanded = []
     importance = []
 
@@ -136,8 +139,8 @@ for event in input_file.readlines():
 
     output_writer.writerow(expanded)
 
-    input_file.close()
-    output_file.close()
+input_file.close()
+output_file.close()
 
 
 
