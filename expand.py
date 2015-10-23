@@ -1,6 +1,8 @@
 import csv
 import sys
 import pickle
+import numpy
+from copy import copy
 
 column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
@@ -81,8 +83,8 @@ input_filename = sys.argv[1]
 output_filename = sys.argv[2]
 
 input_file = open(input_filename, 'r')
-output_file = open(output_filename, 'w')
-output_writer = csv.writer(output_file, delimiter='\t')
+# output_file = open(output_filename, 'w')
+# output_writer = csv.writer(output_file, delimiter='\t')
 
 with open('models/word2vec', 'rb') as word2vec_file:
     full_model = pickle.load(word2vec_file)
@@ -90,57 +92,72 @@ with open('models/word2vec_bigram', 'rb') as bigram_file:
     bigram = pickle.load(bigram_file)
 
 all_lines = input_file.readlines()
-# TODO numpy array prealloc
-for line in all_lines:
-    expanded = []
-    importance = []
 
-    fields = event.split('\t')
-    for i, field in enumerate(fields):
-        field_type = column_types[column_idx[i]]
+NUM_STRINGS = 2
+NUM_NUMERIC = 3
+NUM_IMPORTANCE = 8
+CATEGORICAL_TOTAL = sum(categorical_total.values())
 
-        combined_cameo = 0
+length_of_event = 100 * NUM_STRINGS + NUM_NUMERIC + CATEGORICAL_TOTAL + NUM_IMPORTANCE
+day_array = np.zeros(len(all_lines), length_of_event)
 
-        if field_type == 'importance':
-            importance.append(field)
+with open(input_file, 'r') as inf:
+    old_field_counter = 0
+    field_counter = old_field_counter
+    event_counter = 0
+    for event in inf:
 
-        elif field_type == 'categorical':
-            category = column_idx[i]
+        fields = event.split('\t')
+        for i, field in enumerate(fields):
+            field_type = column_types[column_idx[i]]
 
-            if category == 'CAMEOCode2' or category == 'CAMEOCode3':
-                continue
+            combined_cameo = 0
 
-            category_total = categorical_total[category]
-            one_hot_array = one_hot(field, category_total)
+            if field_type == 'importance':
 
-            expanded.extend(one_hot_array)
+                field_counter += 1
+                day_array[event_counter][old_field_counter:field_counter] = field
 
-        elif field_type == 'string':
-            split_field = field.split(' ')
-            if len(split_field) == 1:
-                try:
-                    word_vec = full_model[split_field]
-                except:
+
+            elif field_type == 'categorical':
+                category = column_idx[i]
+
+                if category == 'CAMEOCode2' or category == 'CAMEOCode3':
                     continue
-            elif len(split_field) == 2:
-                try:
-                    word_vec = full_model[bigram[split_field]]
-                except:
+
+                category_total = categorical_total[category]
+                one_hot_array = one_hot(field, category_total)
+
+                field_counter += len(one_hot_array)
+                day_array[event_counter][old_field_counter:field_counter] = copy(one_hot_array)
+
+            elif field_type == 'string':
+                split_field = field.split(' ')
+                if len(split_field) == 1:
+                    try:
+                        word_vec = full_model[split_field]
+                    except:
+                        continue
+                elif len(split_field) == 2:
+                    try:
+                        word_vec = full_model[bigram[split_field]]
+                    except:
+                        continue
+                else: # TODO can add trigrams if needed
                     continue
-            else: # TODO can add trigrams if needed
-                continue
 
-            expanded.extend(word_vec)
+                field_counter += len(word_vec)
 
-        else:
-            expanded.append(field)
+                day_array[event_counter][old_field_counter:field_counter] = copy(word_vec)
 
-    expanded.extend(importance)
+            else:
+                field_counter += 1
+                day_array[event_counter][old_field_counter:field_counter] = field
 
-    output_writer.writerow(expanded)
+            old_field_counter = field_counter
 
-input_file.close()
-output_file.close()
+np.savetxt(output_filename, day_array, delimiter='\t')
+
 
 
 
