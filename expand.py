@@ -83,8 +83,10 @@ input_file = open(input_filename, 'r')
 output_file = open(output_filename, 'w')
 output_writer = csv.writer(output_file, delimiter='\t')
 
-full_model = pickle.load('models/word2vec')
-bigram = pickle.load('models/word2vec_bigram')
+with open('models/word2vec', 'rb') as word2vec_file:
+    full_model = pickle.load(word2vec_file)
+with open('models/word2vec_bigram', 'rb') as bigram_file:
+    bigram = pickle.load(bigram_file, 'rb')
 
 for event in input_file.readlines():
     expanded = []
