@@ -214,7 +214,7 @@ def clean_row(row, day, cameos):
         if not new_row[-1]: return None
 
     for col in ['Actor1Name', 'Actor2Name']:
-        new_row.append(row[column_idx[col]])
+        new_row.append(row[column_idx[col]].lower())
 
     return new_row
 
