@@ -99,7 +99,7 @@ NUM_IMPORTANCE = 8
 CATEGORICAL_TOTAL = sum(categorical_total.values())
 
 length_of_event = 100 * NUM_STRINGS + NUM_NUMERIC + CATEGORICAL_TOTAL + NUM_IMPORTANCE
-day_array = np.zeros(len(all_lines), length_of_event)
+day_array = np.zeros((len(all_lines), length_of_event))
 
 with open(input_file, 'r') as inf:
     old_field_counter = 0
