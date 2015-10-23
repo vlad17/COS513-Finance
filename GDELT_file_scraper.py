@@ -8,8 +8,8 @@ import sys
 gdelt_site = 'http://data.gdeltproject.org/events/'
 url_opener = urllib.URLopener()
 
-# year = sys.argv[1]
-month = sys.argv[1]
+year = sys.argv[1]
+month = sys.argv[2]
 
 
 
@@ -24,7 +24,7 @@ def download_file(filename):
 
 
 for day in range(1,32):
-    filename = '2015' + str(month).zfill(2) + str(day).zfill(2) + '.export.CSV.zip'
+    filename = year + str(month).zfill(2) + str(day).zfill(2) + '.export.CSV.zip'
     download_file(filename)
 
 # if int(year) > 2005: # year = 2006 or later
