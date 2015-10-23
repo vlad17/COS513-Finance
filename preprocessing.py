@@ -218,7 +218,7 @@ def clean_row(row, day, cameos):
 
     return new_row
 
-compatibleFile = re.compile('\d\d\d\d\d\d\d\d\.export\.CSV')
+compatibleFile = re.compile('.*\d\d\d\d\d\d\d\d\.export\.CSV')
 
 def main():
     if len(sys.argv) != 3 and len(sys.argv) != 4:
@@ -236,11 +236,12 @@ def main():
     unique_cameos = list_to_idx_dict(unique_cameos, 1)
 
     inbase = os.path.basename(inputfile)
+    suffix = "YYYYMMDD.export.CSV"
     if not compatibleFile.match(inbase):
-        print("inputfile should match YYYYMMDD.export.CSV")
+        print("inputfile should match .*" + suffix)
         return 1
 
-    news_day = parse_day(inbase[:8])
+    news_day = parse_day(inbase[-len(suffix):][:8])
     
     print("Converting", inputfile, "to", outputfile)
     
