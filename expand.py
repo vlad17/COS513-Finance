@@ -4,7 +4,7 @@ import gensim
 import csv
 import sys
 
-column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCode2', 'CAMEOCode3', 'CAMEOCode', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
+column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
 column_idx = dict(zip(range(len(column_names)), column_names))
 
@@ -18,9 +18,7 @@ column_types = {
     'NumArticles': 'importance',
     'AvgTone': 'importance',
     'CAMEOCode1': 'categorical',
-    'CAMEOCode2': 'categorical',
-    'CAMEOCode3': 'categorical',
-    'CAMEOCode': 'categorical',
+    'CAMEOCodeFull': 'categorical',
     'IsCooperative': 'numeric',
     'Actor1Country': 'categorical',
     'Actor2Country': 'categorical',
@@ -65,7 +63,7 @@ string_idx = {
 
 categorical_total = {
     'CAMEOCode1': 20,
-    'CAMEOCode': 350,
+    'CAMEOCodeFull': 350,
     'Actor1Country': 1000,
     'Actor2Country': 1000,
     'Actor1Geo_Type': 5,
