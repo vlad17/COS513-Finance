@@ -90,7 +90,7 @@ with open(tsne_filename, 'rb') as fid:
 data_array = data_array.reshape((-1, D))[valid_indices]
 
 # cluster data
-NUM_CLUSTERS = 100
+NUM_CLUSTERS = 8
 centroids, labels = kmeans2(whiten(data_array), NUM_CLUSTERS, iter=20)
 
 # fig = plt.figure(1, figsize=(4, 3))
@@ -111,7 +111,7 @@ def get_weighted_centroids(news_events, date_counts, start_date):
     last_index = 0
 
     for i, date_count in enumerate(date_counts):
-        label_counts = np.array([0]*NUM_CLUSTERS, dtype=float)
+        label_counts = np.array([0 for i in range(NUM_CLUSTERS)], dtype=float)
 
         for data_index in range(last_index, last_index+date_count):
             label_counts[labels[data_index]] += 1
@@ -136,7 +136,7 @@ weighted_centroids = get_weighted_centroids(data_array, date_counts, start_date)
 # read hmm states
 hmm_states = []
 # create random 2 state hmm sequence
-for i in range(100):
+for i in range(15):
     hmm_states.extend(np.random.dirichlet(np.ones(2), size=1))
 
 # transform probabilistic markov states into max likelihood
@@ -146,17 +146,20 @@ prob_states = pd.Series(prob_states, name='prob_states')
 
 #####################################################################################################
 
-news_df = pd.DataFrame(pd.concat([prob_states, weighted_centroids], axis=1))
+news_df = pd.DataFrame(pd.concat([prob_states.T, weighted_centroids], axis=0))
 news_df_t = news_df.T
 
 train = news_df_t[:-4]
 test = news_df_t[-4:]
+train_y = price_changes[:-3]
+test_y = price_changes[-4:]
+
 
 # logistic regression
 model1 = LogisticRegression()
 
-model1.fit(train, price_changes[:-3])
-model1.score(test, price_changes[-4:])
+model1.fit(train, train_y)
+model1.score(test, test_y)
 
 with open(output_filename, 'ab+') as outf:
     pickle.dump(model1, outf)
