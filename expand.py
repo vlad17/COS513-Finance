@@ -2,6 +2,8 @@ import csv
 import sys
 import pickle
 import time
+import numpy as np
+import ipdb
 
 column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
@@ -91,10 +93,13 @@ with open('models/word2vec_bigram', 'rb') as bigram_file:
     bigram = pickle.load(bigram_file)
 # print time.time() - start_time
 
+all_data = []
+
 start_time = time.time()
 for event in input_file.readlines():
     expanded = []
     importance = []
+
 
     fields = event.split('\t')
     for i, field in enumerate(fields):
@@ -141,8 +146,15 @@ for event in input_file.readlines():
             expanded.append(field)
 
     expanded.extend(importance)
+    # ipdb.set_trace()
+    np_expanded = np.array(expanded)
+    # np.concatenate([all_data, np_expanded])
 
-    output_writer.writerow(expanded)
+# np.savetxt(output_filename, all_data, delimiter='\t')
+
+
+
+    output_writer.writerow(np_expanded)
 # print time.time() - start_time
 
 input_file.close()
