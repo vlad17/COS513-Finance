@@ -100,7 +100,7 @@ for event in input_file.readlines():
     for i, field in enumerate(fields):
         try:
             field_type = column_types[column_idx[i]]
-        except:
+        except KeyError:
             print event
 
         combined_cameo = 0
