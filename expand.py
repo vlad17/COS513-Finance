@@ -161,8 +161,9 @@ def main():
                 tot_rows += 1
     print('{}s'.format(elapsed()))
     print('Dropped {} of {}'.format(dropped_rows, tot_rows))
-    tot_cols = sum((categorical_total[col] if coltype == 'categorical' else 1
-                    for col, coltype in column_types.items()))
+    tot_cols = sum((categorical_total[col] if coltype == 'categorical' else
+                    0 if coltype == 'string' else # TODO rm once we use w2v
+                    1 for col, coltype in column_types.items()))
     imp_cols = list(column_types.values()).count('importance')
     print('Total columns: {}, last {} are importance'.format(tot_cols, imp_cols))
     

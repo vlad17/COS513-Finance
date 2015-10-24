@@ -22,6 +22,8 @@ import fileinput
 import pickle
 import sys
 
+TOPIC_COLUMNS = 938 # TODO increase by 200 with word2vec
+
 def main():
     if len(sys.argv) != 4:
         print(__doc__)
@@ -32,7 +34,8 @@ def main():
     K = int(sys.argv[3])
 
     print("Reading in", len(infiles), "files")
-    fullarr = np.loadtxt(fileinput.input(infiles), delimiter='\t')
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t',
+                         usecols = range(TOPIC_COLUMNS))
 
     print("Normalizing and whitening input data")
     scale(fullarr, copy = False)
