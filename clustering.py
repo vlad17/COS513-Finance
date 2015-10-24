@@ -34,7 +34,7 @@ def main():
     fullarr = []
     for file_path in infiles:
         fullarr.append(
-            np.genfromtxt(file_path, delimiter=','
+            np.genfromtxt(file_path, delimiter=','))
     # fullarr = np.genfromtxt(fileinput.input(infiles), delimiter='\t', dtype='f8')
 
     print("Normalizing and whitening input data")
