@@ -33,7 +33,6 @@ def main():
 
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter='\t')
-    #fullarr = np.genfromtxt((read(f) for f in infiles))
 
     print("Normalizing and whitening input data")
     scale(fullarr, copy = False)

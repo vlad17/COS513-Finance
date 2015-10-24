@@ -1,8 +1,31 @@
+"""
+Usage: python expand.py infile outfile [models_dir]
+
+Loads word2vec model from models_dir directory from pickle file of the same
+name. Similarly for word2vec_(bi|tri|quad)gram. Default models_dir is
+/n/fs/gcf/COS513-Finance/models.
+
+Translates the schema outputted from preprocessing.py to a numerical-only
+float array, printed in csv format to outfile.
+"""
 import csv
 import sys
 import pickle
 import time
+import os
 import numpy as np
+
+from contextlib import contextmanager
+from timeit import default_timer
+import time 
+
+@contextmanager
+def elapsed_timer():
+    start = default_timer()
+    elapser = lambda: default_timer() - start
+    yield lambda: elapser()
+    end = default_timer()
+    elapser = lambda: end-start
 
 column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
@@ -31,44 +54,14 @@ column_types = {
     'Actor2Name': 'string',
 }
 
-importance_idx = {
-    'EventDaysSinceEpoch': 0,
-    'PublishedDaysSinceEpoch': 1,
-    'IsVerbal': 2,
-    'GoldsteinScale': 3,
-    'NumMentions': 4,
-    'NumSources': 5,
-    'NumArticles': 6,
-    'AvgTone': 7,
-}
-categorical_idx = {
-    'CAMEOCode1': 8,        # 1-20
-    'CAMEOCode2': 9,        # 1-100
-    'CAMEOCode3': 10,       # 1-10
-    'Actor1Country': 12,    # 1-1000
-    'Actor2Country': 13,    # 1-1000
-    'Actor1Geo_Type': 14,   # 1-5
-    'Actor2Geo_Type': 15,   # 1-5
-    'ActionGeo_Type': 16,   # 1-1000
-}
-numeric_idx = {
-    'IsCooperative': 11,
-    'ActionGeo_Lat': 17,
-    'ActionGeo_Long': 18,
-}
-string_idx = {
-    'Actor1Name': 19,
-    'Actor2Name': 20,
-}
-
 categorical_total = {
     'CAMEOCode1': 20,
     'CAMEOCodeFull': 350,
-    'Actor1Country': 1000,
-    'Actor2Country': 1000,
+    'Actor1Country': 275,
+    'Actor2Country': 275,
     'Actor1Geo_Type': 5,
     'Actor2Geo_Type': 5,
-    'ActionGeo_Type': 1000,
+    'ActionGeo_Type': 5,
 }
 
 def one_hot(number, total):
@@ -78,35 +71,9 @@ def one_hot(number, total):
     return one_hot_array
 
 
-input_filename = sys.argv[1]
-output_filename = sys.argv[2]
-
-input_file = open(input_filename, 'r')
-output_file = open(output_filename, 'w')
-output_writer = csv.writer(output_file, delimiter='\t')
-
-start_time = time.time()
-full_model = bigram = trigram = quadgram = None
-with open('models/word2vec', 'rb') as word2vec_file:
-    full_model = pickle.load(word2vec_file)
-with open('models/word2vec_bigram', 'rb') as bigram_file:
-    bigram = pickle.load(bigram_file)
-with open('models/word2vec_trigram', 'rb') as bigram_file:
-    trigram = pickle.load(bigram_file)
-with open('models/word2vec_quadgram', 'rb') as bigram_file:
-    quadgram = pickle.load(bigram_file)
-
-all_data = []
-
-start_time = time.time()
-tot_rows = 0
-dropped_rows = 0
-for event in input_file.readlines():
+def expand_row(fields):
     expanded = []
     importance = []
-
-    fields = event.split('\t')
-    drop_line = False
     for i, field in enumerate(fields):
 
         field_type = column_types[column_idx[i]]
@@ -143,20 +110,63 @@ for event in input_file.readlines():
                 else:
                     word_vec = full_model[quadgram[trigram[bigram[split_field]]]].tolist()[0]
             except KeyError:
-                drop_line = True
-                continue
+                return None
             expanded.extend(word_vec)
         else:
             expanded.append(field)
     expanded.extend(importance)
+    return expanded
 
-    if drop_line:
-        dropped_rows += 1
-    else:
-        output_writer.writerow(expanded)
-    tot_rows += 1
+def load_models(models_dir):
+    print('Loading models... ', end='')
+    with elapsed_timer() as elapsed:
+        with open(os.path.join(models_dir, 'word2vec'), 'rb') as word2vec_file:
+            full_model = pickle.load(word2vec_file)
+        with open(os.path.join(models_dir, 'word2vec_bigram'), 'rb') as b:
+            bigram = pickle.load(b)
+        with open(os.path.join(models_dir, 'word2vec_trigram'), 'rb') as t:
+            trigram = pickle.load(t)
+        with open(os.path.join(models_dir, 'word2vec_quadgram'), 'rb') as q:
+            quadgram = pickle.load(q)
+    print('{}s'.format(elapsed()))
+    return (full_model, bigram, trigram, quadgram)
 
-print("Dropped", dropped_rows, "of", tot_rows)
 
-input_file.close()
-output_file.close()
+def main():
+    if len(sys.argv) != 3 and len(sys.argv) != 4:
+        print(__doc__)
+        return 1
+
+    infile = sys.argv[1]
+    outfile = sys.argv[2]
+    models_dir = '/n/fs/gcf/COS513-Finance/models'
+    if len(sys.argv) == 4:
+        models_dir = sys.argv[3]
+
+    with open(infile, 'r') as i, open(outfile, 'w') as o:
+        reader = csv.reader(i, delimiter = '\t')
+        writer = csv.writer(o, delimiter = '\t')
+        full_model, bigram, trigram, quadgram = load_models(models_dir)
+        
+        tot_rows = 0
+        dropped_rows = 0
+        print('Expanding rows... ', end = '')
+        with elapsed_timer() as elapsed:
+            for fields in reader:
+                expanded = expand_row(fields)
+                if expanded:
+                    writer.writerow(expanded)
+                else:
+                    dropped_rows += 1
+                tot_rows += 1
+    print('{}s'.format(elapsed()))
+    print('Dropped {} of {}'.format(dropped_rows, tot_rows))
+    tot_cols = sum((categorical_total[col] if coltype == 'categorical' else 1
+                    for col, coltype in column_types.items()))
+    imp_cols = list(column_types.values()).count('importance')
+    print('Total columns: {}, last {} are importance'.format(tot_cols, imp_cols))
+    
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
