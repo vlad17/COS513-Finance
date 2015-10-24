@@ -98,10 +98,11 @@ for event in input_file.readlines():
 
     fields = event.split('\t')
     for i, field in enumerate(fields):
+
         try:
             field_type = column_types[column_idx[i]]
         except KeyError:
-            print event
+            print(event)
 
         combined_cameo = 0
 
