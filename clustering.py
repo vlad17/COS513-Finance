@@ -6,7 +6,7 @@ where you should remember to quote it when invoking the command (else the
 shell will expand the glob pattern for you.
 
 Concatenates the input numpy arrays referenced by the glob pattern,
-then performs clustering, dropping the first 8 importance-related news 
+then performs clustering, dropping the last 8 importance-related news 
 data columns (according to the schema detailed in preprocessing.py and respected
  by expand.py)
 
@@ -14,9 +14,10 @@ Serializes (via pickle) the GMM learned based on the input to outfile.
 """
 
 from glob import glob
-from sklearn.mixture import GMM
+from sklearn.cluster import MiniBatchKMeans
 from sklearn.preprocessing import scale
 import numpy as np
+import itertools
 import fileinput
 import pickle
 import sys
@@ -31,29 +32,23 @@ def main():
     K = int(sys.argv[3])
 
     print("Reading in", len(infiles), "files")
-    fullarr = []
-    for file_path in infiles:
-        fullarr.append(
-            np.genfromtxt(file_path, delimiter=','))
-    # fullarr = np.genfromtxt(fileinput.input(infiles), delimiter='\t', dtype='f8')
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter='\t')
+    #fullarr = np.genfromtxt((read(f) for f in infiles))
 
     print("Normalizing and whitening input data")
     scale(fullarr, copy = False)
 
-    print("Training GMM with K =", K)
+    print("Learning MiniBatchKMeans with K =", K)
 
-    gmm = GMM(n_components = K, covariance_type = 'full')
-    gmm.fit(fullarr)
+    km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
+    km.fit(fullarr)
 
-    cstr = "CONVERGED" if gmm.converged_ else "FAILED TO CONVERGE"
-    print("GMM trained (" + cstr + "), saving.")
+    print("KMeans trained, saving")
 
     with open(outfile, 'wb') as out_model:
-        pickle.dump(gmm, out_model)
+        pickle.dump(km, out_model)
 
-    print("  Means  :", gmm.means_)
-    print("  Weights:", gmm.means_)
-    print("  AIC    :", gmm.aic(fullarr))
+    print("Score:", km.score(fullarr))
     
     return 0
 

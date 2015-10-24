@@ -103,7 +103,14 @@ from datetime import datetime
 import sys
 import os
 import re
+import nltk
+from nltk.corpus import stopwords
 from iso3166 import countries_by_alpha3
+
+nltk.data.path.append("/n/fs/gcf")
+stops = stopwords.words("english")
+def drop_stop_words(words):
+    return ' '.join([word for word in words.split() if word not in stops])
 
 def list_to_idx_dict(ls, start):
     return dict(zip(ls, range(start, start + len(ls))))
@@ -214,7 +221,8 @@ def clean_row(row, day, cameos):
         if not new_row[-1]: return None
 
     for col in ['Actor1Name', 'Actor2Name']:
-        new_row.append(row[column_idx[col]].lower())
+        name = row[column_idx[col]].lower().strip()
+        new_row.append(drop_stop_words(name))
 
     return new_row
 

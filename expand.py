@@ -3,7 +3,6 @@ import sys
 import pickle
 import time
 import numpy as np
-import ipdb
 
 column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
@@ -87,29 +86,30 @@ output_file = open(output_filename, 'w')
 output_writer = csv.writer(output_file, delimiter='\t')
 
 start_time = time.time()
+full_model = bigram = trigram = quadgram = None
 with open('models/word2vec', 'rb') as word2vec_file:
     full_model = pickle.load(word2vec_file)
 with open('models/word2vec_bigram', 'rb') as bigram_file:
     bigram = pickle.load(bigram_file)
-# print time.time() - start_time
+with open('models/word2vec_trigram', 'rb') as bigram_file:
+    trigram = pickle.load(bigram_file)
+with open('models/word2vec_quadgram', 'rb') as bigram_file:
+    quadgram = pickle.load(bigram_file)
 
 all_data = []
 
 start_time = time.time()
+tot_rows = 0
+dropped_rows = 0
 for event in input_file.readlines():
     expanded = []
     importance = []
 
-
     fields = event.split('\t')
+    drop_line = False
     for i, field in enumerate(fields):
 
-        try:
-            field_type = column_types[column_idx[i]]
-        except KeyError:
-            print(event)
-
-        combined_cameo = 0
+        field_type = column_types[column_idx[i]]
 
         if field_type == 'importance':
             importance.append(field)
@@ -117,59 +117,46 @@ for event in input_file.readlines():
         elif field_type == 'categorical':
             category = column_idx[i]
 
-            if category == 'CAMEOCode2' or category == 'CAMEOCode3':
-                continue
-
             category_total = categorical_total[category]
             one_hot_array = one_hot(field, category_total)
 
             expanded.extend(one_hot_array)
 
         elif field_type == 'string':
+            continue
+
+            # TODO: the current model is missing some really obvious stuff,
+            # like singapore and protester. We need to significantly expand our
+            # corpus. For now, we don't even use actor names.
+            
+            field = field.strip()
             split_field = field.split(' ')
-            if len(split_field) == 1:
-                try:
-                    word_vec = full_model[split_field]
-                except:
-                    continue
-            elif len(split_field) == 2:
-                try:
-                    word_vec = full_model[bigram[split_field]]
-                except:
-                    continue
-            else: # TODO can add trigrams if needed
+            try:
+                if len(field) == 0:
+                    word_vec = [0 for i in range(100)]
+                elif len(split_field) == 1:
+                    word_vec = full_model[split_field].tolist()[0]
+                elif len(split_field) == 2:
+                    word_vec = full_model[bigram[split_field]].tolist()[0]
+                elif len(split_field) == 3:
+                    word_vec = full_model[trigram[bigram[split_field]]].tolist()[0]
+                else:
+                    word_vec = full_model[quadgram[trigram[bigram[split_field]]]].tolist()[0]
+            except KeyError:
+                drop_line = True
                 continue
-
-            expanded.extend(word_vec.tolist()[0])
-
+            expanded.extend(word_vec)
         else:
             expanded.append(field)
-
     expanded.extend(importance)
-    # ipdb.set_trace()
-    np_expanded = np.array(expanded)
-    # np.concatenate([all_data, np_expanded])
 
-# np.savetxt(output_filename, all_data, delimiter='\t')
+    if drop_line:
+        dropped_rows += 1
+    else:
+        output_writer.writerow(expanded)
+    tot_rows += 1
 
-
-
-    output_writer.writerow(np_expanded)
-# print time.time() - start_time
+print("Dropped", dropped_rows, "of", tot_rows)
 
 input_file.close()
 output_file.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
