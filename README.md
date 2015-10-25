@@ -6,6 +6,7 @@
 
 Ideas:
 
+* Smarter cluster sampling - not just 150 lines from each day...
 * Try SVM classifier
 * Try linear regression on the return proportions (p[t+1]-p[t])/p[t] in glm.py
 * Use the HMM for up/down classifictation, add its output as another feature
