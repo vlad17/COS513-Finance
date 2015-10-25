@@ -123,10 +123,10 @@ def main():
         all_recalls[cutoff] = avg_recall
 
     print
-    print 'Precisions:'
+    print('Precisions:')
     pprint(all_precisions)
     print
-    print 'Recalls:'
+    print('Recalls:')
     pprint(all_recalls)
 
 
