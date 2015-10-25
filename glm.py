@@ -80,10 +80,10 @@ for reg in ['l1', 'l2']:
 reg = best.get_params(deep = False)['penalty']
 c = best.get_params(deep = False)['C']
 
-train = pd.concat([train, valid])
-train_y = pd.concat([train_y, valid_y])
+#train = pd.concat([train, valid])
+#train_y = pd.concat([train_y, valid_y])
 
-best.fit(train, train_y)
+#best.fit(train, train_y)
 print('Model (reg = {}, c = {}) training acc: {} test accuracy: {}'.format(
     reg, c, best.score(train, train_y), best.score(test, test_y)))
 with open('./models/glm-' + reg + '-' + str(c), 'wb') as outf:
