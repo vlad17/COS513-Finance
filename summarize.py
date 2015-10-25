@@ -67,6 +67,7 @@ def main():
         topics = np.append(topics, np.full((1, N), 1.0), axis = 0)
         importance = np.append(importance, np.full((N, 1), 1.0), axis = 1)
         day = np.dot(topics, importance).flatten()
+        day = np.divide(day, N)
     print('{}s'.format(elapsed()))
 
     with open(outfile, 'w') as o:

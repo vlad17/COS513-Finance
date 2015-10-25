@@ -31,28 +31,27 @@ PublishedDaysSinceEpoch.
 
 Output Schema:
 ***** Importance-related *****
-1. EventDaysSinceEpoch - Days since Unix epoch that event occured. NUMERIC.
-2. PublishedDaysSinceEpoch - Days since Unix epoch that article was published. 
-   NUMERIC. 
-3. IsVerbal - 0 or 1. NUMERIC.
-4. GoldsteinScale - -10 to 10 scale of "weight" of event. NUMERIC.
-5. NumMentions - integer number of mentions of event in article. NUMERIC.
-6. NumSources - number of primary source mentions. NUMERIC.
-7. NumArticles - number of secondary source mentions. NUMERIC.
-8. AvgTone - -100 to 100 indication of positivity/extremity of tone. NUMERIC.
+1. DaysSincePublished - How long since the event's occurence is this news
+   being reported. NUMERIC.
+2. IsVerbal - 0 or 1. NUMERIC.
+3. GoldsteinScale - -10 to 10 scale of "weight" of event. NUMERIC.
+4. NumMentions - integer number of mentions of event in article. NUMERIC.
+5. NumSources - number of primary source mentions. NUMERIC.
+6. NumArticles - number of secondary source mentions. NUMERIC.
+7. AvgTone - -100 to 100 indication of positivity/extremity of tone. NUMERIC.
 ***** Topic-related *****
-9. CAMEOCode1 - Describes high-level event attributes. 20. CATEGORICAL.
-10. CAMEOCodeFull - All event attributes. 350. CATEGORICAL.
-11. IsCooperative - 0 or 1. NUMERIC.
-12. Actor1Country - Country "index". CATEGORICAL. 248.
-13. Actor2Country - Country "index". CATEGORICAL. 248.
-14. Actor1Geo_Type - CATEGORICAL. 5.
-15. Actor2Geo_Type - CATEGORICAL. 5.
-16. ActionGeo_Type - CATEGORICAL. 5.
-17. ActionGeo_Lat - NUMERIC
-18. ActionGeo_Long - NUMERIC
-19. Actor1Name - STRING.
-20. Actor2Name - STRING.
+8. CAMEOCode1 - Describes high-level event attributes. 20. CATEGORICAL.
+9. CAMEOCodeFull - All event attributes. 350. CATEGORICAL.
+10. IsCooperative - 0 or 1. NUMERIC.
+11. Actor1Country - Country "index". CATEGORICAL. 248.
+12. Actor2Country - Country "index". CATEGORICAL. 248.
+13. Actor1Geo_Type - CATEGORICAL. 5.
+14. Actor2Geo_Type - CATEGORICAL. 5.
+15. ActionGeo_Type - CATEGORICAL. 5.
+16. ActionGeo_Lat - NUMERIC
+17. ActionGeo_Long - NUMERIC
+18. Actor1Name - STRING.
+19. Actor2Name - STRING.
 TODO: We can add more stuff, but what to do if it's empty? Right now, we drop
       the row for important (non-name) empty values. What if we impute?
       We can add (Actor*|Action)Geo_CountryCode CATEGORICAL.
@@ -171,12 +170,11 @@ def clean_row(row, day, cameos):
 
     ## Importance-related columns
 
-    # EventDaysSinceEpoch
-    new_row.append(row[column_idx['SQLDATE']])
-    if not new_row[-1]: return None
-
-    # PublishedDaysSinceEpoch
-    new_row.append(day)
+    # DaysSincePublished
+    sqldate = row[column_idx['SQLDATE']]
+    if not sqldate: return None
+    sqldate = parse_day(sqldate)
+    new_row.append(sqldate - day)
 
     # IsVerbal
     quadclass = row[column_idx['QuadClass']]
