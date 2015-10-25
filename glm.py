@@ -15,6 +15,9 @@ from sklearn.linear_model import LogisticRegression
 import pickle
 import itertools
 import sys
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import recall_score
+from pprint import pprint
 
 
 def get_price_info(price_filename, commodity):
@@ -36,8 +39,10 @@ def get_price_info(price_filename, commodity):
 
 def main():    
 
-    summarized_dir = '../summary-data-20130401-20131030/K100/'
+    summarized_dir = '../CORRECT-summary-data-20130401-20151021/100'
+    # print summarized_dir
     summarized_files = glob.glob(summarized_dir + '*.csv')
+    # print summarized_files[0]
     print('Reading {} files'.format(len(summarized_files)))
 
     train_start = '2013-04-01'
@@ -89,6 +94,7 @@ def main():
                                        dual = use_dual and reg == 'l2')
             model.fit(train, train_y)
             score = model.score(valid, valid_y)
+            prob = model.predict_proba(valid)
             if score > best_score:
                 best = model
                 best_score = score
@@ -101,6 +107,29 @@ def main():
     #best.fit(train, train_y)
     print('Model (reg = {}, c = {}) training acc: {} test accuracy: {}'.format(
         reg, c, best.score(train, train_y), best.score(test, test_y)))
+
+    # find precision/recall for cutoffs 
+    cutoffs = [0.1, 0.25, 0.5, 0.75, 0.9]
+    all_precisions = {}
+    all_recalls = {}
+    for cutoff in cutoffs:
+        proba0 = best.predict_proba(test)[:,0]   # probability we predict first class (0)
+        cutoff_preds = np.array(proba0 > cutoff, dtype=int)
+
+        avg_precision = average_precision_score(test_y, cutoff_preds, average='weighted')
+        all_precisions[cutoff] = avg_precision
+
+        avg_recall = recall_score(test_y, cutoff_preds, average='weighted')
+        all_recalls[cutoff] = avg_recall
+
+    print
+    print 'Precisions:'
+    pprint(all_precisions)
+    print
+    print 'Recalls:'
+    pprint(all_recalls)
+
+
     with open('./models/glm-' + reg + '-' + str(c), 'wb') as outf:
         pickle.dump(best, outf)
 
