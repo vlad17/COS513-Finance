@@ -6,8 +6,9 @@ from sklearn.linear_model import LogisticRegression
 import pickle
 
 
-summarized_dir = '../summarized_data/'
+summarized_dir = '../summary-data-20130401-20131030/K100/'
 summarized_files = glob.glob(summarized_dir + '*.csv')
+print('Reading {} files'.format(len(summarized_files)))
 
 train_start = '2013-04-01'
 train_end = '2013-07-31'
@@ -61,10 +62,9 @@ test_y = price_changes[(price_changes.index >= test_start) & (price_changes.inde
 model1 = LogisticRegression()
 
 model1.fit(train, train_y)
-print 'Model error: {}'.format(model1.score(test, test_y))
+print('Model error: {}'.format(model1.score(test, test_y)))
 
-
-with open('./models/glm', 'w') as outf:
+with open('./models/glm', 'wb') as outf:
     pickle.dump(model1, outf)
 
 
