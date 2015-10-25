@@ -39,7 +39,7 @@ def get_price_info(price_filename, commodity):
 
 def main():    
 
-    summarized_dir = '../CORRECT-summary-data-20130401-20151021/100'
+    summarized_dir = '../CORRECT-summary-data-20130401-20151021/100/'
     # print summarized_dir
     summarized_files = glob.glob(summarized_dir + '*.csv')
     # print summarized_files[0]
