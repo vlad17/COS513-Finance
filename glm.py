@@ -4,14 +4,16 @@ import glob
 import fileinput
 from sklearn.linear_model import LogisticRegression
 import pickle
-
+import itertools
 
 summarized_dir = '../summary-data-20130401-20131030/K100/'
 summarized_files = glob.glob(summarized_dir + '*.csv')
 print('Reading {} files'.format(len(summarized_files)))
 
 train_start = '2013-04-01'
-train_end = '2013-07-31'
+train_end = '2013-06-31'
+valid_start = '2013-07-01'
+valid_end = '2013-07-31'
 test_start = '2013-08-01'
 test_end = '2013-09-30'
 
@@ -54,18 +56,38 @@ all_features = all_days.join(price_info_slice)
 train = all_features[(all_features.index >= train_start) & (all_features.index <= train_end)]
 train_y = price_changes[(price_changes.index >= train_start) & (price_changes.index <= train_end)]
 
+valid = all_features[(all_features.index >= valid_start) & (all_features.index <= valid_end)]
+valid_y = price_changes[(price_changes.index >= valid_start) & (price_changes.index <= valid_end)]
+
 test = all_features[(all_features.index >= test_start) & (all_features.index <= test_end)]
 test_y = price_changes[(price_changes.index >= test_start) & (price_changes.index <= test_end)]
 
 
-# logistic regression
-model1 = LogisticRegression()
+use_dual = train.shape[0] < train.shape[1]
+best = None
+best_score = 0
+for reg in ['l1', 'l2']:
+    # choose regularization value based on validation error
+    for c in itertools.chain(np.arange(0.01, 0.1, 0.01), np.arange(0.1, 1, 0.1),
+                             np.arange(1, 10, 1)):
+        model = LogisticRegression(penalty = reg, C = c, tol = 0.000001, 
+                                   dual = use_dual and reg == 'l2')
+        model.fit(train, train_y)
+        score = model.score(valid, valid_y)
+        if score > best_score:
+            best = model
+            best_score = score
+reg = best.get_params(deep = False)['penalty']
+c = best.get_params(deep = False)['C']
 
-model1.fit(train, train_y)
-print('Model error: {}'.format(model1.score(test, test_y)))
+train = pd.concat([train, valid])
+train_y = pd.concat([train_y, valid_y])
 
-with open('./models/glm', 'wb') as outf:
-    pickle.dump(model1, outf)
+best.fit(train, train_y)
+print('Model (reg = {}, c = {}) training acc: {} test accuracy: {}'.format(
+    reg, c, best.score(train, train_y), best.score(test, test_y)))
+with open('./models/glm-' + reg + '-' + str(c), 'wb') as outf:
+    pickle.dump(best, outf)
 
 
 

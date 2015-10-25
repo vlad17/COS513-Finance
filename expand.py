@@ -27,13 +27,12 @@ def elapsed_timer():
     end = default_timer()
     elapser = lambda: end-start
 
-column_names = ['EventDaysSinceEpoch', 'PublishedDaysSinceEpoch', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
+column_names = ['DaysSincePublished', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
 
 column_idx = dict(zip(range(len(column_names)), column_names))
 
 column_types = {
-    'EventDaysSinceEpoch': 'importance',
-    'PublishedDaysSinceEpoch': 'importance',
+    'DaysSincePublished': 'importance',
     'IsVerbal': 'importance',
     'GoldsteinScale': 'importance',
     'NumMentions': 'importance',
