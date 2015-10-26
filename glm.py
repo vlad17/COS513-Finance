@@ -19,6 +19,7 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import recall_score
 from pprint import pprint
 
+k = sys.argv[1]
 
 def get_price_info(price_filename, commodity):
     """ Get changes in price for a commodity over given range """
@@ -39,7 +40,9 @@ def get_price_info(price_filename, commodity):
 
 def main():    
 
-    summarized_dir = '../CORRECT-summary-data-20130401-20151021/100/'
+    summarized_dir = '../CORRECT-summary-data-20130401-20151021/' + k + '/'
+
+    print summarized_dir
     # print summarized_dir
     summarized_files = glob.glob(summarized_dir + '*.csv')
     # print summarized_files[0]
@@ -105,6 +108,8 @@ def main():
     #train_y = pd.concat([train_y, valid_y])
 
     #best.fit(train, train_y)
+    print('------------------------')
+    print('K: {}'.format(k))
     print('Model (reg = {}, c = {}) training acc: {} test accuracy: {}'.format(
         reg, c, best.score(train, train_y), best.score(test, test_y)))
 
@@ -129,8 +134,11 @@ def main():
     print('Recalls:')
     pprint(all_recalls)
 
+    print
+    print(best.score(test, test_y))
 
-    with open('./models/glm-' + reg + '-' + str(c), 'wb') as outf:
+
+    with open('./models/glm-' + k + '-' + reg + '-' + str(c), 'wb') as outf:
         pickle.dump(best, outf)
 
 
