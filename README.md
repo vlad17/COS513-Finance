@@ -6,6 +6,9 @@
 
 Ideas:
 
+* PRIORITY #1: Move data to within an (ignored) subfolder in this git directory, then change scripts to work on relative paths. clone directory on a larger cluster for more paralleled pipeline.
+* Add another feature (number of events per day, N). Also check that lowering scaling by N doesn't make feature floats too small 
+* Currently, the clustering columns (topic-columns) are not scaled/normalized (the were before, on a single-day scope, which is inacurate). Consider using the random sample from clustering.py to generate a pre-processin psuedo-normalization which scales the columns according to a sample mean and sample sd (note MLE bias correction there), both prior to generating the kmeans clusters and before doing a classification.
 * Smarter cluster sampling - not just 150 lines from each day...
 * Try SVM classifier
 * Try linear regression on the return proportions (p[t+1]-p[t])/p[t] in glm.py
