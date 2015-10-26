@@ -92,7 +92,7 @@ def main():
         # choose regularization value based on validation error
         for c in itertools.chain(np.arange(0.01, 0.1, 0.01), np.arange(0.1, 1, 0.1),
                                  np.arange(1, 10, 1)):
-            model = LogisticRegression(penalty = reg, C = c, tol = 0.000001, 
+            model = LogisticRegression(penalty = reg, C = c, tol = 0.0001, 
                                        dual = use_dual and reg == 'l2')
             model.fit(train, train_y)
             score = model.score(valid, valid_y)
@@ -142,6 +142,8 @@ def main():
 
     print
     print(best.score(test, test_y))
+
+
 
 
     with open('./models/glm-' + k + '-' + reg + '-' + str(c), 'wb') as outf:
