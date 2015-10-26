@@ -15,7 +15,11 @@ from sklearn.linear_model import LogisticRegression
 import pickle
 import itertools
 import sys
+from sklearn.metrics import *
+from pprint import pprint
+import matplotlib as plt
 
+k = sys.argv[1]
 
 def get_price_info(price_filename, commodity):
     """ Get changes in price for a commodity over given range """
@@ -36,8 +40,11 @@ def get_price_info(price_filename, commodity):
 
 def main():    
 
-    summarized_dir = '../summary-data-20130401-20131030/K100/'
+    summarized_dir = '../CORRECT-summary-data-20130401-20151021/' + k + '/'
+
+    # print summarized_dir
     summarized_files = glob.glob(summarized_dir + '*.csv')
+    # print summarized_files[0]
     print('Reading {} files'.format(len(summarized_files)))
 
     train_start = '2013-04-01'
@@ -85,10 +92,11 @@ def main():
         # choose regularization value based on validation error
         for c in itertools.chain(np.arange(0.01, 0.1, 0.01), np.arange(0.1, 1, 0.1),
                                  np.arange(1, 10, 1)):
-            model = LogisticRegression(penalty = reg, C = c, tol = 0.000001, 
+            model = LogisticRegression(penalty = reg, C = c, tol = 0.0001, 
                                        dual = use_dual and reg == 'l2')
             model.fit(train, train_y)
             score = model.score(valid, valid_y)
+            prob = model.predict_proba(valid)
             if score > best_score:
                 best = model
                 best_score = score
@@ -99,9 +107,46 @@ def main():
     #train_y = pd.concat([train_y, valid_y])
 
     #best.fit(train, train_y)
+    print('------------------------')
+    print('K: {}'.format(k))
     print('Model (reg = {}, c = {}) training acc: {} test accuracy: {}'.format(
         reg, c, best.score(train, train_y), best.score(test, test_y)))
-    with open('./models/glm-' + reg + '-' + str(c), 'wb') as outf:
+
+    # find precision/recall for cutoffs 
+    cutoffs = [0.1, 0.25, 0.5, 0.75, 0.9]
+    all_precisions = {}
+    all_recalls = {}
+    all_f_scores = {}
+    for cutoff in cutoffs:
+        proba0 = best.predict_proba(test)[:,0]   # probability we predict first class (0)
+        cutoff_preds = np.array(proba0 > cutoff, dtype=int)
+
+        avg_precision = average_precision_score(test_y, cutoff_preds, average='weighted')
+        all_precisions[cutoff] = avg_precision
+
+        avg_recall = recall_score(test_y, cutoff_preds, average='weighted')
+        all_recalls[cutoff] = avg_recall
+
+        f_score = f1_score(test_y, cutoff_preds)
+        all_f_scores[cutoff] = f_score
+
+    print
+    print('Precisions:')
+    pprint(all_precisions)
+    print
+    print('Recalls:')
+    pprint(all_recalls)
+    print
+    print('F Scores:')
+    pprint(all_f_scores)
+
+    print
+    print(best.score(test, test_y))
+
+
+
+
+    with open('./models/glm-' + k + '-' + reg + '-' + str(c), 'wb') as outf:
         pickle.dump(best, outf)
 
 

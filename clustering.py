@@ -15,7 +15,6 @@ Serializes (via pickle) the GMM learned based on the input to outfile.
 
 from glob import glob
 from sklearn.cluster import MiniBatchKMeans
-from sklearn.preprocessing import scale
 import numpy as np
 import itertools
 import fileinput
@@ -36,9 +35,6 @@ def main():
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t',
                          usecols = range(TOPIC_COLUMNS))
-
-    print("Normalizing and whitening input data")
-    scale(fullarr, copy = False)
 
     print("Learning MiniBatchKMeans with K =", K)
 

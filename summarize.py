@@ -6,7 +6,6 @@ label of the each news item in the infile csv, which should be an "expanded"
 format csv, a tab-separated float array.
 """
 
-from sklearn.preprocessing import scale
 import csv
 import numpy as np
 import pickle
@@ -41,11 +40,6 @@ def main():
     print('{}s'.format(elapsed()))
 
     print('topics {} importance {}'.format(topics.shape, importance.shape))
-
-    print('Scaling topics matrix... ', end = '')
-    with elapsed_timer() as elapsed:
-        scale(topics, copy = False)
-    print('{}s'.format(elapsed()))
 
     print('Loading model... ', end = '')
     with elapsed_timer() as elapsed, open(modelfile, 'rb') as i:
