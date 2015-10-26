@@ -15,9 +15,9 @@ from sklearn.linear_model import LogisticRegression
 import pickle
 import itertools
 import sys
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import recall_score
+from sklearn.metrics import *
 from pprint import pprint
+import matplotlib as plt
 
 k = sys.argv[1]
 
@@ -116,6 +116,7 @@ def main():
     cutoffs = [0.1, 0.25, 0.5, 0.75, 0.9]
     all_precisions = {}
     all_recalls = {}
+    all_f_scores = {}
     for cutoff in cutoffs:
         proba0 = best.predict_proba(test)[:,0]   # probability we predict first class (0)
         cutoff_preds = np.array(proba0 > cutoff, dtype=int)
@@ -126,12 +127,18 @@ def main():
         avg_recall = recall_score(test_y, cutoff_preds, average='weighted')
         all_recalls[cutoff] = avg_recall
 
+        f_score = f1_score(test_y, cutoff_preds)
+        all_f_scores[cutoff] = f_score
+
     print
     print('Precisions:')
     pprint(all_precisions)
     print
     print('Recalls:')
     pprint(all_recalls)
+    print
+    print('F Scores:')
+    pprint(all_f_scores)
 
     print
     print(best.score(test, test_y))
