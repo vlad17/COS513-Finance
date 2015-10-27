@@ -17,7 +17,7 @@ import itertools
 import sys
 from sklearn.metrics import *
 from pprint import pprint
-import matplotlib as plt
+# import matplotlib as plt
 
 k = sys.argv[1]
 
