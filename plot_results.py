@@ -68,6 +68,11 @@ ax.set_xscale('log')
 plt.legend()
 
 plt.show()
+plt.savefig('error_v_num_clusters.png')
+# plt.close(fig)
+plt.show()
+
+
 
 print best_file
 
