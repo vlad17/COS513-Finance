@@ -17,7 +17,7 @@ import itertools
 import sys
 from sklearn.metrics import *
 from pprint import pprint
-import matplotlib as plt
+# import matplotlib as plt
 
 k = sys.argv[1]
 
@@ -48,11 +48,11 @@ def main():
     print('Reading {} files'.format(len(summarized_files)))
 
     train_start = '2013-04-01'
-    train_end = '2013-06-31'
-    valid_start = '2013-07-01'
-    valid_end = '2013-07-31'
-    test_start = '2013-08-01'
-    test_end = '2013-09-30'
+    train_end = '2014-09-30'
+    valid_start = '2014-10-01'
+    valid_end = '2014-11-30'
+    test_start = '2014-12-01'
+    test_end = '2015-02-08'
 
     dates = []
     for sfile in summarized_files:
