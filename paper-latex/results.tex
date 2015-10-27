@@ -6,12 +6,12 @@ We trained 54 logistic regression models, varying the number of clusters trained
 
 We also tested precision, recall, and f1 scores for various prediction probability cutoffs between 0.1 and 0.9.
 
-The model with the least error was trained on K=5000, c=2, and used L1 regularization and had an error of 0.492. We plot precision vs recall at various cutoffs. 
+The model with the least error was trained on K=40, c=4, and used L1 regularization and had an error of 0.373. We plot precision vs recall at various cutoffs. 
 
-\includegraphics{precision_v_recall.png}
+\includegraphics{images/precision_v_recall.png}
 
-Train and test errors as a function of K are shown. Models were retrained 20 times each, with randomized initalization constants.
+Train and test errors as a function of K are shown. Models were retrained 20 times each, with randomized initalization constants. Overall, errors were between 0.4 and 0.6 and seemed to hover around expected baseline errors. 
 
-\includegraphics{error_v_k.png}
+\includegraphics{images/error_v_k.png}
 
 We computed the clusters on the a large part of dataset, but due to time constraints had to run initial predictions on the subset of the data that was clustered and coalesced, which did not at the time include the few most recent months reserved for testing. As a result, test data was used for computing K-means. We think this may inflate test accuracy slightly. However, the clusters were also computed from samples of days far in the future of the test data, so those likely had a cancelling adverse effect. In any case, these initial exploratory results are just hints at a possible signal.

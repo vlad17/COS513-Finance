@@ -9,7 +9,7 @@ all_train_errs = {10: [], 20: [], 30: [], 40: [], 50: [], 100: [], 200: [], 300:
 all_test_errs = {10: [], 20: [], 30: [], 40: [], 50: [], 100: [], 200: [], 300: [], 400: [], 500: [], 1000: [], 2000: [], 3000: [], 4000: [], 5000: []}
 k_index = [10,20,30,40,50,100,200,300,400,500,1000,2000,3000,4000,5000]
 
-best_test_err = 0
+best_test_err = 1000
 best_file = ''
 
 for resultf in result_files:
@@ -24,8 +24,8 @@ for resultf in result_files:
         all_train_errs[k].append(train_err)
         all_test_errs[k].append(test_err)
 
-        if test_err > best_test_err:
-            best_test_acc = test_err       
+        if test_err < best_test_err:
+            best_test_err = test_err       
             best_file = resultf
 
 train_means = [0 for i in range(len(k_index))]
