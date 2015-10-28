@@ -8,7 +8,7 @@ Ideas:
 
 * PRIORITY #1: Get training to run on ionic.princeton.edu
 * Scale the date-summary array in glm.py
-* Add another feature (number of events per day, N). Also check that lowering scaling by N doesn't make feature floats too small 
+* Add another feature (number of events per day, N). Also check that lowering scaling by N doesn't make feature floats too small  - handle N = 0 case
 * Cross-validation (see paper)
 * Adaboost (see paper)
 * Extend W2V corpus to have more words, add it as a feature
