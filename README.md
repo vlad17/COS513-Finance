@@ -18,6 +18,9 @@ Ideas:
 * Other linear classifiers: http://scikit-learn.org/stable/modules/linear_model.html - GLM, RANSAC, Bayesian
 * Try linear regression on the return proportions (p[t+1]-p[t])/p[t] in glm.py
 * Use the HMM for up/down classifictation, add its output as another feature
-* Smarter clustering: GMM, IGMM, HDP, SNGP
+* Smarter clustering: GMM, IGMM, HDP, SNGP. Two approaches here:
+  * Apply the dynamic clustering algorithm as a nonparametric model to our random sample. This is most similar to our current pipeline. It would produce an "intrinsic" number of clusters, but this would still be a static clustering pipeline in that the model will eventually grow stale.
+  * Take on a fully bayesian, fully dynamic approach. Add priors to all hyperparameters (and non-hyper parameters - this includes both the linear model and the clusters), and then start on a 0- or 1-cluster prior. Run through our training data, making daily updates to the model (should result in incremental slope changes).
+    * Reasoning: if we have a dynamic number of clusters, then we need to somehow have a variable number of input features to our linear model. To do this, we'll need to have bayesian regression that learns every day (since it would be able to adapt to learn the new slopes as it gains more clusters). This is completely different to train, but is completely dynamic as well. There's no meaningful transition from a static training set to a test set (and with priors over regularization constants there's no need for validation at all). Instead, every day, we just do a bayesian update on the number of clusters, the slopes associated with the features for a given cluster, etc.
 * Get more data, for years <= 2013. Need to convert to YYYYMMDD.export.CSV format. On historical data, we'll need to check the DATE_REPORTED column to recover the same info. Make sure preprocessing.py can handle these differences.
 * Introduce periodicity features (this is day i of period P - how to learn P?)
