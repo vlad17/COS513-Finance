@@ -1,10 +1,11 @@
 Future work for the semester includes, in order of priority (we will probably need help with prioritization here, there's a lot to do):
 \begin{enumerate}
 \item Create and run a 500-machine cluster job for day-wise training on ionic servers
-\item Add some small, but potentially powerful features to improve accuracy: number of events per day, staleness of news
-\item Extend Word2Vec corpus.
-\item Improve $K$-means clustering by focusing on finer-grained search space over $K$ (narrowing range around our best model, above).
+\item Add a feature for the number of events per day.
+\item Consider cross-validation. Our model does not actually ever rely on the absolute time of a day, so we can in theory train on future days and validate on previous ones (we may want to keep training data contiguous, though, because we plan on adding periodicity and dynamic clustering features which would assume contiguousness in time of the training data).
+\item We have a weak classifier. Can we boost it with AdaBoost? Should the weak classifier be a fixed $K$ or should it be generated from a training set by doing cross-validation choosing an appropriate $K$ for each AdaBoost round?
 \item Improve $K$-means clustering by implementing our random-sample-based normalization idea: use the random sample's $\hat{\mu}$ and $\hat{\sigma}$ (corrected for bias) to get z-scores so no column dominates the topic clusters.
+\item Extend Word2Vec corpus.
 \item Investigate the shape of the day-summary vectors in their high-dimensional space. Can they be dimensionally reduced?
 \item Try other classifiers - SVM, Decision Trees, neural nets.
 \item Try linear regression models for predicting returns $\frac{p_{i+1}-p_i}{p_i}$: basic linear, GLM, RANSAC.
