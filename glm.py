@@ -84,7 +84,7 @@ def main():
     test = all_features[(all_features.index >= test_start) & (all_features.index <= test_end)]
     test_y = price_changes[(price_changes.index >= test_start) & (price_changes.index <= test_end)]
 
-    print(sum(np.array(test_y > 0)))
+    print(sum(np.array(test_y > 0)) + ' / ' + len(test_y))
 
 
     use_dual = train.shape[0] < train.shape[1]
