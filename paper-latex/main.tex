@@ -167,6 +167,10 @@
 
 %TODO remember to add runtime info later (not for first run)
 
+%TODO what do our model's residuals look like (if using linear regression) - normal?
+
+%TODO describe the distribution of the day-summaries - what does this high-dimensional feature vector distribution look like over the days? Is it very separable? Can we apply PCA, etc?
+
 \section{Future Work}
 
 % Vlad
@@ -174,9 +178,9 @@
 
 \subsection{Software and Data}
 
-All code used is available at \hyperref[https://github.com/vlad17/COS513-Finance]{https://github.com/vlad17/COS513-Finance}. GDELT provides free access to its database as well: \hyperref[http://data.gdeltproject.org/events/index.html]{http://data.gdeltproject.org/events/index.html}.
+All code used is available in an open-source repository.\footnote{\hyperref[https://github.com/vlad17/COS513-Finance]{\texttt{https://github.com/vlad17/COS513-Finance}}} GDELT provides free access to its database as well.\footnote{ \hyperref[http://data.gdeltproject.org/events/index.html]{\texttt{http://data.gdeltproject.org/events/index.html}}}
 
-Commodities pricing data is retrieved using the \texttt{R} package quantmod, which pulls historical prices using Yahoo: \hyperref[http://www.quantmod.com/]{http://www.quantmod.com/}
+Commodities pricing data is retrieved using the \texttt{R} package \texttt{quantmod}\footnote{\hyperref[http://www.quantmod.com/]{\texttt{http://www.quantmod.com/}}}, which pulls historical prices using Yahoo.
 
 %TODO add a bunch more references everywhere to defend all our claims.
 

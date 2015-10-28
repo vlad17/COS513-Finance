@@ -24,7 +24,9 @@ Our current implementation uses $K$-means for clustering and logistic regression
 
 For our random sample, we sampled an equal number of events from each day. Even though days have variable numbers of events (and the number of reported events reduces as we go back in time), we chose this policy because the increase in news over recent years is not a property of more events occurring, but rather an increase in reporting, which should not affect the distribution of events among their hypothetical clusters of topics.
 
-Raw data starts with 58 columns. Mean line count is ..., standard deviation .... Total size of the set is about 60GB
+The random sample undergoes the same preprocessing and expansion pipeline as described below for the day summaries to be used in the regression, but its output is fed into a clustering model, that is then used in the main pipeline. We are forced to use a sample for tractability.
+
+Raw data starts with 58 columns. Each day typically has 100K rows. Total size of the set is about 60GB. %TODO precise mean and stddev.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -34,8 +36,9 @@ Raw data starts with 58 columns. Mean line count is ..., standard deviation ....
 \end{center}
 \vskip -0.2in
 \label{fig:preprocess}
-\end{figure} 
+\end{figure}
 
+After preprocessing, we are left with $T=12$ topic-related columns and $I=9$ importance columns, where the topic columns are in a compressed format, with categorical variables represented as integers and strings still as strings (though now sanitized and with stop words removed).
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -45,8 +48,11 @@ Raw data starts with 58 columns. Mean line count is ..., standard deviation ....
 \end{center}
 \vskip -0.2in
 \label{fig:exapand}
-\end{figure} 
+\end{figure}
 
+Expansion uses one-hot encoding on categorical features, such as the CAMEO code for the event. As mentioned before, we apply Word2Vec to expand the strings (note: not implemented yet, need larger corpus). %TODO actually do this.
+
+%TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -56,6 +62,16 @@ Raw data starts with 58 columns. Mean line count is ..., standard deviation ....
 \end{center}
 \vskip -0.2in
 \label{fig:summarization}
-\end{figure} 
+\end{figure}
+
+The matrix multiply above conveniently extracts the sum of importance-weighted events belonging to certain topics. Note that this model is extensible to a mixture model, where each event's contribution to a topic's importance for that day is weighed by the probability of belonging to that topic's class. Furthermore, the aggregation creates a uniform description of every day, a flattened vector of dimension dependent on the cluster count.
+
+These daily summaries were then enriched with historical pricing data before being fed into the linear model. The pricing data added was the 5, 10, and 30 day rolling average of the commodity price. %TODO hyperparam selection of rolling mean.
 
 \subsection{Validation}
+
+We partitioned the summarized data into training and validation sets, to train the regression's hyperparameters for regularization. This had several repercussions:
+\begin{enumerate}
+\item We lost a significant amount of training data. Cross-validation is not feasible because one would be attempting to guess past prices based on future data - this is incompatible with the problem of predicting tomorrow's price increase.
+\item The data we lost to the validation set is more recent, so our model may be stale on current data. Is it safe to re-train a model to include the validation set's data as training data?
+\end{enumerate}

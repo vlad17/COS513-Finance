@@ -15,6 +15,7 @@ Ideas:
 * Smarter cluster sampling - not just 150 lines from each day...
 * Try other commodities
 * Try SVM classifier
+* Other linear classifiers: http://scikit-learn.org/stable/modules/linear_model.html - GLM, RANSAC, Bayesian
 * Try linear regression on the return proportions (p[t+1]-p[t])/p[t] in glm.py
 * Use the HMM for up/down classifictation, add its output as another feature
 * Smarter clustering: GMM, IGMM, HDP, SNGP
