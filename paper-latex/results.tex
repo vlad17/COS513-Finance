@@ -8,10 +8,27 @@ We also tested precision, recall, and f1 scores for various prediction probabili
 
 The model with the least error was trained on K=40, c=4, and used L1 regularization and had an error of 0.373. We plot precision vs recall at various cutoffs. 
 
-\includegraphics{images/precision_v_recall.png}
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[scale=0.15]{images/precision_v_recall.png}}
+\caption{Precision vs Recall for the best model}
+\end{center}
+\vskip -0.2in
+\label{fig:precision_v_recall}
+\end{figure} 
 
 Train and test errors as a function of K are shown. Models were retrained 20 times each, with randomized initalization constants. Overall, errors were between 0.4 and 0.6 and seemed to hover around expected baseline errors. 
 
-\includegraphics{images/error_v_k.png}
+
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[scale=0.15]{images/error_v_k.png}}
+\caption{Error vs Number of Clusters}
+\end{center}
+\vskip -0.2in
+\label{fig:error_v_k}
+\end{figure} 
 
 We computed the clusters on the a large part of dataset, but due to time constraints had to run initial predictions on the subset of the data that was clustered and coalesced, which did not at the time include the few most recent months reserved for testing. As a result, test data was used for computing K-means. We think this may inflate test accuracy slightly. However, the clusters were also computed from samples of days far in the future of the test data, so those likely had a cancelling adverse effect. In any case, these initial exploratory results are just hints at a possible signal.
