@@ -4,7 +4,12 @@
 
 [Google Drive Project Folder](https://drive.google.com/a/princeton.edu/folderview?id=0B1BY3pYXuXADUlJTV3llUXJCVE0&usp=sharing_eid&ts=56088709)
 
-Ideas:
+## Packages
+Note: some of our machines have libc version 2.12, so we need to use numpy<=1.7.1
+
+    scipy gensim nltk pandas iso3166 matplotlib sklearn
+
+## Ideas
 
 * PRIORITY #1: Get training to run on ionic.princeton.edu
 * PRIORITY #2: remove glob argument from sample for simplicity.
