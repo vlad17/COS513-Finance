@@ -31,6 +31,9 @@ if [[ "$#" -ne 6 && "$#" -ne 7 ]]; then
     exit 1
 fi
 
+# TODO: smarter dependencies (start training model as soon as expanded is done)
+# TODO: run training one model at a time rather than all synchronously.
+
 R="$1"
 raw_data_dir=$(readlink -f "$2")
 models_dir=$(readlink -f "$3")
