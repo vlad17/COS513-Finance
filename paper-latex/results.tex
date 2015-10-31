@@ -2,11 +2,11 @@ We tested our GLM predictions on silver (XAG) commodity pricing data. Our date r
 
 For baseline values, we simply take the minimum error for predicting either 0 or 1 (price up or price down) for all days. Our baseline error is 0.48.\\
 
-We trained 54 logistic regression models, varying the number of clusters trained on, the inverse regularization strength c, and the type of regularization (L1 or L2). The number of clusters K ranged took values in the set $\{10,20,30,40,50,100,200,300,400,500,1000,2000,3000,4000,5000\}$. Inverse regulartion c was varied between 0.01−0.1 (stepping by 0.01), 0.1−1 (stepping by 0.1), and 1−10 (stepping by 1).\\
+We trained 54 logistic regression models, varying the number of clusters trained on, the inverse regularization strength $c$, and the type of regularization (L1 or L2). The number of clusters $K$ ranged took values in the set $\{10,20,30,40,50,100,200,300,400,500,1000,2000,3000,4000,5000\}$. $c$ was varied between 0.01−0.1 (stepping by 0.01), 0.1−1 (stepping by 0.1), and 1−10 (stepping by 1).\\
 
 We also tested precision, recall, and f1 scores for various prediction probability cutoffs between 0.1 and 0.9.
 
-The model with the least error was trained on K=40, c=4, and used L1 regularization and had an error of 0.373. We plot precision vs recall at various cutoffs. 
+The model with the least error was trained on $K$=40, $c$=4, and used L1 regularization and had an error of 0.373. We plot precision vs recall at various cutoffs. 
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -18,7 +18,7 @@ The model with the least error was trained on K=40, c=4, and used L1 regularizat
 \label{fig:precision_v_recall}
 \end{figure} 
 
-Train and test errors as a function of K are shown. Models were retrained 20 times each, with randomized initalization constants. Overall, errors were between 0.4 and 0.6 and seemed to hover around expected baseline errors. 
+Train and test errors as a function of $K$ are shown. Models were retrained 20 times each, with randomized initalization constants. Overall, errors were between 0.4 and 0.6 and seemed to hover around expected baseline errors. 
 
 
 \begin{figure}[ht]
