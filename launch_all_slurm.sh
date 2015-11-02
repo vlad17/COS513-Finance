@@ -2,13 +2,16 @@
 
 set -e
 
-if [[ "$#" -ne 6 && "$#" -ne 7 ]]; then
-    echo 'Usage: echo [K1 K2 K3 ...] | launch_all_slurm.sh R raw_data_dir models_dir summary_dir lo hi [email]'
+if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
+    echo 'Usage: echo [K1 K2 K3 ...] | launch_all_slurm.sh R raw_data_dir models_dir summary_dir lo hi [email] [code_dir]'
     echo
     echo 'NOTE: THIS CAN ONLY BE RUN ONCE AT A TIME PER USER'
     echo
     echo 'NOTE: make sure all parameter directories are mountable by NFS,'
     echo 'e.g., have the prefix /n/ on cycles.'
+    echo
+    echo 'Uses code_dir to run the python files, if supplied. Defaults to'
+    echo '/n/fs/gcf/COS513-Finance.'
     echo
     echo 'Reads a list of cluster sizes from stdin.'
     echo 
@@ -27,7 +30,7 @@ if [[ "$#" -ne 6 && "$#" -ne 7 ]]; then
     echo
     echo "Example:"
     echo "echo 10 100 | \ "
-    echo "./launch_all_slurm.sh 150 ../raw-data-20130401-20151021/ /n/fs/scratch/vyf/models /n/fs/scratch/vyf/summaries 20130601 20130703 vyf@princeton.edu"
+    echo "./launch_all_slurm.sh 150 ../raw-data-20130401-20151021/ /n/fs/scratch/vyf/models /n/fs/scratch/vyf/summaries 20130601 20130703 \$USER@princeton.edu"
     exit 1
 fi
 
@@ -41,6 +44,7 @@ summary_dir=$(readlink -f "$4")
 lo="$5"
 hi="$6"
 email="$7"
+code_dir="$8"
 
 sample_dir=/scratch/$USER/sample
 pre_sample_dir=/scratch/$USER/sample-preprocessed
@@ -84,7 +88,7 @@ srun /usr/bin/time -f '%E elapsed, %U user, %S system, %M memory, %x status' $3"
 clusters=$(cat -)
 
 GCF=/n/fs/gcf
-FINANCE=$GCF/COS513-Finance
+FINANCE=$code_dir
 PYENV=$GCF/ionic-env/bin/activate
 
 all_days=/tmp/$USER/all-days-$lo-$hi.txt
@@ -103,7 +107,7 @@ for i in $(cat $all_days); do
   slurm_header "00:10:00" "1G" "/bin/bash -c \"
     set -e
     mkdir -p $sample_dir $pre_sample_dir
-    shuf -n 150 $raw_data_dir/$i.export.CSV > $sample_dir/$i.export.CSV
+    shuf -n $R $raw_data_dir/$i.export.CSV > $sample_dir/$i.export.CSV
     source $PYENV
     python $FINANCE/preprocessing.py $sample_dir/$i.export.CSV $pre_sample_dir/$i.csv
     python $FINANCE/expand.py $pre_sample_dir/$i.csv $exp_sample_dir/$i.csv
