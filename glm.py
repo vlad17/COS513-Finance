@@ -84,6 +84,8 @@ def main():
     test = all_features[(all_features.index >= test_start) & (all_features.index <= test_end)]
     test_y = price_changes[(price_changes.index >= test_start) & (price_changes.index <= test_end)]
 
+    print('{} / {}'.format(sum(np.array(train_y > 0)), len(train_y)))
+    print('{} / {}'.format(sum(np.array(valid_y > 0)), len(valid_y)))
     print('{} / {}'.format(sum(np.array(test_y > 0)), len(test_y)))
 
 
