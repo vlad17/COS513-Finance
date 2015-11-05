@@ -12,6 +12,9 @@ year = sys.argv[1]
 month = sys.argv[2]
 
 
+MIN_NUM_EVENTS = 100
+
+
 
 def download_file(filename):
     filepath = gdelt_site + filename
@@ -34,8 +37,9 @@ def split_by_day(filename):
             if current_date != previous_date:
                 
                 with open(current_date + '.export.CSV.zip', 'w') as outf:
-                    for line in day_buffer:
-                        outf.write("%s" % line)
+                    if len(day_buffer) >= MIN_NUM_EVENTS:
+                        for line in day_buffer:
+                            outf.write("%s" % line)
 
                     day_buffer = []
 
