@@ -52,18 +52,17 @@ year_i = int(year)
 month_i = int(month) 
 
 # daily files
-if year > 2013 or (year == 2013 and month > 3):
+if year_i > 2013 or (year_i == 2013 and month_i > 3):
     for day in range(1,32):
         filename = year + str(month).zfill(2) + str(day).zfill(2) + '.export.CSV.zip'
         download_file(filename)
 
 # monthly files
-elif year > 2005: 
+elif year_i > 2005: 
     # 2013 switches from monthly to daily starting April 1st
-    if year == 2013:
+    if year_i == 2013:
         for m in range(0,4):
             filename = year + str(month).zfill(2) + '.zip'
-            print filename
             download_file(filename)
             split_by_day(filename)
     else:
@@ -72,7 +71,7 @@ elif year > 2005:
             download_file(filename)
             split_by_day(filename)
 
-elif year > 1978:
+elif year_i > 1978:
     filename = year + '.csv'
     download_file(filename)
     split_by_day(filename)
