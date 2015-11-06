@@ -63,6 +63,7 @@ elif year > 2005:
     if year == 2013:
         for m in range(0,4):
             filename = year + str(month).zfill(2) + '.zip'
+            print filename
             download_file(filename)
             split_by_day(filename)
     else:
