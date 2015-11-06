@@ -33,13 +33,18 @@ def split_by_day(filename):
         previous_date = current_date
 
         for line in data:
-            current_date = line.split('\t')[1]
+            try:
+                current_date = line.split('\t')[1]
+            except:
+                pass
             if current_date != previous_date:
                 
                 with open(current_date + '.export.CSV.zip', 'w') as outf:
                     if len(day_buffer) >= MIN_NUM_EVENTS:
                         for line in day_buffer:
                             outf.write("%s" % line)
+
+                    print('wrote {}'.format(current_date))
 
                     day_buffer = []
 
