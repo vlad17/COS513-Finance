@@ -38,6 +38,8 @@ def split_by_day(filename):
             except:
                 pass
             if current_date != previous_date:
+
+                print(current_date)
                 
                 with open(current_date + '.export.CSV.zip', 'w') as outf:
                     if len(day_buffer) >= MIN_NUM_EVENTS:
