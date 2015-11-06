@@ -83,36 +83,20 @@ if year_i > 2013 or (year_i == 2013 and month_i > 3):
         filename = year + str(month).zfill(2) + str(day).zfill(2) + '.export.CSV.zip'
         download_file(filename)
 
-
 # monthly files
 elif year_i > 2005: 
     # 2013 switches from monthly to daily starting April 1st
     if year_i == 2013:
-        if month == '-1':
-            for m in range(1,4):
-                filename = year + str(m).zfill(2) + '.zip'
-                download_and_extract(filename)
-        else:
-            filename = year + str(month).zfill(2) + '.zip'
-            download_and_extract(filename)
+        filename = year + str(month).zfill(2) + '.zip'
+        download_and_extract(filename)
     else:
-        if month == '-1':
-            for m in range(1,13):
-                filename = year + str(m).zfill(2) + '.zip'
-                download_and_extract(filename)
-        else:
-            filename = year + str(month).zfill(2) + '.zip'
-            download_and_extract(filename)
+        filename = year + str(month).zfill(2) + '.zip'
+        download_and_extract(filename)
             
 
 elif year_i > 1978:
-    if year == '-1':
-        for y in range(1979,2006):
-            filename = str(y) + '.zip'
-            download_and_extract(filename)
-    else:
-        filename = year + '.zip'
-        download_and_extract(filename)
+    filename = year + '.zip'
+    download_and_extract(filename)
 
 
 
