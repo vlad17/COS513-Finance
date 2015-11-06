@@ -89,7 +89,7 @@ elif year_i > 2005:
     # 2013 switches from monthly to daily starting April 1st
     if year_i == 2013:
         if month == '-1':
-            for m in range(0,4):
+            for m in range(1,4):
                 filename = year + str(m).zfill(2) + '.zip'
                 download_and_extract(filename)
         else:
@@ -97,7 +97,7 @@ elif year_i > 2005:
             download_and_extract(filename)
     else:
         if month == '-1':
-            for m in range(0,13):
+            for m in range(1,13):
                 filename = year + str(m).zfill(2) + '.zip'
                 download_and_extract(filename)
         else:
