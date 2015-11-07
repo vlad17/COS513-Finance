@@ -65,7 +65,7 @@ def split_by_day(filename):
                         for line in day_buffer[1:]:
                             outf.write("%s" % line)
 
-                    print('wrote {}'.format(previous_date))
+                    print('wrote {}.export.CSV'.format(previous_date))
 
                 day_buffer = []
 
