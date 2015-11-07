@@ -149,7 +149,7 @@ def is_verbal(quadclass):
     return quadclass == 1 or quadclass == 3
 
 def is_cooperation(quadclass):
-    return quadclass == 1 or quadclass == 4
+    return quadclass == 1 or quadclass == 2
 
 def bool_int(boolean):
     return 1 if boolean else 0
