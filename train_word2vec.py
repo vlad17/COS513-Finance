@@ -1,5 +1,6 @@
 from gensim.models import Word2Vec, Phrases
 from nltk.corpus import brown
+from nltk.corpus import reuters
 from nltk.corpus import stopwords
 import nltk
 import pickle
@@ -7,7 +8,7 @@ import pickle
 nltk.data.path.append("/n/fs/gcf")
 stops = stopwords.words("english")
 
-# set up word2vec
+# set up word2vec brown
 brown_sents = brown.sents()
 brown_lower = []
 for sentence in brown_sents:
@@ -15,7 +16,17 @@ for sentence in brown_sents:
     sentence = [word for word in sentence if word not in stops]
     brown_lower.append(sentence)
 
-bigram = Phrases(brown_lower)
+# set up word2vec reuters
+reuters_sents = brown.sents()
+reuters_lower = []
+for sentence in reuters_sents:
+    sentence = [word.lower() for word in sentence]
+    sentence = [word for word in sentence if word not in stops]
+    reuters_lower.append(sentence)    
+
+w2v = reuters_lower #try using reuters corpus
+
+bigram = Phrases(w2v)
 b = bigram[brown_lower]
 trigram = Phrases(b)
 t = trigram[b]
