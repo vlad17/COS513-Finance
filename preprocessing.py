@@ -1,5 +1,5 @@
 """
-Usage: python preprocessing.py inputfile outputfile [unique_cameo_codes]
+Usage: python preprocessing.py inputfile outputfile [unique_cameo_codes] [unique_actor_type_codes]
 
 Accepts tab-separated GDELT record files of NUM_FIELDS (or NUM_FIELDS - 1)
 columns (URL, column , and ouptuts a cleaned, preprocessed version to outputfile.
@@ -9,6 +9,10 @@ Assumes basename for input file is of the form YYYYMMDD.export.CSV.
 unique_cameo_codes is a file that defaults to
 /n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt
 It should just be a file where each line is a unique cameo code.
+
+unique_actor_type_codes is a file that defaults to
+/n/fs/gcf/raw-data-20130401-20151021/unique_actor_type_codes.txt
+It should just be a file where each line is a unique Actor1Type1Code or Actor2Type1Code.
 
 NOTES:
 * CATEGORICAL: encoded as integers from [0, N] for N distinct values.
@@ -52,10 +56,13 @@ Output Schema:
 17. ActionGeo_Long - NUMERIC
 18. Actor1Name - STRING.
 19. Actor2Name - STRING.
+20. Actor1Type1Code - CATEGORICAL. 32.
+21. Actor2Type1Code - CATEGORICAL. 32.
 TODO: We can add more stuff, but what to do if it's empty? Right now, we drop
       the row for important (non-name) empty values. What if we impute?
       We can add (Actor*|Action)Geo_CountryCode CATEGORICAL.
       Also we can add Actor(1|2)Geo_(Lat|Long).
+
 
 Input Schema (fields without description are discarded)
 1. GlobalEventID
@@ -162,7 +169,7 @@ def parse_day(day):
 def zerostr(s):
     return s if s else "0"
 
-def clean_row(row, day, cameos):
+def clean_row(row, day, cameos, unique_actor_type_codes):
     """ Performs the output schema -> input schema transformation described
         above. """
     
@@ -222,12 +229,18 @@ def clean_row(row, day, cameos):
         name = row[column_idx[col]].lower().strip()
         new_row.append(drop_stop_words(name))
 
+    # Actor1Type1Code and Actor2Type1Code
+    for col in ['Actor1Type1Code', 'Actor2Type1Code']:
+        code = row[column_idx[col]].strip()
+        code = unique_actor_type_codes[code] if code in unique_actor_type_codes else 0
+        new_row.append(code)
+
     return new_row
 
 compatibleFile = re.compile('.*\d\d\d\d\d\d\d\d\.export\.CSV')
 
 def main():
-    if len(sys.argv) != 3 and len(sys.argv) != 4:
+    if len(sys.argv) < 3 and len(sys.argv) > 5:
         print(__doc__)
         return 1
 
@@ -235,11 +248,18 @@ def main():
     outputfile = sys.argv[2]
 
     cameofile = '/n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt'
-    if (len(sys.argv) == 4):
+    if (len(sys.argv) >= 4):
         cameofile = sys.argv[3]
 
     unique_cameos = [line.strip() for line in open(cameofile, 'r')]
     unique_cameos = list_to_idx_dict(unique_cameos, 1)
+
+    actor_type_code_file = '/n/fs/gcf/raw-data-20130401-20151021/unique_actor_type_codes.txt'
+    if (len(sys.argv) >= 5):
+        actor_type_code_file = sys.argv[4]
+
+    unique_actor_type_codes = [line.strip() for line in open(actor_type_code_file, 'r')]
+    unique_actor_type_codes = list_to_idx_dict(unique_actor_type_codes, 1)
 
     inbase = os.path.basename(inputfile)
     suffix = "YYYYMMDD.export.CSV"
@@ -258,7 +278,7 @@ def main():
         writer = csv.writer(out_csv, delimiter='\t')
         for row in reader:
             tot_rows += 1
-            cleaned_row = clean_row(row, news_day, unique_cameos)
+            cleaned_row = clean_row(row, news_day, unique_cameos, unique_actor_type_codes)
             if cleaned_row:
                 writer.writerow(cleaned_row)
             else:
