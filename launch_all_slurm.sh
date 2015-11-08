@@ -208,8 +208,9 @@ echo "LAUNCHING FULL-DAY SUMMARIES"
 echo "************************************************************"
 
 full_days_summary=()
-for i in $(cat $all_days); do
-  for j in $clusters; do
+# Note intentional for-loop-order inversion here so we can finish models sequentially.
+for j in $clusters; do
+    for i in $(cat $all_days); do
     full_days_summary+=($(sbatch --dependency=afterok:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
   done
 done
