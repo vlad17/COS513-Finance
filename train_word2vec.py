@@ -27,7 +27,7 @@ for sentence in reuters_sents:
 w2v = reuters_lower #try using reuters corpus
 
 bigram = Phrases(w2v)
-b = bigram[brown_lower]
+b = bigram[w2v]
 trigram = Phrases(b)
 t = trigram[b]
 quadgram = Phrases(t)
