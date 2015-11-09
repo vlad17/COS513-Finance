@@ -22,7 +22,7 @@ def elapsed_timer():
     end = default_timer()
     elapser = lambda: end-start
 
-TOPIC_COLUMNS = 938 # TODO Increase by 200 with word2vec 
+TOPIC_COLUMNS = 1138  
 MIN_FLOAT_VALUE = 0.00000005  # TODO set this
 
 def main():
