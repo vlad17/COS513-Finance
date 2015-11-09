@@ -22,7 +22,7 @@ import fileinput
 import pickle
 import sys
 
-TOPIC_COLUMNS = 938 
+TOPIC_COLUMNS = 1138 
 
 def main():
     if len(sys.argv) != 4:
