@@ -5,10 +5,11 @@ glob_input_array_pattern should be something like "/path/to/dir/*.export.CSV",
 where you should remember to quote it when invoking the command (else the
 shell will expand the glob pattern for you.
 
+N is the max number of components
+alpha is a hyperparameter for the number of components
+
 Concatenates the input numpy arrays referenced by the glob pattern,
-then performs clustering, dropping the last 8 importance-related news 
-data columns (according to the schema detailed in preprocessing.py and respected
- by expand.py)
+then runs them through a DPGMM and prints the score.
 
 Serializes (via pickle) the GMM learned based on the input to outfile.
 """
