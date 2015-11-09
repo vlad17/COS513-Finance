@@ -22,7 +22,8 @@ def elapsed_timer():
     end = default_timer()
     elapser = lambda: end-start
 
-TOPIC_COLUMNS = 938 # TODO Increase by 200 with word2vec 
+TOPIC_COLUMNS = 1138  
+MIN_FLOAT_VALUE = 0.00000005  # TODO set this
 
 def main():
     if len(sys.argv) != 4:
@@ -62,6 +63,13 @@ def main():
         importance = np.append(importance, np.full((N, 1), 1.0), axis = 1)
         day = np.dot(topics, importance).flatten()
         day = np.divide(day, N)
+        
+        # check if normalizing by N makes anything too small
+        small_indices = np.where(day < MIN_FLOAT_VALUE):
+        if len(small_indices[0] > 0):
+            print('{}: {}\n'.format(infile, small_indices)
+
+        day.append(N)
     print('{}s'.format(elapsed()))
 
     with open(outfile, 'w') as o:

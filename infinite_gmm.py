@@ -1,53 +1,53 @@
-
 """
-Usage: python clustering.py glob_input_array_pattern outfile K
+Usage: python infinite_gmm.py glob_input_array_pattern outfile N alpha
 
 glob_input_array_pattern should be something like "/path/to/dir/*.export.CSV", 
 where you should remember to quote it when invoking the command (else the
 shell will expand the glob pattern for you.
 
+N is the max number of components
+alpha is a hyperparameter for the number of components
+
 Concatenates the input numpy arrays referenced by the glob pattern,
-then performs clustering, dropping the last 8 importance-related news 
-data columns (according to the schema detailed in preprocessing.py and respected
- by expand.py)
+then runs them through a DPGMM and prints the score.
 
 Serializes (via pickle) the GMM learned based on the input to outfile.
 """
 
 from glob import glob
-from sklearn.cluster import MiniBatchKMeans
 import numpy as np
-import itertools
 import fileinput
 import pickle
 import sys
+from sklearn.mixture import DPGMM
 
 TOPIC_COLUMNS = 1138 
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 5:
         print(__doc__)
         return 1
 
     infiles = glob(sys.argv[1])
     outfile = sys.argv[2]
-    K = int(sys.argv[3])
+    N = int(sys.argv[3])
+    alpha = int(sys.argv[4])
 
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t',
                          usecols = range(TOPIC_COLUMNS))
 
-    print("Learning MiniBatchKMeans with K =", K)
+    print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
 
-    km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
-    km.fit(fullarr)
+    igmm = DPGMM(n_components=N, alpha=alpha, init_params='wmc', verbose=True)
+    igmm.fit(fullarr)
 
-    print("KMeans trained, saving")
+    print("Infinite GMM trained, saving")
 
     with open(outfile, 'wb') as out_model:
-        pickle.dump(km, out_model)
+        pickle.dump(igmm, out_model)
 
-    print("Score:", km.score(fullarr))
+    print("Score:", igmm.score(fullarr))
     
     return 0
 

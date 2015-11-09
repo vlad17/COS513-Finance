@@ -136,14 +136,12 @@ for i in $(cat $all_days); do
   done
 done
 
-for i in $clusters; do
-  name="sample-learn-$i"
-  slurm_header "05:00:00" "8G" "/bin/bash -c \"
-    set -e
-    source $PYENV
-    python $FINANCE/clustering.py \\\"$exp_sample_dir/*\\\" $models_dir/$i.model $i 
-  \"" $name > $SCRIPT_DIR/$name.slurm
-done
+name="sample-learn-$i"
+slurm_header "05:00:00" "8G" "/bin/bash -c \"
+  set -e
+  source $PYENV
+  python $FINANCE/infinite_gmm.py \\\"$exp_sample_dir/*\\\" $models_dir/$i.model 1000 1
+\"" $name > $SCRIPT_DIR/$name.slurm
 
 echo
 echo "************************************************************"

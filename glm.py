@@ -50,9 +50,9 @@ def main():
     train_start = '2013-04-01'
     train_end = '2014-09-30'
     valid_start = '2014-10-01'
-    valid_end = '2014-11-30'
-    test_start = '2014-12-01'
-    test_end = '2015-02-08'
+    valid_end = '2015-04-30'
+    test_start = '2015-05-01'
+    test_end = '2015-11-01'
 
     dates = []
     for sfile in summarized_files:
@@ -84,6 +84,8 @@ def main():
     test = all_features[(all_features.index >= test_start) & (all_features.index <= test_end)]
     test_y = price_changes[(price_changes.index >= test_start) & (price_changes.index <= test_end)]
 
+    print('{} / {}'.format(sum(np.array(train_y > 0)), len(train_y)))
+    print('{} / {}'.format(sum(np.array(valid_y > 0)), len(valid_y)))
     print('{} / {}'.format(sum(np.array(test_y > 0)), len(test_y)))
 
 
@@ -111,8 +113,8 @@ def main():
     #best.fit(train, train_y)
     print('------------------------')
     print('K: {}'.format(k))
-    print('Model (reg = {}, c = {}) training acc: {} test accuracy: {}'.format(
-        reg, c, best.score(train, train_y), best.score(test, test_y)))
+    print('Model (reg = {}, c = {}) training acc: {} valid accuracy: {} test accuracy: {}'.format(
+        reg, c, best.score(train, train_y), best.score(valid, valid_y), best.score(test, test_y)))
 
     # find precision/recall for cutoffs 
     cutoffs = [0.1, 0.25, 0.5, 0.75, 0.9]

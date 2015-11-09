@@ -27,7 +27,12 @@ def elapsed_timer():
     end = default_timer()
     elapser = lambda: end-start
 
-column_names = ['DaysSincePublished', 'IsVerbal', 'GoldsteinScale', 'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 'ActionGeo_Long', 'Actor1Name', 'Actor2Name', ]
+column_names = ['DaysSincePublished', 'IsVerbal', 'GoldsteinScale', 
+                'NumMentions', 'NumSources', 'NumArticles', 'AvgTone', 
+                'CAMEOCode1', 'CAMEOCodeFull', 'IsCooperative', 
+                'Actor1Country', 'Actor2Country', 'Actor1Geo_Type', 
+                'Actor2Geo_Type', 'ActionGeo_Type', 'ActionGeo_Lat', 
+                'ActionGeo_Long', 'Actor1Name', 'Actor2Name']
 
 column_idx = dict(zip(range(len(column_names)), column_names))
 
@@ -89,11 +94,6 @@ def expand_row(fields):
             expanded.extend(one_hot_array)
 
         elif field_type == 'string':
-            continue
-
-            # TODO: the current model is missing some really obvious stuff,
-            # like singapore and protester. We need to significantly expand our
-            # corpus. For now, we don't even use actor names.
             
             field = field.strip()
             split_field = field.split(' ')
@@ -145,6 +145,7 @@ def main():
     with open(infile, 'r') as i, open(outfile, 'w') as o:
         reader = csv.reader(i, delimiter = '\t')
         writer = csv.writer(o, delimiter = '\t')
+        global full_model, bigram, trigram, quadgram 
         full_model, bigram, trigram, quadgram = load_models(models_dir)
         
         tot_rows = 0
