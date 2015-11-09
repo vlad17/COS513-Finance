@@ -94,11 +94,6 @@ def expand_row(fields):
             expanded.extend(one_hot_array)
 
         elif field_type == 'string':
-            continue
-
-            # TODO: the current model is missing some really obvious stuff,
-            # like singapore and protester. We need to significantly expand our
-            # corpus. For now, we don't even use actor names.
             
             field = field.strip()
             split_field = field.split(' ')
