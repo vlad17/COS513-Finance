@@ -4,6 +4,7 @@ from nltk.corpus import reuters
 from nltk.corpus import stopwords
 import nltk
 import pickle
+import fileinput
 
 nltk.data.path.append("/n/fs/gcf")
 stops = stopwords.words("english")
@@ -24,7 +25,15 @@ for sentence in reuters_sents:
     sentence = [word for word in sentence if word not in stops]
     reuters_lower.append(sentence)    
 
-w2v = reuters_lower #try using reuters corpus
+# set up europarl english    
+europarl_lower = []
+f = open('/n/fs/gcf/europarl_en.txt', 'r')
+for line in f:
+	sentence = [word.lower() for word in sentence]
+	sentence = [word for word in sentence if word not in stops]
+	europarl_lower.append(sentence)
+
+w2v = europarl_lower #try using reuters corpus
 
 bigram = Phrases(w2v)
 b = bigram[w2v]
