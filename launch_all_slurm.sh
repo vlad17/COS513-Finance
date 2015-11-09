@@ -156,7 +156,7 @@ sample_expansion=$(echo ${sample_expansion[@]} | tr ' ' ':')
 echo "SLURM JOBS" $sample_expansion
 
 rm -f $SLURM_OUT/sample-expansion-stage-$lo-$hi
-notify_email "sample-expansion-stage-$lo-$hi" > /tmp/$USER/update-sample-expansion
+notify_email "  sample-expansion-stage-$lo-$hi" > /tmp/$USER/update-sample-expansion
 sbatch --dependency=afterok:$sample_expansion /tmp/$USER/update-sample-expansion
 while [ ! -f $SLURM_OUT/sample-expansion-stage-$lo-$hi ]; do 
   sleep 5
@@ -188,14 +188,14 @@ echo "************************************************************"
 
 full_days_exp=()
 for i in $(cat $all_days); do
-    full_days_exp+=($(sbatch --dependency=afterok:$model_learn $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
+    full_days_exp+=($(sbatch --dependency=afterany:$model_learn $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
 done
 full_days_exp=$(echo ${full_days_exp[@]} | tr ' ' ':')
 echo "SLURM JOBS" $full_days_exp
 
 rm -f $SLURM_OUT/full-days-expand-stage-$lo-$hi
 notify_email "full-days-expand-stage-$lo-$hi" > /tmp/$USER/update-full-days-expand
-sbatch --dependency=afterok:$full_days_exp /tmp/$USER/update-full-days-expand
+sbatch --dependency=afterany:$full_days_exp /tmp/$USER/update-full-days-expand
 while [ ! -f $SLURM_OUT/full-days-expand-stage-$lo-$hi ]; do 
   sleep 5
 done
@@ -206,9 +206,10 @@ echo "LAUNCHING FULL-DAY SUMMARIES"
 echo "************************************************************"
 
 full_days_summary=()
-for i in $(cat $all_days); do
-  for j in $clusters; do
-    full_days_summary+=($(sbatch --dependency=afterok:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
+# Note intentional for-loop-order inversion here so we can finish models sequentially.
+for j in $clusters; do
+    for i in $(cat $all_days); do
+    full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
   done
 done
 full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')
@@ -216,7 +217,7 @@ echo "SLURM JOBS" $full_days_summary
 
 rm -f $SLURM_OUT/full-days-summary-stage-$lo-$hi
 notify_email "full-days-summary-stage-$lo-$hi" > /tmp/$USER/update-full-days-summary
-sbatch --dependency=afterok:$full_days_summary /tmp/$USER/update-full-days-summary
+sbatch --dependency=afterany:$full_days_summary /tmp/$USER/update-full-days-summary
 while [ ! -f $SLURM_OUT/full-days-summary-stage-$lo-$hi ]; do 
   sleep 5
 done
