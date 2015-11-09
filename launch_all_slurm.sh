@@ -135,7 +135,7 @@ for i in $(cat $all_days); do
 
   for j in $clusters; do
       name="day-summary-$i-$j"
-      slurm_header "01:00:00" "2G" "/bin/bash -c \"
+      slurm_header "01:00:00" "4G" "/bin/bash -c \"
         set -e
         mkdir -p $summary_dir $summary_dir/$j
         source $PYENV
