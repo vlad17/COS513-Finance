@@ -3,7 +3,7 @@
 set -e
 
 if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
-    echo 'Usage: echo [K1 K2 K3 ...] | launch_all_slurm.sh R raw_data_dir models_dir summary_dir lo hi [email] [code_dir]'
+    echo 'Usage: launch_all_slurm.sh R raw_data_dir models_dir summary_dir lo hi [email] [code_dir]'
     echo
     echo 'NOTE: THIS CAN ONLY BE RUN ONCE AT A TIME PER USER'
     echo
@@ -12,8 +12,6 @@ if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
     echo
     echo 'Uses code_dir to run the python files, if supplied. Defaults to'
     echo '/n/fs/gcf/COS513-Finance.'
-    echo
-    echo 'Reads a list of cluster sizes from stdin.'
     echo 
     echo 'Generates a multiple sets set of up to N slurm scripts with 1 CPU per'
     echo 'task and a max runtime of a day. Uses these to run the random-sample'
@@ -29,13 +27,9 @@ if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
     echo "Optionally sends an email when everything's done."
     echo
     echo "Example:"
-    echo "echo 10 100 | \ "
     echo "./launch_all_slurm.sh 150 ../raw-data-20130401-20151021/ /n/fs/scratch/vyf/models /n/fs/scratch/vyf/summaries 20130601 20130703 \$USER@princeton.edu"
     exit 1
 fi
-
-# TODO: smarter dependencies (start training model as soon as expanded is done)
-# TODO: run training one model at a time rather than all synchronously.
 
 R="$1"
 raw_data_dir=$(readlink -f "$2")
@@ -85,7 +79,6 @@ $5
 srun /usr/bin/time -f '%E elapsed, %U user, %S system, %M memory, %x status' $3"
 }
 
-clusters=$(cat -)
 
 GCF=/n/fs/gcf
 FINANCE=$code_dir
@@ -95,9 +88,13 @@ all_days=/tmp/$USER/all-days-$lo-$hi.txt
 ls -1 $raw_data_dir | grep .export.CSV | cut -c1-8 | sort \
   | sed -n "/$lo/,/$hi/p" > $all_days
 
+# infinite gmm hyperparameters
+alpha=1
+max_components=10000
+
 echo "************************************************************"
-echo "STARTING CLUSTER LEARNING"
-echo "K = $clusters N =" $(wc -l < $all_days) "R = $R"
+echo "STARTING IGMM LEARNING"
+echo "IGMM(max=$max_components, alpha=$alpha) N =" $(wc -l < $all_days) "R = $R"
 echo "************************************************************"
 
 SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts
@@ -125,26 +122,21 @@ for i in $(cat $all_days); do
     rm -rf $pre_dir/$i.csv
   \"" "$name" > $SCRIPT_DIR/$name.slurm
 
-  for j in $clusters; do
-      name="day-summary-$i-$j"
-      slurm_header "01:00:00" "2G" "/bin/bash -c \"
-        set -e
-        mkdir -p $summary_dir $summary_dir/$j
-        source $PYENV
-        python $FINANCE/summarize.py $exp_dir/$i.csv $summary_dir/$j/$i.csv $models_dir/$j.model
-  \"" "$name" > $SCRIPT_DIR/$name.slurm
-  done
+    name="day-summary-$i"
+    slurm_header "01:00:00" "2G" "/bin/bash -c \"
+      set -e
+      mkdir -p $summary_dir $summary_dir/$j
+      source $PYENV
+      python $FINANCE/summarize.py $exp_dir/$i.csv $summary_dir/$i.csv $models_dir/igmm
+\"" "$name" > $SCRIPT_DIR/$name.slurm
 done
 
-# infinite gmm hyperparameters
-alpha=1
-max_components=5000
 
 name="sample-learn"
-slurm_header "05:00:00" "8G" "/bin/bash -c \"
+slurm_header "05:00:00" "16G" "/bin/bash -c \"
   set -e
   source $PYENV
-  python $FINANCE/infinite_gmm.py \\\"$exp_sample_dir/*\\\" $models_dir/$i.model $max_components $alpha
+  python $FINANCE/infinite_gmm.py $exp_sample_dir $models_dir/igmm $max_components $alpha
 \"" $name > $SCRIPT_DIR/$name.slurm
 
 echo
@@ -172,9 +164,7 @@ echo "LAUNCHING MODEL LEARNING"
 echo "************************************************************"
 
 model_learn=()
-for i in $clusters; do
-  model_learn+=($(sbatch --dependency=afterok:$sample_expansion $SCRIPT_DIR/sample-learn-$i.slurm | cut -f4 -d' '))
-done
+model_learn+=($(sbatch --dependency=afterok:$sample_expansion $SCRIPT_DIR/sample-learn.slurm | cut -f4 -d' '))
 model_learn=$(echo ${model_learn[@]} | tr ' ' ':')
 echo "SLURM JOBS" $model_learn
 
@@ -210,11 +200,8 @@ echo "LAUNCHING FULL-DAY SUMMARIES"
 echo "************************************************************"
 
 full_days_summary=()
-# Note intentional for-loop-order inversion here so we can finish models sequentially.
-for j in $clusters; do
-    for i in $(cat $all_days); do
-    full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
-  done
+for i in $(cat $all_days); do
+  full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i.slurm | cut -f4 -d' '))
 done
 full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')
 echo "SLURM JOBS" $full_days_summary
