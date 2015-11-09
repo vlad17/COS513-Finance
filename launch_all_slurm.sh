@@ -136,11 +136,15 @@ for i in $(cat $all_days); do
   done
 done
 
-name="sample-learn-$i"
+# infinite gmm hyperparameters
+alpha=1
+max_components=5000
+
+name="sample-learn"
 slurm_header "05:00:00" "8G" "/bin/bash -c \"
   set -e
   source $PYENV
-  python $FINANCE/infinite_gmm.py \\\"$exp_sample_dir/*\\\" $models_dir/$i.model 1000 1
+  python $FINANCE/infinite_gmm.py \\\"$exp_sample_dir/*\\\" $models_dir/$i.model $max_components $alpha
 \"" $name > $SCRIPT_DIR/$name.slurm
 
 echo
