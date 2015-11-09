@@ -145,7 +145,7 @@ def main():
     with open(infile, 'r') as i, open(outfile, 'w') as o:
         reader = csv.reader(i, delimiter = '\t')
         writer = csv.writer(o, delimiter = '\t')
-        full_model, bigram, trigram, quadgram = load_models(models_dir)
+        global full_model, bigram, trigram, quadgram = load_models(models_dir)
         
         tot_rows = 0
         dropped_rows = 0
