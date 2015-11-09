@@ -1,3 +1,4 @@
+
 """
 Usage: python clustering.py glob_input_array_pattern outfile K
 
@@ -21,7 +22,7 @@ import fileinput
 import pickle
 import sys
 
-TOPIC_COLUMNS = 938 # TODO increase by 200 with word2vec
+TOPIC_COLUMNS = 1138 
 
 def main():
     if len(sys.argv) != 4:

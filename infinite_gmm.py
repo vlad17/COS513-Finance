@@ -21,7 +21,7 @@ import pickle
 import sys
 from sklearn.mixture import DPGMM
 
-TOPIC_COLUMNS = 938 # TODO increase by 200 with word2vec
+TOPIC_COLUMNS = 1138 
 
 def main():
     if len(sys.argv) != 5:
