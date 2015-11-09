@@ -233,7 +233,7 @@ def clean_row(row, day, cameos, unique_actor_type_codes):
     for col in ['Actor1Type1Code', 'Actor2Type1Code']:
         code = row[column_idx[col]].strip()
         code = unique_actor_type_codes[code] if code in unique_actor_type_codes else 0
-        new_row.append(code)
+        #new_row.append(code) TODO: this is broken. We still need to add these columns in the expansion stage
 
     return new_row
 
