@@ -108,6 +108,10 @@ for i in $(cat $all_days); do
     source $PYENV
     python $FINANCE/preprocessing.py $sample_dir/$i.export.CSV $pre_sample_dir/$i.csv
     python $FINANCE/expand.py $pre_sample_dir/$i.csv $exp_sample_dir/$i.csv
+    if [ ! -s $exp_sample_dir/$i.csv ]; then
+      echo file $exp_sample_dir/$i.csv empty, dropping
+      rm $exp_sample_dir/$i.csv
+    fi
     rm -rf $sample_dir/$i.export.CSV $pre_sample_dir/$i.export.CSV
   \"" "$name" > $SCRIPT_DIR/$name.slurm
 
@@ -119,6 +123,10 @@ for i in $(cat $all_days); do
     python $FINANCE/preprocessing.py $raw_data_dir/$i.export.CSV $pre_dir/$i.csv
     cd $FINANCE # TODO ugly dep for models/
     python $FINANCE/expand.py $pre_dir/$i.csv $exp_dir/$i.csv
+    if [ ! -s $exp_dir/$i.csv ]; then
+      echo file $exp_dir/$i.csv empty, dropping
+      rm $exp_dir/$i.csv
+    fi
     rm -rf $pre_dir/$i.csv
   \"" "$name" > $SCRIPT_DIR/$name.slurm
 
