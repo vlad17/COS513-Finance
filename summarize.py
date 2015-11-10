@@ -65,11 +65,11 @@ def main():
         day = np.divide(day, N)
         
         # check if normalizing by N makes anything too small
-        small_indices = np.where(day < MIN_FLOAT_VALUE):
+        small_indices = np.where(day < MIN_FLOAT_VALUE)
         if len(small_indices[0] > 0):
-            print('{}: {}\n'.format(infile, small_indices)
+            print('{}: {}\n'.format(infile, small_indices))
 
-        day.append(N)
+        day = np.append(day, [N])
     print('{}s'.format(elapsed()))
 
     with open(outfile, 'w') as o:
