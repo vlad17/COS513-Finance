@@ -90,7 +90,7 @@ ls -1 $raw_data_dir | grep .export.CSV | cut -c1-8 | sort \
 
 # infinite gmm hyperparameters
 alpha=1
-max_components=10000
+max_components=20000
 
 echo "************************************************************"
 echo "STARTING IGMM LEARNING"
@@ -131,7 +131,7 @@ for i in $(cat $all_days); do
   \"" "$name" > $SCRIPT_DIR/$name.slurm
 
     name="day-summary-$i"
-    slurm_header "01:00:00" "2G" "/bin/bash -c \"
+    slurm_header "01:00:00" "10G" "/bin/bash -c \"
       set -e
       mkdir -p $summary_dir $summary_dir/$j
       source $PYENV

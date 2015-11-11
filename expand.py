@@ -7,6 +7,9 @@ name. Similarly for word2vec_(bi|tri|quad)gram. Default models_dir is
 
 Translates the schema outputted from preprocessing.py to a numerical-only
 float array, printed in csv format to outfile.
+
+Needs 1G with out w2v models loaded (load_models)
+Needs 4G with w2v models
 """
 import csv
 import sys
