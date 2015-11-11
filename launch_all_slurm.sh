@@ -141,7 +141,7 @@ done
 
 
 name="sample-learn"
-slurm_header "05:00:00" "16G" "/bin/bash -c \"
+slurm_header "05:00:00" "48G" "/bin/bash -c \"
   set -e
   source $PYENV
   python $FINANCE/infinite_gmm.py $exp_sample_dir $models_dir/igmm $max_components $alpha
