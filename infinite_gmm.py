@@ -48,6 +48,7 @@ def main():
         pickle.dump(igmm, out_model)
 
     print("Score:", igmm.score(fullarr))
+    print("Num Components:", igmm.n_components)
     
     return 0
 
