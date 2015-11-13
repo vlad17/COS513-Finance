@@ -18,8 +18,9 @@ begin_year = 2006
 end_year = 2011
 
 infiles = set(glob.glob(sys.argv[1] + '/*'))
-N = int(sys.argv[2])
-R = int(sys.argv[3])
+outfile = sys.argv[2]
+N = int(sys.argv[3])
+R = int(sys.argv[4])
 
 
 num_file_matches = 0
