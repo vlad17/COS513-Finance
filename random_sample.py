@@ -48,17 +48,20 @@ for filename, num_events in file_matches.items():
     num_to_sample = int(num_events / float(total_num_events) * N)
     total_selected += num_to_sample
     with open(filename, 'r') as inf:
-        lines = filename.readlines()
+        lines = inf.readlines()
         random_lines = random.sample(lines, num_to_sample)
         out_events.extend(random_lines)
 
 remaining_to_sample = N - total_selected
 filename = file_matches.items()[0][0]
 with open(filename, 'r') as inf:
-    lines = filename.readlines()
+    lines = inf.readlines()
     random_lines = random.sample(lines, remaining_to_sample)
     out_events.extend(random_lines)
 
+
+with open(outfile, 'w') as outf:
+    outf.writelines(out_events)
 
 
 
