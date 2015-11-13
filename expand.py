@@ -97,7 +97,6 @@ def expand_row(fields):
             expanded.extend(one_hot_array)
 
         elif field_type == 'string':
-            continue
             
             field = field.strip()
             split_field = field.split(' ')
