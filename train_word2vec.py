@@ -27,11 +27,11 @@ for sentence in reuters_sents:
 
 # set up europarl english    
 europarl_lower = []
-f = open('/n/fs/gcf/europarl_en.txt', 'r')
+f = open('europarl_en.txt', 'r')
 for line in f:
 	sentence = [word.lower() for word in sentence]
 	sentence = [word for word in sentence if word not in stops]
-	europarl_lower.append(sentence)
+    europarl_lower.append(sentence)
 
 w2v = europarl_lower #try using reuters corpus
 
