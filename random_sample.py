@@ -29,7 +29,9 @@ file_matches = {}
 total_num_events = 0
 while num_file_matches < R:
     random_file = random.choice(list(infiles))
+
     infiles.remove(random_file)
+    print(random_file)
 
     if re.match('^(2006|2007|2008|2009|2010|2011)', random_file):
         num_events = 0
