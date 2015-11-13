@@ -38,6 +38,8 @@ while num_file_matches < R:
         total_num_events += num_events
         file_matches[random_file] = num_events
 
+        num_file_matches += 1
+
 out_events = []
 total_selected = 0
 for filename, num_events in file_matches.items():
