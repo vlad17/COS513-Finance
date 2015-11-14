@@ -41,7 +41,7 @@ def main():
         infiles.remove(random_file)
 
 
-        if re.match('^(2006|2007|2008|2009|2010|2011|2013)', random_file.split('/')[-1]):
+        if re.match('^(2006|2007|2008|2009|2010|2011)', random_file.split('/')[-1]):
             num_events = 0
             with open(random_file, 'r') as inf:
                 num_events = sum(1 for _ in inf)
