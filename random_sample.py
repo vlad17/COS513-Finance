@@ -57,18 +57,19 @@ def main():
     for filename, num_events in file_matches.items():
         num_to_sample = int(num_events / float(total_num_events) * N)
         total_selected += num_to_sample
-        with open(filename, 'r') as inf:
-            lines = np.genfromtxt(inf)
-            random_lines = np.random.randint(0, lines.shape[0], num_to_sample)
-            # random_lines = random.sample(lines, num_to_sample)
-            out_events.append(random_lines)
+        # with open(filename, 'r') as inf:
+        lines = np.loadtxt(inf, delimiter='\t')
+        random_lines = np.random.randint(0, lines.shape[0], num_to_sample)
+        # random_lines = random.sample(lines, num_to_sample)
+        out_events.append(random_lines)
+
 
     remaining_to_sample = N - total_selected
     filename = file_matches.popitem()[0]
-    with open(filename, 'r') as inf:
-        lines = np.genfromtxt(inf)
-        random_lines = np.random.randint(0, lines.shape[0], remaining_to_sample)
-        out_events.append(random_lines)
+    # with open(filename, 'r') as inf:
+    lines = np.loadtxt(inf, delimiter='\t')
+    random_lines = np.random.randint(0, lines.shape[0], remaining_to_sample)
+    out_events.append(random_lines)
 
     ipdb.set_trace()
     fullarr = np.array(out_events)
