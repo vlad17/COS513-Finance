@@ -16,14 +16,6 @@ import ipdb
 import os
 
 
-begin_year = 2006
-end_year = 2011
-
-infiles = set(glob.glob(sys.argv[1] + '/*'))
-outfile = sys.argv[2]
-N = int(sys.argv[3])
-R = int(sys.argv[4])
-K = int(sys.argv[5])
 
 
 TOPIC_COLUMNS = 1138
@@ -34,6 +26,15 @@ def main():
     if len(sys.argv) != 6:
         print(__doc__)
         return 1
+
+    begin_year = 2006
+    end_year = 2011
+
+    infiles = set(glob.glob(sys.argv[1] + '/*'))
+    outfile = sys.argv[2]
+    N = int(sys.argv[3])
+    R = int(sys.argv[4])
+    K = int(sys.argv[5])
 
     num_file_matches = 0
     file_matches = {}
