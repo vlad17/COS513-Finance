@@ -37,7 +37,7 @@ def main():
 
     print("Sampling {} files for {} total events".format(R, N))
     total_num_events = 0
-    while num_file_matches < R:
+    while num_file_matches < R-1:   # R-1 because we have one final sample to account for int division rounding down
         random_file = random.choice(list(infiles))
 
         infiles.remove(random_file)
@@ -58,15 +58,16 @@ def main():
         num_to_sample = int(num_events / float(total_num_events) * N)
         total_selected += num_to_sample
         with open(filename, 'r') as inf:
-            lines = inf.readlines()
-            random_lines = random.sample(lines, num_to_sample)
+            lines = np.genfromtxt(inf)
+            random_lines = np.random.randint(0, lines.shape[0], num_to_sample)
+            # random_lines = random.sample(lines, num_to_sample)
             out_events.append(random_lines)
 
     remaining_to_sample = N - total_selected
     filename = file_matches.popitem()[0]
     with open(filename, 'r') as inf:
-        lines = inf.readlines()
-        random_lines = random.sample(lines, remaining_to_sample)
+        lines = np.genfromtxt(inf)
+        random_lines = np.random.randint(0, lines.shape[0], remaining_to_sample)
         out_events.append(random_lines)
 
     ipdb.set_trace()
