@@ -64,13 +64,13 @@ def main():
         num_to_sample = int(num_events / float(total_num_events) * N)
         total_selected += num_to_sample
 
-        os.system('gshuf -n {} {} >> {}'.format(num_to_sample, first_file, outfile))
+        os.system('shuf -n {} {} >> {}'.format(num_to_sample, first_file, outfile))
 
     # since we used integer division to calculate the number of lines to sample from each file
     # we need to oversample for the last file
     remaining_to_sample = N - total_selected
 
-    os.system('gshuf -n {} {} >> {}'.format(remaining_to_sample, first_file, outfile))
+    os.system('shuf -n {} {} >> {}'.format(remaining_to_sample, first_file, outfile))
 
 
     return 0
