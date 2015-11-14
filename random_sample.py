@@ -15,7 +15,7 @@ import re
 import numpy as np
 from sklearn.cluster import MiniBatchKMeans
 import pickle
-
+import ipdb
 
 
 begin_year = 2006
@@ -35,6 +35,7 @@ def main():
     num_file_matches = 0
     file_matches = {}
 
+    print("Sampling {} files for {} total events".format(R, N))
     total_num_events = 0
     while num_file_matches < R:
         random_file = random.choice(list(infiles))
@@ -59,16 +60,16 @@ def main():
         with open(filename, 'r') as inf:
             lines = inf.readlines()
             random_lines = random.sample(lines, num_to_sample)
-            out_events.extend(random_lines)
+            out_events.append(random_lines)
 
     remaining_to_sample = N - total_selected
     filename = file_matches.popitem()[0]
     with open(filename, 'r') as inf:
         lines = inf.readlines()
         random_lines = random.sample(lines, remaining_to_sample)
-        out_events.extend(random_lines)
+        out_events.append(random_lines)
 
-
+    ipdb.set_trace()
     fullarr = np.array(out_events)
 
     with open(outfile, 'w') as outf:
