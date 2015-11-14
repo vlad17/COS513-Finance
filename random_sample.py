@@ -30,6 +30,11 @@ TOPIC_COLUMNS = 1138
 
 
 def main():
+
+    if len(sys.argv) != 6:
+        print(__doc__)
+        return 1
+
     num_file_matches = 0
     file_matches = {}
 
