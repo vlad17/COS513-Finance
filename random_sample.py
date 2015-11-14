@@ -77,19 +77,19 @@ def main():
     del out_events
 
 
-    # print("Learning MiniBatchKMeans with K =", K)
+    print("Learning MiniBatchKMeans with K =", K)
 
-    # km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
-    # km.fit(fullarr)
+    km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
+    km.fit(fullarr)
 
-    # print("KMeans trained, saving")
+    print("KMeans trained, saving")
 
-    # with open(outfile, 'wb') as out_model:
-    #     pickle.dump(km, out_model)
+    with open(outfile, 'wb') as out_model:
+        pickle.dump(km, out_model)
 
-    # print("Score:", km.score(fullarr))
+    print("Score:", km.score(fullarr))
 
-    # return 0
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())
