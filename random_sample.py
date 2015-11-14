@@ -40,7 +40,7 @@ def main():
         random_file = random.choice(list(infiles))
 
         infiles.remove(random_file)
-        print(random_file)
+        # print(random_file)
 
         if re.match('^(2006|2007|2008|2009|2010|2011)', random_file.split('/')[-1]):
             num_events = 0
@@ -62,7 +62,7 @@ def main():
             out_events.extend(random_lines)
 
     remaining_to_sample = N - total_selected
-    filename = file_matches.items()[0][0]
+    filename = file_matches.popitem()[0]
     with open(filename, 'r') as inf:
         lines = inf.readlines()
         random_lines = random.sample(lines, remaining_to_sample)
@@ -77,19 +77,19 @@ def main():
     del out_events
 
 
-    print("Learning MiniBatchKMeans with K =", K)
+    # print("Learning MiniBatchKMeans with K =", K)
 
-    km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
-    km.fit(fullarr)
+    # km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
+    # km.fit(fullarr)
 
-    print("KMeans trained, saving")
+    # print("KMeans trained, saving")
 
-    with open(outfile, 'wb') as out_model:
-        pickle.dump(km, out_model)
+    # with open(outfile, 'wb') as out_model:
+    #     pickle.dump(km, out_model)
 
-    print("Score:", km.score(fullarr))
+    # print("Score:", km.score(fullarr))
 
-    return 0
+    # return 0
 
 if __name__ == "__main__":
     sys.exit(main())
