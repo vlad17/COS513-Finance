@@ -12,10 +12,8 @@ import glob
 import sys
 import random
 import re
-import numpy as np
-from sklearn.cluster import MiniBatchKMeans
-import pickle
 import ipdb
+import os
 
 
 begin_year = 2006
@@ -37,13 +35,13 @@ def main():
 
     print("Sampling {} files for {} total events".format(R, N))
     total_num_events = 0
-    while num_file_matches < R-1:   # R-1 because we have one final sample to account for int division rounding down
+    while num_file_matches < R:   # R-1 because we have one final sample to account for int division rounding down
         random_file = random.choice(list(infiles))
 
         infiles.remove(random_file)
-        # print(random_file)
 
-        if re.match('^(2006|2007|2008|2009|2010|2011)', random_file.split('/')[-1]):
+
+        if re.match('^(2006|2007|2008|2009|2010|2011|2013)', random_file.split('/')[-1]):
             num_events = 0
             with open(random_file, 'r') as inf:
                 num_events = sum(1 for _ in inf)
@@ -52,45 +50,24 @@ def main():
 
             num_file_matches += 1
 
-    out_events = []
     total_selected = 0
+
+    first_file = None
+    os.remove(outfile)
     for filename, num_events in file_matches.items():
+        if first_file == None:
+            first_file = filename
         num_to_sample = int(num_events / float(total_num_events) * N)
         total_selected += num_to_sample
-        # with open(filename, 'r') as inf:
-        lines = np.loadtxt(inf, delimiter='\t')
-        random_lines = np.random.randint(0, lines.shape[0], num_to_sample)
-        # random_lines = random.sample(lines, num_to_sample)
-        out_events.append(random_lines)
 
+        os.system('gshuf -n {} {} >> {}'.format(num_to_sample, first_file, outfile))
 
+    # since we used integer division to calculate the number of lines to sample from each file
+    # we need to oversample for the last file
     remaining_to_sample = N - total_selected
-    filename = file_matches.popitem()[0]
-    # with open(filename, 'r') as inf:
-    lines = np.loadtxt(inf, delimiter='\t')
-    random_lines = np.random.randint(0, lines.shape[0], remaining_to_sample)
-    out_events.append(random_lines)
 
-    ipdb.set_trace()
-    fullarr = np.array(out_events)
+    os.system('gshuf -n {} {} >> {}'.format(remaining_to_sample, first_file, outfile))
 
-    with open(outfile, 'w') as outf:
-        outf.writelines(out_events)
-
-    del out_events
-
-
-    print("Learning MiniBatchKMeans with K =", K)
-
-    km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
-    km.fit(fullarr)
-
-    print("KMeans trained, saving")
-
-    with open(outfile, 'wb') as out_model:
-        pickle.dump(km, out_model)
-
-    print("Score:", km.score(fullarr))
 
     return 0
 
