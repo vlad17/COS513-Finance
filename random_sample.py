@@ -1,11 +1,10 @@
 """
-Usage: python random_sample.py infile_dir outfile N R K
+Usage: python random_sample.py infile_dir outfile N R
 
 N = total number of events to sample
 R = total number of files to sample
-K = number of clusters
 
-Serializes (via pickle) the K means model based on the input to outfile.
+Examle: python random_sample.py /n/fs/gcf/raw-data /n/fs/scratch/dchouren/random_sampled_lines 1000000 150
 """
 
 import glob
@@ -16,14 +15,9 @@ import ipdb
 import os
 
 
-
-
-TOPIC_COLUMNS = 1138
-
-
 def main():
 
-    if len(sys.argv) != 6:
+    if len(sys.argv) != 5:
         print(__doc__)
         return 1
 
@@ -34,7 +28,11 @@ def main():
     outfile = sys.argv[2]
     N = int(sys.argv[3])
     R = int(sys.argv[4])
-    K = int(sys.argv[5])
+
+    try:
+        os.remove(outfile)
+    except OSError:
+        pass
 
     num_file_matches = 0
     file_matches = {}
@@ -59,7 +57,7 @@ def main():
     total_selected = 0
 
     first_file = None
-    os.remove(outfile)
+
     for filename, num_events in file_matches.items():
         if first_file == None:
             first_file = filename
