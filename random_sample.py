@@ -4,7 +4,7 @@ Usage: python random_sample.py infile_dir outfile N R
 N = total number of events to sample
 R = total number of files to sample
 
-Examle: python random_sample.py /n/fs/gcf/raw-data /n/fs/scratch/dchouren/random_sampled_lines 1000000 150
+Examle: python random_sample.py /n/fs/gcf/raw-data /n/fs/scratch/dchouren/random_20000101.export.CSV 1000000 150
 """
 
 import glob
