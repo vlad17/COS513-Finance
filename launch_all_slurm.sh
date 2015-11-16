@@ -104,7 +104,7 @@ SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts
 
 for i in $clusters; do
   name="sample-learn-$i"
-  slurm_header "05:00:00" "15G" "/bin/bash -c \"
+  slurm_header "05:00:00" "32G" "/bin/bash -c \"
     set -e
     mkdir -p $pre_sample_dir $exp_sample_dir
     source $PYENV

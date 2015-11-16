@@ -29,7 +29,7 @@ def main():
         print(__doc__)
         return 1
 
-    infiles = glob(sys.argv[1] + '/*')
+    infiles = glob(sys.argv[1])
     outfile = sys.argv[2]
     K = int(sys.argv[3])
 

@@ -114,14 +114,14 @@ def expand_row(fields):
             #         word_vec = full_model[quadgram[trigram[bigram[split_field]]]].tolist()[0]
             # except KeyError:
             #     return None
-            expanded.extend(word_vec)
+            # expanded.extend(word_vec)
         else:
             expanded.append(field)
     expanded.extend(importance)
     return expanded
 
 def load_models(models_dir):
-    print('Loading models... ', end='')
+    print('Loading models... ', end = '')
     with elapsed_timer() as elapsed:
         with open(os.path.join(models_dir, 'word2vec'), 'rb') as word2vec_file:
             full_model = pickle.load(word2vec_file)
