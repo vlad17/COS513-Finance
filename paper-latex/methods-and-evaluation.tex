@@ -18,6 +18,30 @@ Thus, our model assumes that:
 
 Both of these are strong assumptions. The first may be weakened by adapting a dynamic clustering model, such as an infinite Gaussian Mixture Model or an HDP. The second requires $\textbf{d}_i$ to be both contain a sufficient amount of information to predict price behavior, which is a matter of appropriate feature extraction, and the assumption that we do not lose too much predictive power in summarizing a day by aggregating over the clusters to which its news events belonged to.
 
+\subsubsection{Vector Autoregressive}
+VAR models are some of the most flexible and easy to use models for multivariate time series. They have proven to be especially useful for describing the dynamic behavior of economic and financial time series and for forecasting \cite{tsay, VAR}. \\
+Let $Y_t = (y_1, y_2,...,y_nt)'$ denote an $(n \times 1)$ vector of time series variables. The basic p-lag vector autoregressive model (VAR(p)) has the form:
+$$\bf{Y}_t=\bf{c}+\bf{\Pi}_1\bf{Y}_{t-1}+\bf{\Pi}_2\bf{Y}_{t-2}+\cdots+\bf{\Pi}_p\bf{Y}_{t-p}+\epsilon_t,$$ $$t=1\ldots T$$
+where $\Pi_i$ are $(n \times n)$ matrix and $\epsilon_t$ is an $(n \times 1)$ unobservable zero mean noise vector process.
+\subsubsection{Regimes and Markov-Switching}
+Recently, there has been work on Markov-Switching Vector Autoregressive Models (MSVAR) \cite{tsay}. In a Markov Switching Model the observed change in a variable between period t and t+1 is assumed to be a random draw from a distribution. Which distribution is appropriate depends  on an unobserved state variable $s_t$. When $s_t=1$, the observed change $y_t$ is drawn from $N(\mu_1,\sigma_1^2)$ and when $s_t=2$, the observed change $y_t$ is draw from $N(\mu_2,\sigma_2^2)$.
+The state variable is then assumed to evolve according to a Markov Chain such that the probability of being in state 1 at time t given that state 1 obtained at time t-1 equals $p_{11}$. Accordingly, we can build a transition matrix. There has been a decent amount of work that assumes the existence of 2 latent states (bullish vs. bearish market states) \cite{OIL}. MSVAR has also been used for high-frequency forecasts of foreign exchange markets \cite{MSVAR}.
+\subsubsection{Impulse Response}
+Since the contribution of Sims \cite{SIMS} the interaction between variables and disturbances in VAR models has been best described and interpreted by impulse response functions.
+An impulse response is when a shock is assigned to one variable of the system and where the propagation of this shock on all the variables of the system s studied over time.
+Impulse response functions are used to describe how the economy reacts over time to exogenous impulses, which economists usually call shocks. Impulse response functions describe the reaction of endogenous macroeconomic variables at the time of the shock and over subsequent points in time.
+The standard method to identify such shocks is through recursive identification where we impose a certain ordering to the variables, hence assuming that all contemporaneous interactions among variables are recursive. This corresponds to a B model allowing for instantaneous effects of the shocks on the variables which can be written as follows:
+$$y_t=A^{(0)}_{s_t}+\sum_{i=1}^p A^{(i)}_{s_t}y_{t-i}+B_{s_t}\epsilon_t$$
+Identifying the exact dates and the impact of these impulse responses can allow to better characterize big shifts in the markets that might (e.g. recessions) \cite{SIMS}.
+\subsubsection{General Approach to Exogenous Factors}
+There has been a lot of work on integrating exogenous factors (factors that are not caused by the financial data and are usual external to the financial systems/markets). VAR is, consequently, extended to accommodate a matrix of external events as follows \cite{VARX}: 
+$$\bf{Y}_t=\bf{c}+\bf{\Pi}_1\bf{Y}_{t-1}+\bf{\Pi}_2\bf{Y}_{t-2}+\cdots+\bf{\Pi}_p\bf{Y}_{t-p}+\bf{\Phi D}_t+\bf{GX}_t+\epsilon_t$$
+where $D_t$ represents an $(l \times l)$ matrix of deterministic components, $X_t$ represents an $(m \times 1)$ matrix of exogenous variable and $\Phi$ and $G$ are parameter matrices.
+$\bf{y}_t=A^{-1}A^*_1\bf{y}_{t-1}+\ldots+A^{-1}A^*_p\bf{y}_{t-p}+A^{-1}A^*_1B\epsilon_t$
+
+\subsubsection{ARIMA}
+ARIMA stands for Auto-Regressive Integrated Moving Average. ARIMA models are, in theory, the most general class of models for forecasting a time series which can be made to be “stationary” by taking the difference (if necessary), perhaps in conjunction with nonlinear transformations such as logging or deflating (if necessary). A random variable that is a time series is stationary if its statistical properties are all constant over time.  A stationary series has no trend, its variations around its mean have a constant amplitude, and it wiggles in a consistent fashion, i.e., its short-term random time patterns always look the same in a statistical sense. The latter condition means that its auto-correlations (correlations with its own prior deviations from the mean) remain constant over time, or equivalently, that its power spectrum remains constant over time.  A random variable of this form can be viewed (as usual) as a combination of signal and noise, and the signal (if one is apparent) could be a pattern of fast or slow mean reversion, or sinusoidal oscillation, or rapid alternation in sign, and it could also have a seasonal component.  An ARIMA model can be viewed as a “filter” that tries to separate the signal from the noise, and the signal is then extrapolated into the future to obtain forecasts. Several works have built and tested Autoregressive Integrated Moving Average (ARIMA) models to forecast various econometric time series. For example, \cite{Vol} used ARIMA for realized volatility forecasting.
+
 \subsection{Execution}
 
 Our current implementation uses $K$-means for clustering and logistic regression for classification. We trained, validated, and sampled from the days between 2013-04-01 and 2015-07-31. Recent days were used for testing.
