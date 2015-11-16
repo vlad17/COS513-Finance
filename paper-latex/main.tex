@@ -106,7 +106,13 @@
 % package.
 \icmlauthor{Vladimir Feinberg}{vyf@princeton.edu}
 \icmladdress{Princeton University}
+\icmlauthor{Ghassen Jerfel}{gjerfel@princeton.edu}
+\icmladdress{Princeton University}
 \icmlauthor{Daway Chou-Ren}{dchouren@princeton.edu}
+\icmladdress{Princeton University}
+\icmlauthor{Zi Xiang Pan}{zpan@princeton.edu}
+\icmladdress{Princeton University}
+\icmlauthor{Tom Wu}{tongbinw@princeton.edu}
 \icmladdress{Princeton University}
 
 % You may provide any keywords that you 
@@ -119,7 +125,7 @@
 
 \begin{abstract} 
 
-We propose a new method for predicing commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weights each day's news events with an extracted importance metric. We use GDELT for raw news attributes and sentiment analysis. With a $K$-means model for clustering and logistic regression as a prediction for the probability that a commodity price will  increase the next day, and using an $80-10-10$ split on two years of news data from 2013-04-01 to 2015-02-08, we achieved an error rate of 0.373 with a 0.5 cutoff for binary classification.
+We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weights each day's news events with an extracted importance metric. We use GDELT for raw news attributes and sentiment analysis. With a $K$-means model for clustering and logistic regression and a vector autoregressive model as a prediction for the probability that a commodity price will  increase the next day, and using an $80-10-10$ split on six years of news data from 2006-04-01 to 2015-02-08, we achieved an error rate of ??? with a ??? cutoff for binary classification.
 
 \end{abstract} 
 
@@ -135,27 +141,23 @@ We propose a new method for predicing commodity price data through the use of ag
 
 \section{Introduction}
  
-% Daway 
 \input{introduction.tex}
+
  
 \section{Motivating Analysis}
 
-% Vlad
 \input{motivating-analysis.tex}
 
 \section{Related Work}
 
-% Daway
 \input{related_work.tex}
 
 \section{Methods and Evaluation}
 
-% Vlad (+ Daway for pictures)
 \input{methods-and-evaluation.tex}
 
 \section{Results}
 
-% Daway
 \input{results.tex}
 % remember to add the disclaimer on the current results
 
@@ -167,7 +169,6 @@ We propose a new method for predicing commodity price data through the use of ag
 
 \section{Future Work}
 
-% Vlad
 \input{future_work.tex}
 
 \subsection{Software and Data}
