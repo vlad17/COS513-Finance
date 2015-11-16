@@ -97,22 +97,23 @@ def expand_row(fields):
             expanded.extend(one_hot_array)
 
         elif field_type == 'string':
+            continue
             
-            field = field.strip()
-            split_field = field.split(' ')
-            try:
-                if len(field) == 0:
-                    word_vec = [0 for i in range(100)]
-                elif len(split_field) == 1:
-                    word_vec = full_model[split_field].tolist()[0]
-                elif len(split_field) == 2:
-                    word_vec = full_model[bigram[split_field]].tolist()[0]
-                elif len(split_field) == 3:
-                    word_vec = full_model[trigram[bigram[split_field]]].tolist()[0]
-                else:
-                    word_vec = full_model[quadgram[trigram[bigram[split_field]]]].tolist()[0]
-            except KeyError:
-                return None
+            # field = field.strip()
+            # split_field = field.split(' ')
+            # try:
+            #     if len(field) == 0:
+            #         word_vec = [0 for i in range(100)]
+            #     elif len(split_field) == 1:
+            #         word_vec = full_model[split_field].tolist()[0]
+            #     elif len(split_field) == 2:
+            #         word_vec = full_model[bigram[split_field]].tolist()[0]
+            #     elif len(split_field) == 3:
+            #         word_vec = full_model[trigram[bigram[split_field]]].tolist()[0]
+            #     else:
+            #         word_vec = full_model[quadgram[trigram[bigram[split_field]]]].tolist()[0]
+            # except KeyError:
+            #     return None
             expanded.extend(word_vec)
         else:
             expanded.append(field)
