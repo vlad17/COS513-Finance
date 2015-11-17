@@ -15,7 +15,7 @@ import fileinput
 import pickle
 import sys
 import os
-from preprocessing import clean_row
+import preprocessing
 # from expand import expand_row
 
 TOPIC_COLUMNS = 938 
@@ -99,7 +99,7 @@ def expand_row(fields):
 
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 3:
         print(__doc__)
         return 1
 
@@ -123,7 +123,7 @@ def main():
     with open(tmp_file) as random_lines_file:
         for line in random_lines_file:
             print(line)
-            preprocessed = clean_row(line)
+            preprocessed = preprocessing.clean_row(line)
             # fields = preprocessed.split('\t')
             expanded = expand_row(preprocessed)
 
