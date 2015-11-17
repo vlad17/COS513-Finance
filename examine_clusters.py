@@ -106,7 +106,9 @@ def main():
     infiles = glob(sys.argv[1] + '/*')
 
     print("Loading model")
-    model = pickle.load(sys.argv[2])
+    model = None
+    with open(sys.argv[2], 'rb') as model_file:
+        model = pickle.load(model_file)
 
     tmp_file = '/tmp/random_lines_for_clusting'
     try:
