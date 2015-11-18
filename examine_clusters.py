@@ -40,7 +40,7 @@ def main():
 
     for inf in raw_files:
         # print inf
-        # print pre_process_dir + '/' + inf.split('/')[-1]
+        print pre_process_dir + '/' + inf.split('/')[-1]
         os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + '/' + inf.split('/')[-1]))
 
     print('Expanding')
