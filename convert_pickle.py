@@ -4,4 +4,5 @@ import pickle
 with open(sys.argv[1], 'rb') as model_file:
     model = pickle.load(model_file)
 
-pickle.dump(model, './1000_2.model', protocol=2)
+with open('./1000_2.model', 'wb') as model_out:
+    pickle.dump(model, model_out, protocol=2)
