@@ -61,7 +61,7 @@ def main():
             for raw_line, expanded_line in zip(raw_in, expanded_in):
                 # ipdb.set_trace()
                 print(raw_line)
-                print(model.predict(expanded_line.split('\t'))
+                print(model.predict(expanded_line.split('\t')))
                 print()
 
     return 0
