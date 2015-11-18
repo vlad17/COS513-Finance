@@ -11,7 +11,6 @@ from glob import glob
 import pickle
 import sys
 import os
-from itertools import izip
 
 
 def main():
@@ -59,7 +58,7 @@ def main():
     print('Examining')
     for raw_file, expanded_file in zip(raw_files, expanded_files):
         with open(raw_file, 'r') as raw_in, open(expanded_file, 'r') as expanded_in:
-            for raw_line, expanded_line in izip(raw_in, expanded_in):
+            for raw_line, expanded_line in zip(raw_in, expanded_in):
                 print(raw_line)
                 print(model.predict(expanded_line))
 
