@@ -30,12 +30,20 @@ def main():
 
     raw_files = glob(raw_dir + '/*')
 
+
+    files = glob(preprocessed_dir + '/*')
+    for f in files:
+        os.remove(f)
+    preprocess_files = glob(preprocessed_dir + '/*')
+
     for inf in raw_files:
         # print inf
         # print pre_process_dir + '/' + inf.split('/')[-1]
         os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + '/' + inf.split('/')[-1]))
 
-    preprocess_files = glob(preprocessed_dir + '/*')
+    files = glob(expanded_dir + '/*')
+    for f in files:
+        os.remove(f)
 
     for inf in preprocess_files:
         os.system('python expand.py {} {}'.format(inf, expanded_dir + '/' + inf.split('/')[-1]))
