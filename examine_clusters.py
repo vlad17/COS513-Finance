@@ -11,6 +11,7 @@ from glob import glob
 import pickle
 import sys
 import os
+import ipdb
 
 
 def main():
@@ -59,6 +60,7 @@ def main():
     for raw_file, expanded_file in zip(raw_files, expanded_files):
         with open(raw_file, 'r') as raw_in, open(expanded_file, 'r') as expanded_in:
             for raw_line, expanded_line in zip(raw_in, expanded_in):
+                ipdb.set_trace()
                 print(raw_line)
                 print(model.predict(expanded_line))
 
