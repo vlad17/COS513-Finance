@@ -30,18 +30,19 @@ def main():
         model = pickle.load(model_file)
 
     raw_files = glob(raw_dir + '/*')
-
+    print(raw_files)
 
     print('Preprocessing')
     files = glob(preprocessed_dir + '/*')
     for f in files:
         os.remove(f)
-    preprocess_files = glob(preprocessed_dir + '/*')
 
     for inf in raw_files:
         # print inf
         print(preprocessed_dir + '/' + inf.split('/')[-1])
         os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + '/' + inf.split('/')[-1]))
+    
+    preprocess_files = glob(preprocessed_dir + '/*')
 
     print('Expanding')
     files = glob(expanded_dir + '/*')
