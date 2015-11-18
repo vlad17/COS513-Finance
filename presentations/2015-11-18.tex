@@ -36,7 +36,7 @@ Notice when we're really confident we tend to leverage {\em a lot}. We might wan
 	%Daway
 		\section{Clustering}
 	
-	We attempted using a Dirchlet Process GMM because we have relatively information for deciding how many news clusters there should be. Unfortunately, implementations we attempted to use were intractable given the memory and computing constraints of the ionic cluster. Thus we had to revert back to a $K$-means clustering model.
+	We attempted using a Dirichlet Process GMM because we have relatively information for deciding how many news clusters there should be. Unfortunately, implementations we attempted to use were intractable given the memory and computing constraints of the ionic cluster. Thus we had to revert back to a $K$-means clustering model.
 
 	We train these models on a set of randomly sampled events for a given date range, for example, the date range of 01-01-2006 to 12-31-2013. Currently we sample 600,000 events across 150 randomly chosen files in this range, weighting the number of events from each day according to the total number of events in that day. Since trading strategies occur day by day, we can train this clustering offline and then make an "online" prediction for which cluster the next day's news data will belong in.
 
