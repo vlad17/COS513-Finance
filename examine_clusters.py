@@ -66,6 +66,8 @@ def main():
                 except KeyError:
                     clusters[cluster] = [raw_line.split('\t')[-1]]
 
+    ipdb.set_trace()
+
     with open('/n/fs/scratch/dchouren/models/clusters.pickle', 'wb') as handle:
         pickle.dump(clusters, handle)
 
