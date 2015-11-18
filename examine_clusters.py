@@ -1,16 +1,17 @@
 
 """
-Usage: python examine_clusters.py raw_data_dir model_file 
+Usage: python examine_clusters.py raw_data_dir preprocessed_dir expanded_dir model_file 
 
-Examines cluster model for a given K
+Examines cluster model assignments by preprocessing, expanding, and then clustering some raw data according to a loaded model
 
-Example: python examine_clusters.py /n/fs/gcf/raw-data /n/fs/scratch/dchouren/models/1000.model
+Example: python examine_clusters.py /n/fs/scratch/dchouren/examine_data/raw /n/fs/scratch/dchouren/examine_data/preprocessed/ /n/fs/scratch/dchouren/examine_data/expanded/ /n/fs/scratch/dchouren/models/1000.model
 """
 
 from glob import glob
 import pickle
 import sys
 import os
+from itertools import izip
 
 
 def main():
@@ -58,7 +59,7 @@ def main():
     print('Examining')
     for raw_file, expanded_file in zip(raw_files, expanded_files):
         with open(raw_file, 'r') as raw_in, open(expanded_file, 'r') as expanded_in:
-            for raw_line, expanded_line in raw_in, expanded_in:
+            for raw_line, expanded_line in izip(raw_in, expanded_in):
                 print(raw_line)
                 print(model.predict(expanded_line))
 
