@@ -31,20 +31,19 @@ def main():
         model = pickle.load(model_file)
 
     raw_files = glob(raw_dir + '/*')
-    print(raw_files)
 
+    print()
     print('Preprocessing')
     files = glob(preprocessed_dir + '/*')
     for f in files:
         os.remove(f)
 
     for inf in raw_files:
-        # print inf
-        print(preprocessed_dir + '/' + inf.split('/')[-1])
         os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + '/' + inf.split('/')[-1]))
     
     preprocess_files = glob(preprocessed_dir + '/*')
 
+    print()
     print('Expanding')
     files = glob(expanded_dir + '/*')
     for f in files:
@@ -55,14 +54,15 @@ def main():
 
     expanded_files = glob(expanded_dir + '/*')
 
-
+    print()
     print('Examining')
     for raw_file, expanded_file in zip(raw_files, expanded_files):
         with open(raw_file, 'r') as raw_in, open(expanded_file, 'r') as expanded_in:
             for raw_line, expanded_line in zip(raw_in, expanded_in):
-                ipdb.set_trace()
+                # ipdb.set_trace()
                 print(raw_line)
-                print(model.predict(expanded_line))
+                print(model.predict(expanded_line.split('\t'))
+                print()
 
     return 0
 
