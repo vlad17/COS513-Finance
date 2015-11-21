@@ -53,6 +53,8 @@ def main():
 
     first_file = None
 
+    print("Shuffing")
+
     for filename, num_events in file_matches.items():
         if first_file == None:
             first_file = filename
