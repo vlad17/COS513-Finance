@@ -102,46 +102,46 @@ echo "************************************************************"
 
 SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts
 
-# for i in $clusters; do
-#   name="sample-learn-$i"
-#   slurm_header "05:00:00" "46G" "/bin/bash -c \"
-#     set -e
-#     mkdir -p $pre_sample_dir $exp_sample_dir
-#     source $PYENV
-#     python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre-$i.csv
-#     python $FINANCE/expand.py $pre_sample_dir/sample-pre-$i.csv $exp_sample_dir/sample-exp-$i.csv
-#     python $FINANCE/clustering.py \\\"$exp_sample_dir/sample-exp-$i.csv\\\" $models_dir/$i.model $i
-#     rm -rf $pre_sample_dir/sample-pre-$i.csv
-#     rm -rf $exp_sample_dir/sample-exp-$i.csv
-#   \"" "$name" > $SCRIPT_DIR/$name.slurm
-# done
+for i in $clusters; do
+  name="sample-learn-$i"
+  slurm_header "05:00:00" "46G" "/bin/bash -c \"
+    set -e
+    mkdir -p $pre_sample_dir $exp_sample_dir
+    source $PYENV
+    python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre-$i.csv
+    python $FINANCE/expand.py $pre_sample_dir/sample-pre-$i.csv $exp_sample_dir/sample-exp-$i.csv
+    python $FINANCE/clustering.py \\\"$exp_sample_dir/sample-exp-$i.csv\\\" $models_dir/$i.model $i
+    rm -rf $pre_sample_dir/sample-pre-$i.csv
+    rm -rf $exp_sample_dir/sample-exp-$i.csv
+  \"" "$name" > $SCRIPT_DIR/$name.slurm
+done
 
-# for i in $(cat $all_days); do
-#   name="day-expand-$i"
-#   slurm_header "00:30:00" "2G" "/bin/bash -c \"
-#     set -e
-#     mkdir -p $pre_dir $exp_dir
-#     source $PYENV
-#     python $FINANCE/preprocessing.py $raw_data_dir/$i.export.CSV $pre_dir/$i.csv
-#     cd $FINANCE # TODO ugly dep for models/
-#     python $FINANCE/expand.py $pre_dir/$i.csv $exp_dir/$i.csv
-#     if [ ! -s $exp_dir/$i.csv ]; then
-#       echo file $exp_dir/$i.csv empty, dropping
-#       rm $exp_dir/$i.csv
-#     fi
-#     rm -rf $pre_dir/$i.csv
-#   \"" "$name" > $SCRIPT_DIR/$name.slurm
+for i in $(cat $all_days); do
+  name="day-expand-$i"
+  slurm_header "00:30:00" "2G" "/bin/bash -c \"
+    set -e
+    mkdir -p $pre_dir $exp_dir
+    source $PYENV
+    python $FINANCE/preprocessing.py $raw_data_dir/$i.export.CSV $pre_dir/$i.csv
+    cd $FINANCE # TODO ugly dep for models/
+    python $FINANCE/expand.py $pre_dir/$i.csv $exp_dir/$i.csv
+    if [ ! -s $exp_dir/$i.csv ]; then
+      echo file $exp_dir/$i.csv empty, dropping
+      rm $exp_dir/$i.csv
+    fi
+    rm -rf $pre_dir/$i.csv
+  \"" "$name" > $SCRIPT_DIR/$name.slurm
 
-#   for j in $clusters; do
-#       name="day-summary-$i-$j"
-#       slurm_header "01:00:00" "12G" "/bin/bash -c \"
-#         set -e
-#         mkdir -p $summary_dir $summary_dir/$j
-#         source $PYENV
-#         python $FINANCE/summarize.py $exp_dir/$i.csv $summary_dir/$j/$i.csv $models_dir/$j.model
-#   \"" "$name" > $SCRIPT_DIR/$name.slurm
-#   done
-# done
+  for j in $clusters; do
+      name="day-summary-$i-$j"
+      slurm_header "01:00:00" "12G" "/bin/bash -c \"
+        set -e
+        mkdir -p $summary_dir $summary_dir/$j
+        source $PYENV
+        python $FINANCE/summarize.py $exp_dir/$i.csv $summary_dir/$j/$i.csv $models_dir/$j.model
+  \"" "$name" > $SCRIPT_DIR/$name.slurm
+  done
+done
 
 echo
 echo "************************************************************"
