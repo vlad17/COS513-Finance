@@ -42,11 +42,12 @@ def main():
         if re.match('^(2006|2007|2008|2009|2010|2011)', inf.split('/')[-1]):
 
             num_events = 0
-            with open(inf, 'r') as inf:
-                num_events = sum(1 for _ in inf)
+            inf_name = str(inf)
+            with open(inf, 'r') as inf_open:
+                num_events = sum(1 for _ in inf_open)
             total_num_events += num_events
 
-            file_matches[inf] = num_events
+            file_matches[inf_name] = num_events
 
 
     total_selected = 0
