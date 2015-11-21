@@ -148,28 +148,30 @@ echo "************************************************************"
 echo "LAUNCHING SAMPLE CLUSTER LEARNING STAGE"
 echo "************************************************************"
 
-model_learn=()
-for i in $clusters; do
-  model_learn+=($(sbatch $SCRIPT_DIR/sample-learn-$i.slurm | cut -f4 -d' '))
-done
-model_learn=$(echo ${model_learn[@]} | tr ' ' ':')
-echo "SLURM JOBS" $model_learn
+# model_learn=()
+# for i in $clusters; do
+#   model_learn+=($(sbatch $SCRIPT_DIR/sample-learn-$i.slurm | cut -f4 -d' '))
+# done
+# model_learn=$(echo ${model_learn[@]} | tr ' ' ':')
+# echo "SLURM JOBS" $model_learn
 
-rm -f $SLURM_OUT/sample-learning-stage-$lo-$hi
-notify_email "sample-learning-stage-$lo-$hi" > /tmp/$USER/update-sample-learning
-sbatch --dependency=afterok:$model_learn /tmp/$USER/update-sample-learning
-while [ ! -f $SLURM_OUT/sample-learning-stage-$lo-$hi ]; do
-  sleep 5
-done
+# rm -f $SLURM_OUT/sample-learning-stage-$lo-$hi
+# notify_email "sample-learning-stage-$lo-$hi" > /tmp/$USER/update-sample-learning
+# sbatch --dependency=afterok:$model_learn /tmp/$USER/update-sample-learning
+# while [ ! -f $SLURM_OUT/sample-learning-stage-$lo-$hi ]; do
+#   sleep 5
+# done
 
 echo
 echo "************************************************************"
 echo "LAUNCHING FULL-DAY EXPANSIONS"
 echo "************************************************************"
 
+#--dependency=afterany:$model_learn 
+
 full_days_exp=()
 for i in $(cat $all_days); do
-    full_days_exp+=($(sbatch --dependency=afterany:$model_learn $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
+    full_days_exp+=($(sbatch $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
 done
 full_days_exp=$(echo ${full_days_exp[@]} | tr ' ' ':')
 echo "SLURM JOBS" $full_days_exp
