@@ -5,13 +5,51 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{color}
 \begin{document}
-	%Tom
-	\section{Data search}
-	
 	%Ghassen
 	\section{LM ARIMA}
+		\subsection{Exploratory Analysis}
+		We used the Autocorrelation Function to explore possible AR or MA terms. Reminder: AR is for the AutoRegressive terms = autocorrelated lags and MA is for the Mean Average terms (non-linear model and the underlying implementation uses Kalman filters).
 	
+		\subsection{Training/Testing Strategy}
+	We resorted to walk forward optimization (moving window training) which is a form of k-fold cross-validation for time series data. We have a moving window of the time series and at each instance of the window we re-estimate the coefficients and do look-ahead predictions. This helps to average out the error measures as well as devise an online strategy for trading.
+	However, it would be expensive to re-estimate the order (number of lags or MA terms) at each step. Therefore, we use auto.arima() one time to explore the order inferred by all of the testing data then refit to that order in each window: re-estimate the AR and MA coefficients but fix the order. 
+	The criterion for our training would be AIC (a lower AIC indicates a higher log-likelihood thus a high predictable power while penalizing for number of terms: regularization) for ARIMA. As for the linear model, it could be AIC as well (computation is off by a constant in R for AIC in LM and ARIMA so it is hard to compare) but we focused on the p-value of each regressor and the general R-squared for the training fit and the visual analysis of the results as well as the Mean Absolute Error (or Mean Scaled Error).
+	
+\begin{center}	\includegraphics[scale=0.7]{../ACF.PNG}\end{center}
+	\subsection{ARIMA}
+	As seen in the ACF plot, there are 5 autocorrelated lags wihin a close range. However, auto.arima struggles with the scale of our data to explore more than 2 MA terms and 3 AR terms so it picks a model of AR(3)MA(1) or AR(2)MA(2). The MA terms lead to a non-linear system, therefore, our later LM analysis is not expressing the whole data.
+	
+	Using ARIMA, we faced lots of issues with the convergence given singularity problems in the design matrix. This amounted to 2 distinct problems: multicollinearity: was easy to remove linearly dependent columns using QR decomposition but high correlation between the columns was hard to analyse AND the number of variables exceeding the number of observations. Therefore, we used Variance Inflation Factors to analyze the correlation between columns and eliminate those that exceeded a certain threshold. Afterwards, we had to reduce our dimensions to be able to fit smaller windows of the time series: we used PCA where we found that 95$\%$ of the variance was contributed by the first 200 of the 808 columns and thus used those for ARIMA.
+	
+	However, ARIMA still takes too long. auto.arima() on the hold dataset is more than 7 hours (before PCA). The values after PCA had a worse AIC (a criterion of fitness) and we still have to decide on the best window size.
+	\begin{center}
+	\includegraphics[scale=0.7]{../PCA.PNG}	
+	\end{center}
+	Therefore, our results are still inconclusive. However, our training Mean Absolute Error was as low as 0.07 for AR(3)MA(1) [takes 3 hours+ to compute]. This is equivalent to 10-20\% erorr rate. [couldn't obtain exact values from the forecast because of small values driving the approximation to infinity and messing up the package's MAPE estimate].
+	Our testing however was characterized by overconfidence (really low Standard Error) and volatility (values are really high and fast-changing). This indicates a problem with our ARIMA model that could be rooted in either remaining multicollinearity or simply over-fitting.
+
+
+	\subsection{Linear Models}:
+	The linear model's fit is determined by the in-sample R-squared initially and the Mean Absolute Error for the out-of-sample.
+	We estimated the model using the 4 most import lags: 1, 2, 14, 20 and 21. We ignored the MA term in this case.
+	The results were an R-squared of 0.98 but when adjusted to the dimensions is more like 0.56 which is still a good correlation value. P-value < 0.01 demonstrates the statistical significance of our variables.
+	However, for ease of prediction (1-step ahead prediction for each window) we limited ourselves to the highly autocorrelated 1-lag ($x_{t-1}$). Using lags as far away as 14 and 21 would require a recursive estimation. This is why we are trying to make ARIMA work: once the orders are defined forecasting is trivial. However, for this week, we only did 2 lags + news data.
+	Finally, we obtained an MAE of 0.7 which is about 10 times higher than the best in-sample MAE of ARIMA. However, the results made more sense than ARIMA's and as we can see in the graph, they identified major fluctuations in the data with resembling amplitudes. Therefore, the high MAE is rather misleading.
+	
+	Finally, right before the presentation, we realized a silly error with the preprocessing of the financial time series which might explain the inaccuracies of the ARIMA (why it would overfit this bad) and improve the prediction accuracy of both LM and ARIMA.
+
+\begin{center}
+\includegraphics[scale=0.7]{../Pred820.PNG}
+\end{center}
+
+	%Tom
+	\section{Grid Search for the Most Promising Parameters}
+	
+        See \hyperref[http://tiny.cc/grid_search_results]{{\color{blue} \underline{grid results online}}}.
+
+
 	%Vlad
 	\section{Kelly trading strategy}
 	
