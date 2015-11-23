@@ -34,7 +34,7 @@ def main():
     K = int(sys.argv[3])
 
     print("Reading in", len(infiles), "files")
-    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,7:]
 
     print("Learning MiniBatchKMeans with K =", K)
 
