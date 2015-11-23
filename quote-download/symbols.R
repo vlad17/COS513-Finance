@@ -566,11 +566,13 @@ symbols = c("DX",
 "NYM",
 "SFR")
 
+ symbols <- c("VIX", "SPY", "FTSE", "N225")
+
 for(t in symbols) {
   cat(paste("Downloading", t, "\n"))
   tryCatch(
     {
-      ticker <- getFX(t,  from="2013-01-01", to='2015-11-01')
+      ticker <- getSymbols(t,  from="2013-01-01", to='2015-11-01')
       cat(paste("The ticker was", ticker, "\n"))
       eval(parse(text=paste('data <- ', ticker, sep='')))
       write.zoo(data, file=paste(ticker, '.csv', sep=''))
