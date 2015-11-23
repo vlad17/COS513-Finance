@@ -7,6 +7,9 @@ name. Similarly for word2vec_(bi|tri|quad)gram. Default models_dir is
 
 Translates the schema outputted from preprocessing.py to a numerical-only
 float array, printed in csv format to outfile.
+
+Needs 1G with out w2v models loaded (load_models)
+Needs 4G with w2v models
 """
 import csv
 import sys
@@ -70,7 +73,10 @@ categorical_total = {
 
 def one_hot(number, total):
     one_hot_array = [0 for i in range(total)]
-    one_hot_array[int(number)-1] = 1
+    try:
+        one_hot_array[int(number)-1] = 1
+    except:
+        pass
 
     return one_hot_array
 
@@ -94,30 +100,31 @@ def expand_row(fields):
             expanded.extend(one_hot_array)
 
         elif field_type == 'string':
+            continue
             
-            field = field.strip()
-            split_field = field.split(' ')
-            try:
-                if len(field) == 0:
-                    word_vec = [0 for i in range(100)]
-                elif len(split_field) == 1:
-                    word_vec = full_model[split_field].tolist()[0]
-                elif len(split_field) == 2:
-                    word_vec = full_model[bigram[split_field]].tolist()[0]
-                elif len(split_field) == 3:
-                    word_vec = full_model[trigram[bigram[split_field]]].tolist()[0]
-                else:
-                    word_vec = full_model[quadgram[trigram[bigram[split_field]]]].tolist()[0]
-            except KeyError:
-                return None
-            expanded.extend(word_vec)
+            # field = field.strip()
+            # split_field = field.split(' ')
+            # try:
+            #     if len(field) == 0:
+            #         word_vec = [0 for i in range(100)]
+            #     elif len(split_field) == 1:
+            #         word_vec = full_model[split_field].tolist()[0]
+            #     elif len(split_field) == 2:
+            #         word_vec = full_model[bigram[split_field]].tolist()[0]
+            #     elif len(split_field) == 3:
+            #         word_vec = full_model[trigram[bigram[split_field]]].tolist()[0]
+            #     else:
+            #         word_vec = full_model[quadgram[trigram[bigram[split_field]]]].tolist()[0]
+            # except KeyError:
+            #     return None
+            # expanded.extend(word_vec)
         else:
             expanded.append(field)
     expanded.extend(importance)
     return expanded
 
 def load_models(models_dir):
-    print('Loading models... ', end='')
+    print('Loading models... ', end = '')
     with elapsed_timer() as elapsed:
         with open(os.path.join(models_dir, 'word2vec'), 'rb') as word2vec_file:
             full_model = pickle.load(word2vec_file)
@@ -146,7 +153,7 @@ def main():
         reader = csv.reader(i, delimiter = '\t')
         writer = csv.writer(o, delimiter = '\t')
         global full_model, bigram, trigram, quadgram 
-        full_model, bigram, trigram, quadgram = load_models(models_dir)
+        # full_model, bigram, trigram, quadgram = load_models(models_dir)
         
         tot_rows = 0
         dropped_rows = 0
