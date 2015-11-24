@@ -45,10 +45,10 @@ hi="$6"
 email="$7"
 code_dir="$8"
 
-sample_dir=/scratch/$USER/sample
-pre_sample_dir=/scratch/$USER/sample-preprocessed
-exp_sample_dir=/scratch/$USER/sample-expanded
-pre_dir=/scratch/$USER/preprocessed
+sample_dir=/n/fs/scratch/$USER/sample
+pre_sample_dir=/n/fs/scratch/$USER/sample-preprocessed
+exp_sample_dir=/n/fs/scratch/$USER/sample-expanded
+pre_dir=/n/fs/scratch/$USER/preprocessed
 exp_dir=/n/fs/scratch/$USER/expanded
 
 mkdir -p $exp_sample_dir /tmp/$USER $models_dir $summary_dir
