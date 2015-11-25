@@ -171,7 +171,7 @@ echo "************************************************************"
 
 full_days_exp=()
 for i in $(cat $all_days); do
-    full_days_exp+=($(sbatch --dependency=afterany:$model_learn  $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
+    full_days_exp+=($(sbatch $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
 done
 full_days_exp=$(echo ${full_days_exp[@]} | tr ' ' ':')
 echo "SLURM JOBS" $full_days_exp
