@@ -1,10 +1,10 @@
 """
-Usage: python random_sample.py infile_dir outfile N R
+Usage: python random_sample.py infile_dir outfile N
 
 N = total number of events to sample
 R = total number of files to sample
 
-Examle: python random_sample.py /n/fs/gcf/raw-data /n/fs/scratch/dchouren/random_20000101.export.CSV 1000000 150
+Examle: python random_sample.py /n/fs/gcf/raw-data /n/fs/scratch/dchouren/random_20000101.export.CSV 1000000
 """
 
 import glob
@@ -17,7 +17,7 @@ import os
 
 def main():
 
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 4:
         print(__doc__)
         return 1
 
@@ -27,36 +27,34 @@ def main():
     infiles = set(glob.glob(sys.argv[1] + '/*'))
     outfile = sys.argv[2]
     N = int(sys.argv[3])
-    R = int(sys.argv[4])
 
     try:
         os.remove(outfile)
     except OSError:
         pass
 
-    num_file_matches = 0
     file_matches = {}
 
-    print("Sampling {} files for {} total events".format(R, N))
+    print("Sampling for {} total events".format(N))
     total_num_events = 0
-    while num_file_matches < R:   # R-1 because we have one final sample to account for int division rounding down
-        random_file = random.choice(list(infiles))
 
-        infiles.remove(random_file)
+    for inf in infiles:
+        if re.match('^(2006|2007|2008|2009|2010|2011)', inf.split('/')[-1]):
 
-
-        if re.match('^(2006|2007|2008|2009|2010|2011)', random_file.split('/')[-1]):
             num_events = 0
-            with open(random_file, 'r') as inf:
-                num_events = sum(1 for _ in inf)
+            inf_name = str(inf)
+            with open(inf, 'r') as inf_open:
+                num_events = sum(1 for _ in inf_open)
             total_num_events += num_events
-            file_matches[random_file] = num_events
 
-            num_file_matches += 1
+            file_matches[inf_name] = num_events
+
 
     total_selected = 0
 
     first_file = None
+
+    print("Shuffing")
 
     for filename, num_events in file_matches.items():
         if first_file == None:
@@ -64,7 +62,7 @@ def main():
         num_to_sample = int(num_events / float(total_num_events) * N)
         total_selected += num_to_sample
 
-        os.system('shuf -n {} {} >> {}'.format(num_to_sample, first_file, outfile))
+        os.system('shuf -n {} {} >> {}'.format(num_to_sample, filename, outfile))
 
     # since we used integer division to calculate the number of lines to sample from each file
     # we need to oversample for the last file

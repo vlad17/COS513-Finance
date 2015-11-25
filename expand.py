@@ -73,7 +73,10 @@ categorical_total = {
 
 def one_hot(number, total):
     one_hot_array = [0 for i in range(total)]
-    one_hot_array[int(number)-1] = 1
+    try:
+        one_hot_array[int(number)-1] = 1
+    except:
+        pass
 
     return one_hot_array
 

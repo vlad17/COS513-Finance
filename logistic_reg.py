@@ -1,7 +1,7 @@
 """
-Usage: python svm.py train_start, train_end, valid_start, valid_end, test_start, test_end, k, commodity
+Usage: python logistic_reg.py train_start, train_end, valid_start, valid_end, test_start, test_end, k, commodities
 
-commodity should be a comma separated list of commodities to study
+commodities should be a comma separated list of commodities to study
 
 Loads expanded, summarized feature set of K days, splits data into training and test sets,
 and trains using SVM model on the training sets
@@ -84,17 +84,17 @@ def main():
         train_y = price_changes[(price_changes.index >= train_start) & (price_changes.index <= train_end)]
 
         # PCA
-        pca = decomposition.PCA(n_components=20, whiten=True)
-        pca.fit(train)
-        train = pca.transform(train)
+        # pca = decomposition.PCA(n_components=20, whiten=True)
+        # pca.fit(train)
+        # train = pca.transform(train)
 
         valid = all_features[(all_features.index >= valid_start) & (all_features.index <= valid_end)]
         valid_y = price_changes[(price_changes.index >= valid_start) & (price_changes.index <= valid_end)]
-        valid = pca.transform(valid)
+        # valid = pca.transform(valid)
 
         test = all_features[(all_features.index >= test_start) & (all_features.index <= test_end)]
         test_y = price_changes[(price_changes.index >= test_start) & (price_changes.index <= test_end)]
-        test = pca.transform(test)
+        # test = pca.transform(test)
 
         print('{} / {} Percentage:{}'.format(sum(np.array(train_y > 0)), len(train_y), sum(np.array(train_y > 0)) * 1.0 / len(train_y)))
         print('{} / {} Percentage:{}'.format(sum(np.array(valid_y > 0)), len(valid_y), sum(np.array(valid_y > 0)) * 1.0 / len(valid_y)))
@@ -110,11 +110,13 @@ def main():
             # choose regularization value based on validation error
             for c in itertools.chain(np.logspace(-3.0, 3.0, num=6)):
                 model = LogisticRegression(penalty = reg, C = c, tol = 0.0001,
-                                           dual = use_dual and reg == reg)
+                                           dual = (False and use_dual) and reg == reg)
                 model.fit(train, train_y)
+                train_score = model.score(train, train_y) 
+                print ()
+                print("Train accuracy: " + str(train_score))
                 valid_score = model.score(valid, valid_y)
                 valid_f1_score = f1_score(valid_y, model.predict(valid))
-                print ()
                 print ("parameters: reg={} c={}".format(reg, c))
                 print("validation accuracy: " + str(valid_score))
                 print('Validation f1 score: ' + str(valid_f1_score))

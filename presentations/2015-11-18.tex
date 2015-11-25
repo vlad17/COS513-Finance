@@ -9,8 +9,6 @@
 \begin{document}
 	%Ghassen
 	\section{LM ARIMA}
-
-
 		\subsection{Exploratory Analysis}
 		We used the Autocorrelation Function to explore possible AR or MA terms. Reminder: AR is for the AutoRegressive terms = autocorrelated lags and MA is for the Mean Average terms (non-linear model and the underlying implementation uses Kalman filters).
 	
@@ -32,7 +30,7 @@
 	Therefore, our results are still inconclusive. However, our training Mean Absolute Error was as low as 0.07 for AR(3)MA(1) [takes 3 hours+ to compute]. This is equivalent to 10-20\% erorr rate. [couldn't obtain exact values from the forecast because of small values driving the approximation to infinity and messing up the package's MAPE estimate].
 	Our testing however was characterized by overconfidence (really low Standard Error) and volatility (values are really high and fast-changing). This indicates a problem with our ARIMA model that could be rooted in either remaining multicollinearity or simply over-fitting.
 
-	
+
 	\subsection{Linear Models}:
 	The linear model's fit is determined by the in-sample R-squared initially and the Mean Absolute Error for the out-of-sample.
 	We estimated the model using the 4 most import lags: 1, 2, 14, 20 and 21. We ignored the MA term in this case.
