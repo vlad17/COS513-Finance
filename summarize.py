@@ -13,6 +13,7 @@ import sys
 from contextlib import contextmanager
 from timeit import default_timer
 import time 
+import ipdb
 
 @contextmanager
 def elapsed_timer():
@@ -54,6 +55,7 @@ def main():
 
     N = len(predictions)
     print('Matrix construction and multiply... ', end = '')
+    ipdb.set_trace()
     with elapsed_timer() as elapsed:
         K = km.get_params(deep = False)['n_clusters']
         topics = np.zeros((K, N))
@@ -67,7 +69,7 @@ def main():
         # check if normalizing by N makes anything too small
         small_indices = np.where(day < MIN_FLOAT_VALUE)
         if len(small_indices[0] > 0):
-            print('{}: {}\n'.format(infile, small_indices))
+            print('\n{}: {}\n'.format(infile, small_indices))
 
         day = np.append(day, [N])
     print('{}s'.format(elapsed()))
