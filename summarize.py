@@ -55,12 +55,14 @@ def main():
 
     N = len(predictions)
     print('Matrix construction and multiply... ', end = '')
-    ipdb.set_trace()
+    # ipdb.set_trace()
     with elapsed_timer() as elapsed:
         K = km.get_params(deep = False)['n_clusters']
         topics = np.zeros((K, N))
         for i, cluster in enumerate(predictions):
             topics[cluster, i] = 1.0
+
+        ipdb.set_trace()
         topics = np.append(topics, np.full((1, N), 1.0), axis = 0)
         importance = np.append(importance, np.full((N, 1), 1.0), axis = 1)
         day = np.dot(topics, importance).flatten()
