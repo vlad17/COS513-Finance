@@ -1,5 +1,5 @@
 """
-Usage: python summarize.py infile outfile modelfile
+Usage: python summarize.py infile summary_stats_file outfile modelfile
 
 Loads via pickle the MiniBatchKMeans model which should be used to identify the
 label of the each news item in the infile csv, which should be an "expanded"
@@ -27,13 +27,14 @@ TOPIC_COLUMNS = 938
 MIN_FLOAT_VALUE = 0.00000005  # TODO set this
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 5:
         print(__doc__)
         return 1
 
     infile = sys.argv[1]
-    outfile = sys.argv[2]
-    modelfile = sys.argv[3]
+    summary_stats_file = sys.argv[2]
+    outfile = sys.argv[3]
+    modelfile = sys.argv[4]
 
     print('Reading in day file {}... '.format(infile), end = '')
     with elapsed_timer() as elapsed, open(infile, 'r') as i:
@@ -52,6 +53,14 @@ def main():
     with elapsed_timer() as elapsed:
         predictions = km.predict(topics)
     print('{}s'.format(elapsed()))
+
+    print('Loading summary statistics... ')
+    summary_stats = None
+    with open(summary_stats_file, 'rb') as inf:
+        summary_stats = np.loadtxt(inf)
+    stds = summary_stats[:len(summary_stats)/2]
+    means = summary_stats[len(summary_stats)/2:]
+
 
     N = len(predictions)
     print('Matrix construction and multiply... ', end = '')

@@ -35,18 +35,30 @@ def main():
 
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,7:]
+    print(infiles[0])
+    if infiles[0] == 'random_sample_20000101':
+        print("Normalizing")
+        stds = np.apply_along_axis(np.std, 0, fullarr)[:,np.newaxis].T
+        means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
+        standardized_arr = (fullarr - means) / stds
+
+        with open('/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats', 'wb+') as summary_stats_outf:
+            np.savetxt(summary_stats_outf, stds.T, delimiter='\t')
+        with open('/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats', 'ab') as summary_stats_outf:
+            np.savetxt(summary_stats_outf, means.T, delimiter='\t')
+
 
     print("Learning MiniBatchKMeans with K =", K)
 
     km = MiniBatchKMeans(n_clusters = K, verbose = True) # TODO max_iter
-    km.fit(fullarr)
+    km.fit(standardized_arr)
 
     print("KMeans trained, saving")
 
     with open(outfile, 'wb') as out_model:
         pickle.dump(km, out_model)
 
-    print("Score:", km.score(fullarr))
+    print("Score:", km.score(standardized_arr))
     
     return 0
 
