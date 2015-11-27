@@ -169,19 +169,19 @@ echo "************************************************************"
 
 #--dependency=afterany:$model_learn 
 
-# full_days_exp=()
-# for i in $(cat $all_days); do
-#     full_days_exp+=($(sbatch --dependency=afterany:$model_learn  $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
-# done
-# full_days_exp=$(echo ${full_days_exp[@]} | tr ' ' ':')
-# echo "SLURM JOBS" $full_days_exp
+full_days_exp=()
+for i in $(cat $all_days); do
+    full_days_exp+=($(sbatch --dependency=afterany:$model_learn  $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
+done
+full_days_exp=$(echo ${full_days_exp[@]} | tr ' ' ':')
+echo "SLURM JOBS" $full_days_exp
 
-# rm -f $SLURM_OUT/full-days-expand-stage-$lo-$hi
-# notify_email "full-days-expand-stage-$lo-$hi" > /tmp/$USER/update-full-days-expand
-# sbatch --dependency=afterany:$full_days_exp /tmp/$USER/update-full-days-expand
-# while [ ! -f $SLURM_OUT/full-days-expand-stage-$lo-$hi ]; do 
-#   sleep 5
-# done
+rm -f $SLURM_OUT/full-days-expand-stage-$lo-$hi
+notify_email "full-days-expand-stage-$lo-$hi" > /tmp/$USER/update-full-days-expand
+sbatch --dependency=afterany:$full_days_exp /tmp/$USER/update-full-days-expand
+while [ ! -f $SLURM_OUT/full-days-expand-stage-$lo-$hi ]; do 
+  sleep 5
+done
 
 echo
 echo "************************************************************"
@@ -190,22 +190,22 @@ echo "************************************************************"
 
 #  --dependency=afterany:$full_days_exp
 
-# full_days_summary=()
-# # Note intentional for-loop-order inversion here so we can finish models sequentially.
-# for j in $clusters; do
-#     for i in $(cat $all_days); do
-#     full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
-#   done
-# done
-# full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')
-# echo "SLURM JOBS" $full_days_summary
+full_days_summary=()
+# Note intentional for-loop-order inversion here so we can finish models sequentially.
+for j in $clusters; do
+    for i in $(cat $all_days); do
+    full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
+  done
+done
+full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')
+echo "SLURM JOBS" $full_days_summary
 
-# rm -f $SLURM_OUT/full-days-summary-stage-$lo-$hi
-# notify_email "full-days-summary-stage-$lo-$hi" > /tmp/$USER/update-full-days-summary
-# sbatch --dependency=afterany:$full_days_summary /tmp/$USER/update-full-days-summary
-# while [ ! -f $SLURM_OUT/full-days-summary-stage-$lo-$hi ]; do 
-#   sleep 5
-# done
+rm -f $SLURM_OUT/full-days-summary-stage-$lo-$hi
+notify_email "full-days-summary-stage-$lo-$hi" > /tmp/$USER/update-full-days-summary
+sbatch --dependency=afterany:$full_days_summary /tmp/$USER/update-full-days-summary
+while [ ! -f $SLURM_OUT/full-days-summary-stage-$lo-$hi ]; do 
+  sleep 5
+done
 
 echo
 echo "************************************************************"

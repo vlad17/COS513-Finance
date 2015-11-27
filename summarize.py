@@ -1,5 +1,5 @@
 """
-Usage: python summarize.py infile summary_stats_file outfile modelfile
+Usage: python summarize.py infile outfile modelfile
 
 Loads via pickle the MiniBatchKMeans model which should be used to identify the
 label of the each news item in the infile csv, which should be an "expanded"
@@ -27,14 +27,13 @@ TOPIC_COLUMNS = 938
 MIN_FLOAT_VALUE = 0.00000005  # TODO set this
 
 def main():
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 4:
         print(__doc__)
         return 1
 
     infile = sys.argv[1]
-    summary_stats_file = sys.argv[2]
-    outfile = sys.argv[3]
-    modelfile = sys.argv[4]
+    outfile = sys.argv[2]
+    modelfile = sys.argv[3]
 
     print('Reading in day file {}... '.format(infile), end = '')
     with elapsed_timer() as elapsed, open(infile, 'r') as i:
@@ -49,29 +48,33 @@ def main():
         km = pickle.load(i)
     print('{}s'.format(elapsed()))
 
-    print('Predicting data... ', end = '')
-    with elapsed_timer() as elapsed:
-        predictions = km.predict(topics)
-    print('{}s'.format(elapsed()))
 
-    print('Loading summary statistics... ')
+    # FOR NORMALIZING EXPANDED STUFF #
+    print('Normalizing')
     summary_stats = None
-    with open(summary_stats_file, 'rb') as inf:
+    stats_file = '/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats'
+    with open(stats_file, 'rb') as inf:
         summary_stats = np.loadtxt(inf)
     stds = summary_stats[:len(summary_stats)/2]
     means = summary_stats[len(summary_stats)/2:]
 
+    normalized_topics = (topics - means) / stds
+
+
+    print('Predicting data... ', end = '')
+    with elapsed_timer() as elapsed:
+        predictions = km.predict(normalized_topics)
+    print('{}s'.format(elapsed()))
+
 
     N = len(predictions)
     print('Matrix construction and multiply... ', end = '')
-    # ipdb.set_trace()
     with elapsed_timer() as elapsed:
         K = km.get_params(deep = False)['n_clusters']
         topics = np.zeros((K, N))
         for i, cluster in enumerate(predictions):
             topics[cluster, i] = 1.0
 
-        ipdb.set_trace()
         topics = np.append(topics, np.full((1, N), 1.0), axis = 0)
         importance = np.append(importance, np.full((N, 1), 1.0), axis = 1)
         day = np.dot(topics, importance).flatten()
