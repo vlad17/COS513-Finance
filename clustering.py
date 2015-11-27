@@ -45,6 +45,8 @@ def main():
     # print("Normalizing")
     # stds = np.apply_along_axis(np.std, 0, fullarr)[:,np.newaxis].T
     # means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
+
+    # stds[stds == 0] = 1.0
     
     # with open(stats_file, 'wb+') as summary_stats_outf:
     #     np.savetxt(summary_stats_outf, stds, delimiter='\t')
