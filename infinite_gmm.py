@@ -12,6 +12,8 @@ Concatenates the input numpy arrays referenced by the glob pattern,
 then runs them through a DPGMM and prints the score.
 
 Serializes (via pickle) the GMM learned based on the input to outfile.
+
+Example: python infinite_gmm.py /n/fs/gcf/dchouren-repo/COS513-Finance/igmm_10000_20000101.export.CSV* /n/fs/gcf/dchouren-repo/COS513-Finance/models/igmm_alpha 10000 1
 """
 
 from glob import glob
@@ -22,7 +24,7 @@ import sys
 from sklearn.mixture import DPGMM
 import itertools
 
-TOPIC_COLUMNS = 1138 
+TOPIC_COLUMNS = 938 
 
 def main():
     if len(sys.argv) != 5:
