@@ -43,7 +43,7 @@ def main():
     print("Parameter searching...")
     igmm = None
     best_score = -1
-    best_alpha = 
+    best_alpha = -1
     best_model = None
     for alpha in itertools.chain(np.arange(0.1,1,0.1), np.arange(1,10,1)): 
         print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
