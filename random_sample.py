@@ -24,7 +24,7 @@ def main():
     begin_year = 2006
     end_year = 2011
 
-    infiles = set(glob.glob(sys.argv[1]) + '/*')
+    infiles = set(glob.glob(sys.argv[1] + '/*'))
     outfile = sys.argv[2]
     N = int(sys.argv[3])
 
@@ -39,7 +39,7 @@ def main():
     total_num_events = 0
 
     for inf in infiles:
-        if re.match('^(2011)', inf.split('/')[-1]):
+        if re.match('^(2010|2011)', inf.split('/')[-1]):
 
             num_events = 0
             inf_name = str(inf)
