@@ -102,8 +102,8 @@ echo "************************************************************"
 
 SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts
 
-num_components = 5000
-alpha = 0.4
+num_components=5000
+alpha=0.4
 
 name="sample-learn"
 slurm_header "05:00:00" "46G" "/bin/bash -c \"
