@@ -37,8 +37,7 @@ def main():
     alpha = int(sys.argv[4])
 
     print("Reading in", len(infiles), "files")
-    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t',
-                         usecols = range(TOPIC_COLUMNS))
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')
 
     print("Parameter searching...")
     igmm = None
