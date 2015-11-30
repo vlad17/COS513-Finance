@@ -23,6 +23,7 @@ import pickle
 import sys
 from sklearn.mixture import DPGMM
 import itertools
+import ipdb
 
 TOPIC_COLUMNS = 938 
 
@@ -42,13 +43,14 @@ def main():
     print("Parameter searching...")
     igmm = None
     best_score = -1
-    best_alpha = -1
+    best_alpha = 
     best_model = None
     for alpha in itertools.chain(np.arange(0.1,1,0.1), np.arange(1,10,1)): 
         print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
         igmm = DPGMM(covariance_type='diag', n_components=N, alpha=alpha, init_params='wmc')
         igmm.fit(fullarr)
         score = igmm.score(fullarr)
+        score = sum(score)/len(score)
         print(score)
 
         if score > best_score:
