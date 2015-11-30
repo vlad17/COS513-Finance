@@ -23,7 +23,11 @@ Let $Y_t = (y_1, y_2,...,y_nt)'$ denote an $(n \times 1)$ vector of time series 
 $$\bf{Y}_t=\bf{c}+\bf{\Pi}_1\bf{Y}_{t-1}+\bf{\Pi}_2\bf{Y}_{t-2}+\cdots+\bf{\Pi}_p\bf{Y}_{t-p}+\epsilon_t,$$ $$t=1\ldots T$$
 where $\Pi_i$ are $(n \times n)$ matrix and $\epsilon_t$ is an $(n \times 1)$ unobservable zero mean noise vector process.
 
-TODO(Ghassen): Why we don't use Regimes with Markov-Switching and Impulse Response
+\subsubsection{L1 Linear model}
+
+TODO(Ghassen)
+
+TODO(Ghassen): Why we don't use Regimes with Markov-Switching and Impulse Response, why we dont use binary
 %\subsubsection{Regimes and Markov-Switching}
 %Recently, there has been work on Markov-Switching Vector Autoregressive Models (MSVAR) \cite{tsay}. In a Markov Switching Model the observed change in a variable between period t and t+1 is assumed to be a random draw from a distribution. Which distribution is appropriate depends  on an unobserved state variable $s_t$. When $s_t=1$, the observed change $y_t$ is drawn from $N(\mu_1,\sigma_1^2)$ and when $s_t=2$, the observed change $y_t$ is draw from $N(\mu_2,\sigma_2^2)$.
 %The state variable is then assumed to evolve according to a Markov Chain such that the probability of being in state %1 at time t given that state 1 obtained at time t-1 equals $p_{11}$. Accordingly, we can build a transition matrix. There has been a decent amount of work that assumes the existence of 2 latent states (bullish vs. bearish market states) \cite{OIL}. MSVAR has also been used for high-frequency forecasts of foreign exchange markets \cite{MSVAR}.
@@ -75,7 +79,7 @@ After preprocessing, we are left with $T=12$ topic-related columns and $I=9$ imp
 \label{fig:exapand}
 \end{figure}
 
-Expansion uses one-hot encoding on categorical features, such as the CAMEO code for the event. As mentioned before, we apply Word2Vec to expand the strings (note: not implemented yet, need larger corpus). %TODO actually do this.
+Expansion uses one-hot encoding on categorical features, such as the CAMEO code for the event.
 
 %TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
 
