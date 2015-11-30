@@ -48,7 +48,7 @@ def main():
         print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
         igmm = DPGMM(covariance_type='diag', n_components=N, alpha=alpha, init_params='wmc')
         igmm.fit(fullarr)
-        score = igmm.score_samples(fullarr)
+        score = igmm.score(fullarr)
         print(score)
 
         if score > best_score:
