@@ -39,7 +39,7 @@ def main():
     total_num_events = 0
 
     for inf in infiles:
-        if re.match('^(2010|2011)', inf.split('/')[-1]):
+        if re.match('^(2006|2007|2008|2009|2010|2011)', inf.split('/')[-1]):
 
             num_events = 0
             inf_name = str(inf)
