@@ -102,19 +102,20 @@ echo "************************************************************"
 
 SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts
 
-for i in $clusters; do
-  name="sample-learn-$i"
-  slurm_header "05:00:00" "46G" "/bin/bash -c \"
-    set -e
-    mkdir -p $pre_sample_dir $exp_sample_dir
-    source $PYENV
-    python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre-$i.csv
-    python $FINANCE/expand.py $pre_sample_dir/sample-pre-$i.csv $exp_sample_dir/sample-exp-$i.csv
-    python $FINANCE/clustering.py \\\"$exp_sample_dir/sample-exp-$i.csv\\\" $models_dir/$i.model $i
-    rm -rf $pre_sample_dir/sample-pre-$i.csv
-    rm -rf $exp_sample_dir/sample-exp-$i.csv
-  \"" "$name" > $SCRIPT_DIR/$name.slurm
-done
+num_components = 5000
+alpha = 0.4
+
+name="sample-learn"
+slurm_header "05:00:00" "46G" "/bin/bash -c \"
+  set -e
+  mkdir -p $pre_sample_dir $exp_sample_dir
+  source $PYENV
+  python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre.csv
+  python $FINANCE/expand.py $pre_sample_dir/sample-pre.csv $exp_sample_dir/sample-exp.csv
+  python $FINANCE/infinite_gmm.py \\\"$exp_sample_dir/sample-exp.csv\\\" $models_dir/igmm.model $num_components $alpha
+  rm -rf $pre_sample_dir/sample-pre.csv
+  rm -rf $exp_sample_dir/sample-exp.csv
+\"" "$name" > $SCRIPT_DIR/$name.slurm
 
 for i in $(cat $all_days); do
   name="day-expand-$i"
@@ -132,15 +133,13 @@ for i in $(cat $all_days); do
     rm -rf $pre_dir/$i.csv
   \"" "$name" > $SCRIPT_DIR/$name.slurm
 
-  for j in $clusters; do
-      name="day-summary-$i-$j"
-      slurm_header "01:00:00" "12G" "/bin/bash -c \"
-        set -e
-        mkdir -p $summary_dir $summary_dir/$j
-        source $PYENV
-        python $FINANCE/summarize.py $exp_dir/$i.csv $summary_dir/$j/$i.csv $models_dir/$j.model
+  name="day-summary-$i"
+  slurm_header "01:00:00" "12G" "/bin/bash -c \"
+    set -e
+    mkdir -p $summary_dir
+    source $PYENV
+    python $FINANCE/summarize.py $exp_dir/$i.csv $summary_dir/$i.csv $models_dir/igmm.model
   \"" "$name" > $SCRIPT_DIR/$name.slurm
-  done
 done
 
 echo
@@ -149,9 +148,7 @@ echo "LAUNCHING SAMPLE CLUSTER LEARNING STAGE"
 echo "************************************************************"
 
 model_learn=()
-for i in $clusters; do
-  model_learn+=($(sbatch $SCRIPT_DIR/sample-learn-$i.slurm | cut -f4 -d' '))
-done
+model_learn+=($(sbatch $SCRIPT_DIR/sample-learn.slurm | cut -f4 -d' '))
 model_learn=$(echo ${model_learn[@]} | tr ' ' ':')
 echo "SLURM JOBS" $model_learn
 
@@ -192,10 +189,8 @@ echo "************************************************************"
 
 full_days_summary=()
 # Note intentional for-loop-order inversion here so we can finish models sequentially.
-for j in $clusters; do
-    for i in $(cat $all_days); do
-    full_days_summary+=($(sbatch $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
-  done
+for i in $(cat $all_days); do
+  full_days_summary+=($(sbatch $SCRIPT_DIR/day-summary-$i.slurm | cut -f4 -d' '))
 done
 full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')
 echo "SLURM JOBS" $full_days_summary
