@@ -125,8 +125,7 @@
 
 \begin{abstract} 
 
-We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weights each day's news events with an extracted importance metric. We use GDELT for raw news attributes and sentiment analysis. With a $K$-means model for clustering and logistic regression and a vector autoregressive model as a prediction for the probability that a commodity price will  increase the next day, and using an $80-10-10$ split on six years of news data from 2006-04-01 to 2015-02-08, we achieved an error rate of ??? with a ??? cutoff for binary classification.
-
+We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weights each day's news events with an extracted importance metric. We use the GDELT news database to extract raw news attributes and sentiment evaluations of the articles. With a $K$-means model for clustering news data feeding into an a lasso regression model as a prediction for the log returns on commodity price will for the next day, [TODO(Ghassen) l1 model accuracy]. When using a Kelly criterion based trading strategy, we gained [TODO(Vlad) returns] when training on ? days and testing on ? [TODO(Vlad)].
 \end{abstract} 
 
 %TODO review below
@@ -140,9 +139,12 @@ We propose a new method for predicting commodity price data through the use of a
 % Do not alter the style template; in particular, do not compress the paper format by reducing the vertical spaces.
 
 \section{Introduction}
+
+TODO(Daway): Sections 1 - 3: cut down and incorporate edits from midterm grades (and relevant parts of section 4)
+
+TODO(Vlad): Trading strategy
  
 \input{introduction.tex}
-
  
 \section{Motivating Analysis}
 
@@ -152,20 +154,17 @@ We propose a new method for predicting commodity price data through the use of a
 
 \input{related_work.tex}
 
-\section{Methods and Evaluation}
+\section{Methods}
 
 \input{methods-and-evaluation.tex}
 
 \section{Results}
 
 \input{results.tex}
-% remember to add the disclaimer on the current results
 
-%TODO remember to add runtime info later (not for first run)
+\section{Evaluation}
 
-%TODO what do our model's residuals look like (if using linear regression) - normal?
-
-%TODO describe the distribution of the day-summaries - what does this high-dimensional feature vector distribution look like over the days? Is it very separable? Can we apply PCA, etc?
+Trading strategy (relative to a leverage rate r)
 
 \section{Future Work}
 
@@ -177,7 +176,7 @@ All code used is available in an open-source repository.\footnote{\hyperref[http
 
 Commodities pricing data is retrieved using the \texttt{R} package \texttt{quantmod}\footnote{\hyperref[http://www.quantmod.com/]{\texttt{http://www.quantmod.com/}}}, which pulls historical prices using Yahoo.
 
-%TODO add a bunch more references everywhere to defend all our claims.
+TODO(Tom): Update our sources for quotes
 
 % Acknowledgements should only appear in the accepted version. 
 % \section*{Acknowledgments} 
