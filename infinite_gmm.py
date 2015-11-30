@@ -20,6 +20,7 @@ import fileinput
 import pickle
 import sys
 from sklearn.mixture import DPGMM
+import itertools
 
 TOPIC_COLUMNS = 1138 
 
@@ -28,7 +29,7 @@ def main():
         print(__doc__)
         return 1
 
-    infiles = glob(sys.argv[1] + '/*')
+    infiles = glob(sys.argv[1])
     outfile = sys.argv[2]
     N = int(sys.argv[3])
     alpha = int(sys.argv[4])
@@ -36,6 +37,14 @@ def main():
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t',
                          usecols = range(TOPIC_COLUMNS))
+
+    print("Parameter searching...")
+    igmm = None
+    for alpha in itertools.chain(np.arange(0.1,1,0.1), np.arange(1,10,1)):
+        print("alpha={}".format(alpha))
+        igmm = DPGMM(n_components=N, alpha=alpha, init_params='wmc', verbose=True)
+
+    igmm 
 
     print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
 
