@@ -24,7 +24,7 @@ def main():
     begin_year = 2006
     end_year = 2011
 
-    infiles = set(glob.glob(sys.argv[1] + '/*'))
+    infiles = set(glob.glob(sys.argv[1]))
     outfile = sys.argv[2]
     N = int(sys.argv[3])
 
