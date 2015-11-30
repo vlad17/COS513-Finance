@@ -5,8 +5,7 @@ Our data pipeline was designed to provide day-wise parallelism over our data set
 
 \subsection{Model}
 
-%TODO cite W2V
-Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. Next, in the \textbf{expansion} stage, we project each row to a purely real space, where we use a one-hot encoding for categorical values and a Word2Vec encoding for string values, which relies on a static corpus to learn in an unsupervised manner a mapping from words to numeric vectors based on their proximity to other words every time they appear in the corpus. Finally, in the \textbf{summary} stage, this purely numeric representation of each event in a set is summarized by a static clustering classification.
+Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. After the relevant columns are extracted, some columns contain numerical data Next, in the \textbf{expansion} stage, we project each row to a purely real space by using one-hot encoding for categorical values. For each category, one-hot encoding assigns an integer to each unique value in that category. Finally, in the \textbf{summary} stage, k-means clustering is performed on this purely numeric representation of the data. Euclidean distance is used as the distance metric for k-means. A range of values between 10 and 5000 are used for k.
 
 The day summaries are then conglomerated in a time series $\{\textbf{d}_i\}$. For a time series of a commodity's price, $\{p_i\}$, we have the corresponding sequence of binary labels indicating whether price has increased the next day, $y_i=1_{p_{i+1}>p_i}$.
 
