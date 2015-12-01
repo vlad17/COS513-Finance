@@ -190,7 +190,7 @@ echo "************************************************************"
 full_days_summary=()
 # Note intentional for-loop-order inversion here so we can finish models sequentially.
 for i in $(cat $all_days); do
-  full_days_summary+=($(sbatch $SCRIPT_DIR/day-summary-$i.slurm | cut -f4 -d' '))
+  full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i.slurm | cut -f4 -d' '))
 done
 full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')
 echo "SLURM JOBS" $full_days_summary
