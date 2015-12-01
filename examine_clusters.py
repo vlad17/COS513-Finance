@@ -68,7 +68,7 @@ def main():
 
     ipdb.set_trace()
 
-    with open('/n/fs/scratch/dchouren/models/clusters.pickle', 'wb') as handle:
+    with open('/n/fs/gcf/dchouren-repo/COS513-Finance/models/clusters.pickle', 'wb') as handle:
         pickle.dump(clusters, handle)
 
     return 0
