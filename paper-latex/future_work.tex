@@ -1,6 +1,8 @@
 
 TODO(Ghassen): Stuff you said during the meeting
 
+Currently, we only run our sparse linear model once on the training data set and apply it to the entire span of the test days. By the last training day, our model is now built from news data that is over 200 days old (though the historical pricing information is correctly offset by recent lags). Re-training the LM model based on the most recent window of days would be better.
+
 TODO(Daway): DPGMM model
 
 TODO(Tom): Other indices/stocks?

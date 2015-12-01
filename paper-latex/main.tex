@@ -163,7 +163,30 @@ TODO(Vlad): Trading strategy
 
 \section{Evaluation}
 
-Trading strategy (relative to a leverage rate r)
+To evaluate our results in the context of financial predictions, we ran a trading strategy on our test data set, using the predictions of our linear model.
+
+Given a risk-free rate for borrowing leverage, $r$, the Kelly Criterion states that for a security with mean returns $\mu$ and volatility $\sigma$, the optimal fractional investment in the security one should make is $\frac{\mu-r}{\sigma^2}$ \cite{davis2012fractional}. 
+todo assumptions
+Estimating volatility from the training set and using the predicted next-day returns to calculate the proportion of the commodity tested, silver, to buy, we were able to simulate our performance over the 221-day period:
+
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[scale=0.3]{images/sparse-silver.png}}
+\caption{Portfolio performance for $r=0$ over time on the test set. Note mistakes (when the net value of our assets, in purple, falls) typically occur from poorly predicting upswings. At the above rate, we make 0.7\% returns on the given investment. We choose an artificial starting investment of \$15 (allowing for partial stock purchases) to keep the scales the same. The black line is the no-risk play.}
+\end{center}
+\vskip -0.2in
+\label{fig:preprocess}
+\end{figure}
+
+We don't use the S\&P as a metric for the risk-free rate over this time because it actually fell 1.2\% over the testing period. Using instead a generous estimate of the yearly U.S. Treasury bond yield for the year of the test set, at 0.5\% (but modified to be compounded daily to fit with the per-day trading strategy), we still have some improvement.
+
+The risk free rate did not effect our returns and is only useful as a benchmark to compare our strategy. Over the entire test run, we are only ever confident enough to purchase (or short) an amount of stocks equal to 51.8\% of our current net value, so no leverage is ever used.
+
+Because our model beats all reasonable risk-free rates, there is some (albeit small, financially speaking) predictive power offered by the model. The returns on our net worth fluctuate over the test period with a standard deviation of 0.740\%, and we ended up with 0.727\% gains at the end of the test period.
+
+TODO(Vlad + Ghassen): Add analogous performance summary for model trained without any GDELT information.
+
 
 \section{Future Work}
 
