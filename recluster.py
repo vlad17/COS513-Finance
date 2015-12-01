@@ -68,3 +68,5 @@ def main():
     ipdb.set_trace()
     ipdb.set_trace()
 
+if __name__ == "__main__":
+    sys.exit(main())
