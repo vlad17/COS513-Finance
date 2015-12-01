@@ -24,7 +24,7 @@ def main():
     filtered_in = []
 
     for inf in infiles:
-        if re.match('^(2006|2007|2008|2009|2010|2011)', inf.split('/')[-1]):
+        if re.match('^(2010|2011)', inf.split('/')[-1]):
 
             filtered_in.append(inf)
 
