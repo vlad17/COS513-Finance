@@ -1,21 +1,6 @@
-Future work for the semester includes, in order of priority (we will probably need help with prioritization here, there's a lot to do):
-\begin{enumerate}
-\item Create and run a 500-machine cluster job for day-wise training on ionic servers
-\item Add a feature for the number of events per day.
-\item Consider cross-validation. Our model does not actually ever rely on the absolute time of a day, so we can in theory train on future days and validate on previous ones (we may want to keep training data contiguous, though, because we plan on adding periodicity and dynamic clustering features which would assume contiguousness in time of the training data).
-\item We have a weak classifier. Can we boost it with AdaBoost? Should the weak classifier be a fixed $K$ or should it be generated from a training set by doing cross-validation choosing an appropriate $K$ for each AdaBoost round?
-\item Improve $K$-means clustering by implementing our random-sample-based normalization idea: use the random sample's $\hat{\mu}$ and $\hat{\sigma}$ (corrected for bias) to get z-scores so no column dominates the topic clusters.
-\item Extend Word2Vec corpus.
-\item Investigate the shape of the day-summary vectors in their high-dimensional space. Can they be dimensionally reduced?
-\item Try other classifiers - SVM, Decision Trees, neural nets.
-\item Try linear regression models for predicting returns $\frac{p_{i+1}-p_i}{p_i}$: basic linear, GLM, RANSAC.
-\item Try other commodities than gold - maybe predict an average of some commodities (i.e. behaviour of a portfolio)
-\item Smarter clustering: Try GMM over various $K$.
-\item Even smarter clustering: Try Infinite GMM, HDP, and event SN$\Gamma$P. These would still be static-clustering methods, where we run the nonparametric models over our training data set, and then apply the static learned model to our test.
-\end{enumerate}
 
-An alternative approach to the above is very appealing and resolves a lot of inherent issues in our assumptions, but is unfortunately probably out of the scope of the current project. It would be to equip the current model (some probabilistic linear model with input from a probabilistic clustering model as well as the deterministically-processed input) with priors for both the linear model's slopes and the clustering model's parameters. Then, every single day, we would do a Bayesian update based on our performance. In this manner we can dynamically grow the number of clusters over time. Furthermore, this model can fully appreciate our data's time series format:
-\begin{enumerate}
-\item The Bayesian updates will be able to adapt to changes over time.
-\item There is no intrinsic distinction between training and test data - we would set the model running from the beginning of our data. We assume that by the time it reaches the present day, it has converged to an accurate enough belief about reality that it would work reasonably well (we can test this by moving what we consider to be the ``present day" into the past).
-\end{enumerate}
+TODO(Ghassen): Stuff you said during the meeting
+
+TODO(Daway): DPGMM model
+
+TODO(Tom): Other indices/stocks?
