@@ -57,6 +57,9 @@ def main():
     print()
     print('Examining')
     clusters = {}
+    
+    save_stdout = sys.stdout
+    sys.stdout = open('trash', 'w')
     for raw_file, expanded_file in zip(raw_files, expanded_files):
         with open(raw_file, 'r') as raw_in, open(expanded_file, 'r') as expanded_in:
             for raw_line, expanded_line in zip(raw_in, expanded_in):
@@ -65,6 +68,8 @@ def main():
                     clusters[cluster].append(raw_line.split('\t')[-1])
                 except KeyError:
                     clusters[cluster] = [raw_line.split('\t')[-1]]
+
+    sys.stdout = save_stdout
 
     ipdb.set_trace()
 
