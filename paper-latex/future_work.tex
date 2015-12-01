@@ -4,5 +4,11 @@ TODO(Ghassen): Stuff you said during the meeting
 Currently, we only run our sparse linear model once on the training data set and apply it to the entire span of the test days. By the last training day, our model is now built from news data that is over 200 days old (though the historical pricing information is correctly offset by recent lags). Re-training the LM model based on the most recent window of days would be better.
 
 TODO(Daway): DPGMM model
+\subsubsection{Infinite Gaussian Mixture Model}
+For clustering news events we have relatively little information how deciding how many clusters there should be. In our $K$-means model, we do a parameter search for values of $K$ from 10 to 5000. Ideally we would be able to use an infinite Gaussian mixture model that takes in a hyperparameter for a clustering coefficient and automatically determines the number of clusters and therefore remove the need for this imprecise parameter search. 
+
+We attempted using a Dirichlet Process GMM but the implementation we attempted to use was intractable given our computing power. We may attempt to optimize the parameters of the DPGMM in the future or work on limiting the model's training set further. 
+
 
 TODO(Tom): Other indices/stocks?
+

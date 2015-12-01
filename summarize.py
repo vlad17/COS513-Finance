@@ -13,6 +13,7 @@ import sys
 from contextlib import contextmanager
 from timeit import default_timer
 import time 
+import ipdb
 
 @contextmanager
 def elapsed_timer():
@@ -47,10 +48,24 @@ def main():
         km = pickle.load(i)
     print('{}s'.format(elapsed()))
 
+
+    # FOR NORMALIZING EXPANDED STUFF #
+    print('Normalizing')
+    summary_stats = None
+    stats_file = '/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats'
+    with open(stats_file, 'rb') as inf:
+        summary_stats = np.loadtxt(inf)
+    stds = summary_stats[:len(summary_stats)/2]
+    means = summary_stats[len(summary_stats)/2:]
+
+    normalized_topics = (topics - means) / stds
+
+
     print('Predicting data... ', end = '')
     with elapsed_timer() as elapsed:
-        predictions = km.predict(topics)
+        predictions = km.predict(normalized_topics)
     print('{}s'.format(elapsed()))
+
 
     N = len(predictions)
     print('Matrix construction and multiply... ', end = '')
@@ -59,6 +74,7 @@ def main():
         topics = np.zeros((K, N))
         for i, cluster in enumerate(predictions):
             topics[cluster, i] = 1.0
+
         topics = np.append(topics, np.full((1, N), 1.0), axis = 0)
         importance = np.append(importance, np.full((N, 1), 1.0), axis = 1)
         day = np.dot(topics, importance).flatten()
@@ -67,7 +83,7 @@ def main():
         # check if normalizing by N makes anything too small
         small_indices = np.where(day < MIN_FLOAT_VALUE)
         if len(small_indices[0] > 0):
-            print('{}: {}\n'.format(infile, small_indices))
+            print('\n{}: {}\n'.format(infile, small_indices))
 
         day = np.append(day, [N])
     print('{}s'.format(elapsed()))
