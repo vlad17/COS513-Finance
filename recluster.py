@@ -28,6 +28,8 @@ def main():
 
             filtered_in.append(inf)
 
+    ipdb.set_trace()
+
     print("Reading in", len(filtered_in), "files")
     fullarr = np.loadtxt(fileinput.input(filtered_in), delimiter = '\t')[:,7:]
 
