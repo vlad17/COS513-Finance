@@ -5,9 +5,9 @@ Our data pipeline was designed to provide day-wise parallelism over our data set
 
 \subsection{Model}
 
-Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. After the relevant columns are extracted, some columns contain numerical data Next, in the \textbf{expansion} stage, we project each row to a purely real space by using one-hot encoding for categorical values. For each category, one-hot encoding assigns an integer to each unique value in that category. Finally, in the \textbf{summary} stage, k-means clustering is performed on this purely numeric representation of the data. Euclidean distance is used as the distance metric for k-means. A range of values between 10 and 5000 are used for k.
+Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. For topics, a mix of numeric and categorical fields are extracted. Importance columns are saved for use in a further step. Next, in the \textbf{expansion} stage, we project each row of topic features to a purely real space by using one-hot encoding for categorical values. For each category, one-hot encoding assigns an integer to each unique value in that category. Finally, in the \textbf{summary} stage, $K$-means clustering is performed on this purely numeric representation of the data. Euclidean distance is used as the distance metric for $K$-means. A range of values between 10 and 5000 are used for $K$.
 
-The day summaries are then conglomerated in a time series $\{\textbf{d}_i\}$. For a time series of a commodity's price, $\{p_i\}$, we have the corresponding sequence of binary labels indicating whether price has increased the next day, $y_i=1_{p_{i+1}>p_i}$.
+The day summaries are then conglomerated in a time series $\{\textbf{d}_i\}$. For a day-indexed time series of a commodity's price, $\{p_i\}$, we have the corresponding sequence of binary labels indicating whether price has increased the next day, $y_i=1_{p_{i+1}>p_i}$.
 
 Thus, our model assumes that:
 \begin{enumerate}
@@ -49,13 +49,11 @@ ARIMA stands for Auto-Regressive Integrated Moving Average. ARIMA models are, in
 
 \subsection{Execution}
 
-Our current implementation uses $K$-means for clustering and logistic regression for classification. We trained, validated, and sampled from the days between 2013-04-01 and 2015-07-31. Recent days were used for testing.
+Our current implementation uses $K$-means for clustering and logistic regression for classification. We trained, validated, and sampled from the days between 2006-01-01 and 2015-07-31. Recent days were used for testing.
 
-For our random sample, we sampled an equal number of events from each day. Even though days have variable numbers of events (and the number of reported events reduces as we go back in time), we chose this policy because the increase in news over recent years is not a property of more events occurring, but rather an increase in reporting, which should not affect the distribution of events among their hypothetical clusters of topics.
+For our random sample, we sampled one million total events, with rate from a day's file proportional to the number of events in that day. The random sample undergoes the same preprocessing and expansion pipeline as described below for the day summaries to be used in the regression, but its output is fed into a clustering model, that is then used in the main pipeline. We are forced to use a sample for tractability.
 
-The random sample undergoes the same preprocessing and expansion pipeline as described below for the day summaries to be used in the regression, but its output is fed into a clustering model, that is then used in the main pipeline. We are forced to use a sample for tractability.
-
-Raw data starts with 58 columns. Each day typically has 100K rows. Total size of the set is about 60GB. %TODO precise mean and stddev.
+Raw data starts with 58 columns. Each day typically has 100K rows. The total size of the set is about 60GB. %TODO precise mean and stddev.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -79,7 +77,7 @@ After preprocessing, we are left with $T=12$ topic-related columns and $I=9$ imp
 \label{fig:exapand}
 \end{figure}
 
-Expansion uses one-hot encoding on categorical features, such as the CAMEO code for the event.
+Expansion uses one-hot encoding on categorical features, such as the event CAMEO codes.
 
 %TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
 

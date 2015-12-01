@@ -39,7 +39,7 @@ def main():
         os.remove(f)
 
     for inf in raw_files:
-        os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + '/' + inf.split('/')[-1]))
+        os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + inf.split('/')[-1]))
     
     preprocess_files = glob(preprocessed_dir + '/*')
 
@@ -57,7 +57,7 @@ def main():
     print()
     print('Examining')
     clusters = {}
-    
+
     save_stdout = sys.stdout
     sys.stdout = open('trash', 'w')
     for raw_file, expanded_file in zip(raw_files, expanded_files):
