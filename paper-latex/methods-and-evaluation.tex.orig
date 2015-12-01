@@ -1,14 +1,17 @@
-TODO(Tom): can you cite http://blog.gdeltproject.org/gdelt-2-0-our-global-world-in-realtime/ here
-
+%TODO cite http://blog.gdeltproject.org/gdelt-2-0-our-global-world-in-realtime/
 Recent GDELT updates provide feeds with 15-minute resolution, but historical feeds offered only daily resolution. We decided for simplicity to analyze daily changes in price, taking a full day's worth of news data into account. This was most in line with testing our hypothesis, that an aggregation of topic clusters in a day's news is predictive of commodity pricing.
 
 Our data pipeline was designed to provide day-wise parallelism over our data set in order to enable fast testing of new feature extraction methods. The raw data, as well as intermediate data, is stored in TSV ASCII format.
 
 \subsection{Model}
 
-Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. For topics, a mix of numeric and categorical fields are extracted. Importance columns are saved for use in a further step. Next, in the \textbf{expansion} stage, we project each row of topic features to a purely real space by using one-hot encoding for categorical values. For each category, one-hot encoding assigns an integer to each unique value in that category. Finally, in the \textbf{summary} stage, $K$-means clustering is performed on this purely numeric representation of the data. Euclidean distance is used as the distance metric for $K$-means. A range of values between 10 and 5000 are used for $K$.
+<<<<<<< HEAD
+Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. Next, in the \textbf{expansion} stage, we project each row to a purely real space, where we use a one-hot encoding for categorical values. Finally, in the \textbf{summary} stage, this purely numeric representation of each event in a set is summarized by a static clustering classification.
+=======
+Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. After the relevant columns are extracted, some columns contain numerical data Next, in the \textbf{expansion} stage, we project each row to a purely real space by using one-hot encoding for categorical values. For each category, one-hot encoding assigns an integer to each unique value in that category. Finally, in the \textbf{summary} stage, k-means clustering is performed on this purely numeric representation of the data. Euclidean distance is used as the distance metric for k-means. A range of values between 10 and 5000 are used for k.
+>>>>>>> 69c47e869b9596326d190b0d79578dd86b7741f3
 
-The day summaries are then conglomerated in a time series $\{\textbf{d}_i\}$. For a day-indexed time series of a commodity's price, $\{p_i\}$, we have the corresponding sequence of binary labels indicating whether price has increased the next day, $y_i=1_{p_{i+1}>p_i}$.
+The day summaries are then conglomerated in a time series $\{\textbf{d}_i\}$. For a time series of a commodity's price, $\{p_i\}$, we have the corresponding sequence of binary labels indicating whether price has increased the next day, $y_i=1_{p_{i+1}>p_i}$.
 
 Thus, our model assumes that:
 \begin{enumerate}
@@ -19,7 +22,7 @@ Thus, our model assumes that:
 Both of these are strong assumptions. The first may be weakened by adapting a dynamic clustering model, such as an infinite Gaussian Mixture Model or an HDP. The second requires $\textbf{d}_i$ to be both contain a sufficient amount of information to predict price behavior, which is a matter of appropriate feature extraction, and the assumption that we do not lose too much predictive power in summarizing a day by aggregating over the clusters to which its news events belonged to.
 
 \subsubsection{Vector Autoregressive}
-VAR models are some of the most flexible and easy to use models for multivariate time series. They have proven to be especially useful for describing the dynamic behavior of economic and financial time series and for forecasting \cite{tsay, VAR} TODO(Sean): fix citation. \\
+VAR models are some of the most flexible and easy to use models for multivariate time series. They have proven to be especially useful for describing the dynamic behavior of economic and financial time series and for forecasting \cite{tsay, VAR}. \\
 Let $Y_t = (y_1, y_2,...,y_nt)'$ denote an $(n \times 1)$ vector of time series variables. The basic p-lag vector autoregressive model (VAR(p)) has the form:
 $$\bf{Y}_t=\bf{c}+\bf{\Pi}_1\bf{Y}_{t-1}+\bf{\Pi}_2\bf{Y}_{t-2}+\cdots+\bf{\Pi}_p\bf{Y}_{t-p}+\epsilon_t,$$ $$t=1\ldots T$$
 where $\Pi_i$ are $(n \times n)$ matrix and $\epsilon_t$ is an $(n \times 1)$ unobservable zero mean noise vector process.
@@ -50,11 +53,13 @@ ARIMA stands for Auto-Regressive Integrated Moving Average. ARIMA models are, in
 
 \subsection{Execution}
 
-Our current implementation uses $K$-means for clustering and logistic regression for classification. We trained, validated, and sampled from the days between 2006-01-01 and 2015-07-31. Recent days were used for testing.
+Our current implementation uses $K$-means for clustering and logistic regression for classification. We trained, validated, and sampled from the days between 2013-04-01 and 2015-07-31. Recent days were used for testing.
 
-For our random sample, we sampled one million total events, with rate from a day's file proportional to the number of events in that day. The random sample undergoes the same preprocessing and expansion pipeline as described below for the day summaries to be used in the regression, but its output is fed into a clustering model, that is then used in the main pipeline. We are forced to use a sample for tractability.
+For our random sample, we sampled an equal number of events from each day. Even though days have variable numbers of events (and the number of reported events reduces as we go back in time), we chose this policy because the increase in news over recent years is not a property of more events occurring, but rather an increase in reporting, which should not affect the distribution of events among their hypothetical clusters of topics.
 
-Raw data starts with 58 columns. Each day typically has 100K rows. The total size of the set is about 60GB. %TODO precise mean and stddev.
+The random sample undergoes the same preprocessing and expansion pipeline as described below for the day summaries to be used in the regression, but its output is fed into a clustering model, that is then used in the main pipeline. We are forced to use a sample for tractability.
+
+Raw data starts with 58 columns. Each day typically has 100K rows. Total size of the set is about 60GB. %TODO precise mean and stddev.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -78,7 +83,7 @@ After preprocessing, we are left with $T=12$ topic-related columns and $I=9$ imp
 \label{fig:exapand}
 \end{figure}
 
-Expansion uses one-hot encoding on categorical features, such as the event CAMEO codes.
+Expansion uses one-hot encoding on categorical features, such as the CAMEO code for the event.
 
 %TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
 
