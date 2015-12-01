@@ -4,7 +4,7 @@ Usage: python examine_clusters.py raw_data_dir preprocessed_dir expanded_dir mod
 
 Examines cluster model assignments by preprocessing, expanding, and then clustering some raw data according to a loaded model
 
-Example: python examine_clusters.py /n/fs/scratch/dchouren/examine_data/raw /n/fs/scratch/dchouren/examine_data/preprocessed/ /n/fs/scratch/dchouren/examine_data/expanded/ /n/fs/scratch/dchouren/models/1000.model
+Example: python examine_clusters.py /n/fs/scratch/dchouren/examine_data/raw /n/fs/scratch/dchouren/examine_data/preprocessed/ /n/fs/scratch/dchouren/examine_data/expanded/ /n/fs/gcf/dchouren-repo/COS513-Finance/models/1000.model
 """
 
 from glob import glob
