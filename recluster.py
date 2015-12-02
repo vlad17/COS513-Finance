@@ -53,6 +53,9 @@ def main():
     raw_dir = '/n/fs/scratch/dchouren/examine_data/raw'
     raw_files = glob.glob(raw_dir + '/*')
 
+    num_spread = 0
+    clusters_in = []
+
     save_stdout = sys.stdout
     sys.stdout = open('trash', 'w')
     for raw_file, expanded_file in zip(raw_files, expanded_files):
@@ -62,13 +65,17 @@ def main():
 
                 url = raw_line.split('\t')[-1]
                 if 'desoto' in url.lower():
-                    print(cluster)
+                    clusters_in.append(cluster)
+                    # print(cluster)
                 try:
                     clusters[cluster].append(url)
                 except KeyError:
                     clusters[cluster] = [url]
 
     sys.stdout = save_stdout
+
+    print(clusters_in)
+    print(len(clusters_in))
 
     ipdb.set_trace()
     ipdb.set_trace()
