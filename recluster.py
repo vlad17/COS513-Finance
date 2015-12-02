@@ -59,10 +59,14 @@ def main():
         with open(raw_file, 'r') as raw_in, open(expanded_file, 'r') as expanded_in:
             for raw_line, expanded_line in zip(raw_in, expanded_in):
                 cluster = int(km.predict(expanded_line.split('\t')[7:])[0])
+
+                url = raw_line.split('\t')[-1]
+                if 'desoto' in url.lower():
+                    print(cluster)
                 try:
-                    clusters[cluster].append(raw_line.split('\t')[-1])
+                    clusters[cluster].append(url)
                 except KeyError:
-                    clusters[cluster] = [raw_line.split('\t')[-1]]
+                    clusters[cluster] = [url]
 
     sys.stdout = save_stdout
 
