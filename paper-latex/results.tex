@@ -22,47 +22,32 @@ As can be seen, purity for cluster 0 is fairly high, with seven of ten articles 
 \noindent A search for the name of the mastermind of the Mumbai attacks, Zakiur Rehman Lakhvi, returned results in 69 of 1000 clusters, which indicates we have much more cross-cluster similarity than we'd like. But this is a more preferable problem to have than a lack of intra-cluster similarity. Our eyeball test can only evaluate cluster quality based on keywords such as actor names and locations and general topics. Its possible that Lakhvi can appear in 69 clusters because the other metrics articles are clustered on, such as tone or the importance features, which an eyeball test cannot detect, do in fact separate Lakhvi related articles into that many clusters.
 
 \subsection{Regression}
-
-
-
 \begin{figure}[h!]
-	\caption{Accuracy for various test sizes}
-	\centering
 	\includegraphics[width=0.5\textwidth]{results/acc.jpg}
+	\caption{Accuracy for various test sizes}
 \end{figure}
-
 \begin{figure}[h!]
-	\caption{Mean aboslute error for various test sizes}
 	\includegraphics[width=0.5\textwidth]{results/mae.jpg}
+	\caption{Mean aboslute error for various test sizes}
 \end{figure}
-
-\begin{figure}[h!]
-	\caption{Accuracy for various sparsity}
+\figurename{6} and \figurename{7} show the accuracy and mean absolute error across test size and sparsity for a fixed window of last 22-560 training days.
+\begin{figure}[H]
 	\includegraphics[width=0.5\textwidth]{results/acc2.jpg}
+	\caption{Accuracy for various test sizes}
 \end{figure}
-
-\begin{figure}[h!]
-	\caption{Mean abolsute error for various sparsity}
+\begin{figure}[H]
 	\includegraphics[width=0.5\textwidth]{results/mae2.jpg}
+	\caption{Mean abolsute error for various sparsity}
 \end{figure}
+
+\figurename{8} and \figurename{9} show the accuracy and mean absolute error across test size and sparsity for a moving window of last 22-560 training days
 
 \begin{figure}[h!]
-	\caption{Comparison of log returns for sparsity = 0.1, training size = 400}
 	\includegraphics[width=0.5\textwidth]{results/prediction.jpg}
+	\caption{Comparison of log returns for sparsity = 0.1, training size = 400}
 \end{figure}
 
+\figurename{10} is a log return plot with a moving window of 400 days and sparsity 0.1 having a mean absolute error of 0.37.
 
-TODO(Sean): test err, $R^2$, residuals plot, residuals normality test?
-acc/mae
-Accuracy across decreasing testing size(columns) and decreasing training size(row)
-MAE(mean absolute error) same labelling
-Fixed windw train last 500 test on 200
-acc2/mae2
-decreasing training size(columns) decreasing sparsity (row)
-mae2(3,3) is lowest
-moving windows train 200 test 
 
-pred vs actual
-
-best adj r2 is 0.66
 
