@@ -9,6 +9,6 @@ For clustering news events we have relatively little information how deciding ho
 
 We attempted using a Dirichlet Process GMM but the implementation we attempted to use was intractable given our computing power. We may attempt to optimize the parameters of the DPGMM in the future or work on limiting the model's training set further. 
 
-
-TODO(Tom): Other indices/stocks?
+\subsubsection{Other Commodities, Indices and Stocks}
+Our analysis has been primarily been focused on the silver commodity up to now. To evaluate whether our model has predictive power on other financial securities, we used linear regression to model the returns of other commodities, indices and stocks based on features from GDELT. We compare the out-of-sample $R^2$ value with the baseline $R^2$ value obtained by performing linear regression on the time series itself without GDELT. If the improvement in the validation $R^2$ value is high for a particular security, then it suggests that the ARIMA model may also be effective on that stock. So far, out of the securities that we have analyzed (gold, oil, S&P500, etc), we have not identified a security whose predictions can be significantly improved by GDELT. When we identify such security in the future, we will include them in our analysis.
 
