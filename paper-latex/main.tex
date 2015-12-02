@@ -125,7 +125,7 @@
 
 \begin{abstract} 
 
-We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weights each day's news events with an extracted importance metric. We use the GDELT news database to extract raw news attributes and sentiment evaluations of the articles. With a $K$-means model for clustering news data feeding into an a lasso regression model as a prediction for the log returns on commodity price will for the next day, [TODO(Ghassen) l1 model accuracy]. When using a Kelly criterion based trading strategy, with training on 563 days and testing on 221, we made 0.7\% returns.
+We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weights each day's news events with an extracted importance metric. We use the GDELT news database to extract raw news attributes and sentiment evaluations of the articles. With a $K$-means model for clustering news data feeding into a lasso regression model we predict the log returns of several commodity prices but mainly silver where we achieved a 0.65 binarry accuracy rate and a 0.37 mean absolute error. When using a Kelly criterion based trading strategy, with training on 563 days and testing on 221, we made 0.7\% returns.
 \end{abstract} 
 
 %TODO review below
@@ -188,7 +188,7 @@ Because our model beats all reasonable risk-free rates, there is some (albeit sm
 
 \input{future_work.tex}
 
-\subsection{Software and Data}
+\section{Software and Data}
 
 All code used is available in an open-source repository.\footnote{\hyperref[https://github.com/vlad17/COS513-Finance]{\texttt{https://github.com/vlad17/COS513-Finance}}} GDELT provides free access to its database as well.\footnote{ \hyperref[http://data.gdeltproject.org/events/index.html]{\texttt{http://data.gdeltproject.org/events/index.html}}}
 
