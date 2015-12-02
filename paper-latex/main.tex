@@ -125,7 +125,7 @@
 
 \begin{abstract} 
 
-We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weights each day's news events with an extracted importance metric. We use the GDELT news database to extract raw news attributes and sentiment evaluations of the articles. With a $K$-means model for clustering news data feeding into an a lasso regression model as a prediction for the log returns on commodity price will for the next day, [TODO(Ghassen) l1 model accuracy]. When using a Kelly criterion based trading strategy, with training on 563 days and testing on 221, we made 0.7\% returns.
+We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weighs each day's news events with an extracted importance metric. We use the GDELT news database to extract raw news attributes and sentiment evaluations of the articles. With a $K$-means model for clustering news data feeding into an a lasso regression model as a prediction for the log returns on commodity price will for the next day, [TODO(Ghassen) l1 model accuracy]. When using a Kelly criterion based trading strategy, with training on 563 days and testing on 221, we made 0.7\% returns.
 \end{abstract} 
 
 %TODO review below
@@ -162,9 +162,7 @@ We propose a new method for predicting commodity price data through the use of a
 
 To evaluate our results in the context of financial predictions, we ran a trading strategy on our test data set, using the predictions of our linear model.
 
-Given a risk-free rate for borrowing leverage, $r$, the Kelly Criterion states that for a security with mean returns $\mu$ and volatility $\sigma$, the optimal fractional investment in the security one should make is $\frac{\mu-r}{\sigma^2}$ \cite{davis2012fractional}. 
-todo assumptions
-Estimating volatility from the training set and using the predicted next-day returns to calculate the proportion of the commodity tested, silver, to buy, we were able to simulate our performance over the 221-day period:
+Given a risk-free rate for borrowing leverage, $r$, the Kelly Criterion states that for a security with mean returns $\mu$ and volatility $\sigma$, the optimal fractional investment in the security one should make is $\frac{\mu-r}{\sigma^2}$ \cite{davis2012fractional}.  Estimating volatility from the training set and using the predicted next-day returns to calculate the proportion of the commodity tested, silver, to buy, we were able to simulate our performance over the 221-day period:
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -182,7 +180,7 @@ The risk free rate did not effect our returns and is only useful as a benchmark 
 
 Because our model beats all reasonable risk-free rates, there is some (albeit small, financially speaking) predictive power offered by the model. The returns on our net worth fluctuate over the test period with a standard deviation of 0.740\%, and we ended up with 0.727\% gains at the end of the test period.
 
-[Note for reviewers: we will add a model with GDELT information removed for model comparison].
+[Note for reviewers: we will add a model with GDELT information removed for model comparison in the future].
 
 \section{Future Work}
 

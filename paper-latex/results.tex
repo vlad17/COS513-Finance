@@ -1,7 +1,7 @@
 
 \subsection{Clustering}
 
-We manually inspect our clusters for both high similary of articles within clusters and ow similarity of articles between clusters. Since we do not have a gold standard for news event labels, we cannot calculate values such as true positives and true negatives. We present some qualitative results.
+We manually inspect our clusters for both high similarity of articles within clusters and low similarity of articles between clusters. Since we do not have a gold standard for news event labels, we cannot calculate values such as true positives and true negatives. We present some qualitative results.
 
 \textbf{First ten articles of Cluster 0:}  
 \begin{compactenum}
@@ -19,7 +19,7 @@ We manually inspect our clusters for both high similary of articles within clust
 
 As can be seen, purity for cluster 0 is fairly high, with seven of ten articles dealing with judicial decisions. In general, most clusters appear to have reasonable purity, but there is also high similarity between clusters. For example, articles similar to the first article in cluster 0 also appear in cluster 5. Cluster 5 is similar to cluster 0 in that they both deal with judicial decisions.\\
 
-\noindent A search for the name of the mastermind of the Mumbai attacks, Zakiur Rehman Lakhvi, returned results in 69 of 1000 clusters, which indicates we have much more cross-cluster similarity than we'd like. But this is a more preferable problem to have than a lack of intra-cluster similarity. Our eyeball test can only evaluate cluster quality based on keywords such as actor names and locations and general topics. Its possible that Lakhvi can appear in 69 clusters because the other metrics articles are clustered on, such as tone or the importance features, which an eyeball test cannot detect, do in fact separate Lakhvi related articles into that many clusters.
+\noindent A search for the name of the mastermind of the Mumbai attacks, Zakiur Rehman Lakhvi, returned results in 69 of 1000 clusters, which indicates we have much more cross-cluster similarity than we wouldI like. But this is a more preferable problem to have than a lack of intra-cluster similarity. Our eyeball test can only evaluate cluster quality based on keywords such as actor names and locations and general topics. Its possible that Lakhvi can appear in 69 clusters because the other metrics articles are clustered on, such as tone or the importance features, which an eyeball test cannot detect, do in fact separate Lakhvi related articles into that many clusters.
 
 \subsection{Regression}
 \begin{figure}[H]
@@ -40,7 +40,7 @@ As can be seen, purity for cluster 0 is fairly high, with seven of ten articles 
 	\caption{Mean abolsute error for various sparsity}
 \end{figure}
 
-\figurename{8} and \figurename{9} show the accuracy and mean absolute error across sparsity for a moving window of last 22-560 training days. As recomputing the whole windows is computationally prohibitive, we only recomputed the coefficients for the training days, but as we can see the best accuracies are approximately similar but we managed to reduce best mean absolute error ot 0.37 from 0.52 in the fixed window.
+\figurename{8} and \figurename{9} show the accuracy and mean absolute error across sparsity for a moving window of last 22-560 training days. As recomputing the whole windows is computationally expensive, we only recomputed the coefficients for the training days, but as we can see the best accuracies are approximately similar but we managed to reduce best mean absolute error ot 0.37 from 0.52 in the fixed window.
 
 \begin{figure}[h!]
 	\includegraphics[width=0.5\textwidth]{results/prediction.jpg}
