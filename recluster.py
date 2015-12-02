@@ -64,7 +64,7 @@ def main():
                 cluster = int(km.predict(expanded_line.split('\t')[7:])[0])
 
                 url = raw_line.split('\t')[-1]
-                if 'desoto' in url.lower():
+                if 'lakhvi' in url.lower():
                     clusters_in.append(cluster)
                     # print(cluster)
                 try:
