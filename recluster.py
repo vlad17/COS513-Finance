@@ -49,9 +49,9 @@ def main():
     clusters = {}
 
     expanded_dir = '/n/fs/scratch/dchouren/examine_data/expanded'
-    expanded_files = glob(expanded_dir + '/*')
+    expanded_files = glob.glob(expanded_dir + '/*')
     raw_dir = '/n/fs/scratch/dchouren/examine_data/raw'
-    raw_files = glob(raw_dir + '/*')
+    raw_files = glob.glob(raw_dir + '/*')
 
     save_stdout = sys.stdout
     sys.stdout = open('trash', 'w')
