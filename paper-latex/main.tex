@@ -20,6 +20,7 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{paralist}
 
 \def \N {\mathbb{N}}
 \def \Nbr {\mathcal{N}}
@@ -163,7 +164,9 @@ TODO(Daway): Sections 1 - 3: cut down and incorporate edits from midterm grades 
 
 To evaluate our results in the context of financial predictions, we ran a trading strategy on our test data set, using the predictions of our linear model.
 
-Given a risk-free rate for borrowing leverage, $r$, the Kelly Criterion states that for a security with mean returns $\mu$ and volatility $\sigma$, the optimal fractional investment in the security one should make is $\frac{\mu-r}{\sigma^2}$ \cite{davis2012fractional}. The assumptions in this model is that the stock is a superposition of the trend predicted by the expected returns and Brownian motion with the prescribed variance over a unit of time (in our case, a day). Estimating volatility from the training set and using the predicted next-day returns to calculate the proportion of the commodity tested, silver, to buy, we were able to simulate our performance over the 221-day period:
+Given a risk-free rate for borrowing leverage, $r$, the Kelly Criterion states that for a security with mean returns $\mu$ and volatility $\sigma$, the optimal fractional investment in the security one should make is $\frac{\mu-r}{\sigma^2}$ \cite{davis2012fractional}. 
+todo assumptions
+Estimating volatility from the training set and using the predicted next-day returns to calculate the proportion of the commodity tested, silver, to buy, we were able to simulate our performance over the 221-day period:
 
 \begin{figure}[ht]
 \vskip 0.2in
