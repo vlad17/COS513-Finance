@@ -23,4 +23,46 @@ As can be seen, purity for cluster 0 is fairly high, with seven of ten articles 
 
 \subsection{Regression}
 
+
+
+\begin{figure}[h!]
+	\caption{Accuracy for various test sizes}
+	\centering
+	\includegraphics[width=0.5\textwidth]{results/acc.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Mean aboslute error for various test sizes}
+	\includegraphics[width=0.5\textwidth]{results/mae.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Accuracy for various sparsity}
+	\includegraphics[width=0.5\textwidth]{results/acc2.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Mean abolsute error for various sparsity}
+	\includegraphics[width=0.5\textwidth]{results/mae2.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\caption{Comparison of log returns for sparsity = 0.1, training size = 400}
+	\includegraphics[width=0.5\textwidth]{results/prediction.jpg}
+\end{figure}
+
+
 TODO(Sean): test err, $R^2$, residuals plot, residuals normality test?
+acc/mae
+Accuracy across decreasing testing size(columns) and decreasing training size(row)
+MAE(mean absolute error) same labelling
+Fixed windw train last 500 test on 200
+acc2/mae2
+decreasing training size(columns) decreasing sparsity (row)
+mae2(3,3) is lowest
+moving windows train 200 test 
+
+pred vs actual
+
+best adj r2 is 0.66
+
