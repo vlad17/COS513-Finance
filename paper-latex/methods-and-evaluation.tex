@@ -95,6 +95,6 @@ Expansion uses one-hot encoding on categorical features, such as the event CAMEO
 \label{fig:summarization}
 \end{figure}
 
-The matrix multiply above conveniently extracts the sum of importance-weighted events belonging to certain topics. Note that this model is extensible to a mixture model, where each event's contribution to a topic's importance for that day is weighed by the probability of belonging to that topic's class. Furthermore, the aggregation creates a uniform description of every day, a flattened vector of dimension dependent on the cluster count.
+The matrix multiplication above conveniently extracts the sum of importance-weighted events belonging to certain topics. Note that this model is extensible to a mixture model, where each event's contribution to a topic's importance for that day is weighed by the probability of belonging to that topic's class. Furthermore, the aggregation creates a uniform description of every day, a flattened vector of dimension dependent on the cluster count.
 
 These daily summaries were then enriched with historical pricing data before being fed into the linear model. The pricing data added was the 5, 10, and 30 day rolling average of the commodity price. %TODO hyperparam selection of rolling mean.
