@@ -21,27 +21,28 @@ def main():
         pass
 
 
-    filtered_in = []
+    # filtered_in = []
 
-    for inf in infiles:
-        if re.match('^(201007)', inf.split('/')[-1]):
+    # for inf in infiles:
+    #     if re.match('^(201007)', inf.split('/')[-1]):
 
-            filtered_in.append(inf)
+    #         filtered_in.append(inf)
 
-    ipdb.set_trace()
+    # ipdb.set_trace()
 
-    print("Reading in", len(filtered_in), "files")
-    fullarr = np.loadtxt(fileinput.input(filtered_in), delimiter = '\t')[:,7:]
+    # print("Reading in", len(filtered_in), "files")
+    # fullarr = np.loadtxt(fileinput.input(filtered_in), delimiter = '\t')[:,7:]
 
 
     K = 100
     print("Learning MiniBatchKMeans with K =", K)
 
-    km = MiniBatchKMeans(n_clusters = K, verbose = True)
-    km.fit(fullarr)
+    # km = MiniBatchKMeans(n_clusters = K, verbose = True)
+    # km.fit(fullarr)
+    km = pickle.load(open('/n/fs/gcf/dchouren-repo/COS513-Finance/new100.model2', 'rb'))
 
-    with open(outfile, 'wb') as out_model:
-        pickle.dump(km, out_model)
+    # with open(outfile, 'wb') as out_model:
+    #     pickle.dump(km, out_model)
 
 
     print('Examining')
