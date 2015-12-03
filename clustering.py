@@ -34,8 +34,25 @@ def main():
     K = int(sys.argv[3])
 
     print("Reading in", len(infiles), "files")
-    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t',
-                         usecols = range(TOPIC_COLUMNS))
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,7:]
+    # print(infiles[0])
+    # if infiles[0] == 'random_sample_20000101':
+
+    # stats_file = '/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats'
+
+
+    # FOR WRITING OUT RANDOM SAMPLE STATS #
+    # print("Normalizing")
+    # stds = np.apply_along_axis(np.std, 0, fullarr)[:,np.newaxis].T
+    # means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
+
+    # stds[stds == 0] = 1.0
+    
+    # with open(stats_file, 'wb+') as summary_stats_outf:
+    #     np.savetxt(summary_stats_outf, stds, delimiter='\t')
+    # with open(stats_file, 'ab') as summary_stats_outf:
+    #     np.savetxt(summary_stats_outf, means, delimiter='\t')
+
 
     print("Learning MiniBatchKMeans with K =", K)
 

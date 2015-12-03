@@ -40,7 +40,7 @@ def get_price_info(price_filename, commodity):
 
 def main():    
 
-    summarized_dir = '../CORRECT-summary-data-20130401-20151021/' + k + '/'
+    summarized_dir = '/n/fs/gcf/CORRECT-summary-data-20130401-20151021/' + k + '/'
 
     # print summarized_dir
     summarized_files = glob.glob(summarized_dir + '*.csv')
@@ -52,7 +52,7 @@ def main():
     valid_start = '2014-10-01'
     valid_end = '2015-04-30'
     test_start = '2015-05-01'
-    test_end = '2015-11-01'
+    test_end = '2015-10-01'
 
     dates = []
     for sfile in summarized_files:
@@ -70,6 +70,12 @@ def main():
 
 
     price_info, price_changes = get_price_info(price_filename, commodity)
+    # print (price_info)
+    print ("Price changes")
+    print (type(price_changes))
+    # price_changes = price_changes.shift(-1)
+    # price_changes = 1 - price_changes
+
     price_info_slice = price_info[price_info.index.isin(dates)]
     price_changes = price_changes[price_changes.index.isin(dates)]
 
@@ -78,11 +84,19 @@ def main():
     train = all_features[(all_features.index >= train_start) & (all_features.index <= train_end)]
     train_y = price_changes[(price_changes.index >= train_start) & (price_changes.index <= train_end)]
 
+    # PCA
+    #pca = decomposition.PCA(n_components=10)
+    #pca.fit(train)
+    #train = pca.transform(train)
+
     valid = all_features[(all_features.index >= valid_start) & (all_features.index <= valid_end)]
     valid_y = price_changes[(price_changes.index >= valid_start) & (price_changes.index <= valid_end)]
+    #valid = pca.transform(valid)
 
     test = all_features[(all_features.index >= test_start) & (all_features.index <= test_end)]
     test_y = price_changes[(price_changes.index >= test_start) & (price_changes.index <= test_end)]
+    #test = pca.transform(test)
+
 
     print('{} / {}'.format(sum(np.array(train_y > 0)), len(train_y)))
     print('{} / {}'.format(sum(np.array(valid_y > 0)), len(valid_y)))
@@ -94,13 +108,15 @@ def main():
     best_score = 0
     for reg in ['l1', 'l2']:
         # choose regularization value based on validation error
-        for c in itertools.chain(np.arange(0.01, 0.1, 0.01), np.arange(0.1, 1, 0.1),
-                                 np.arange(1, 10, 1)):
+        for c in itertools.chain(np.logspace(-2.0, 3.0, num=10)):
             model = LogisticRegression(penalty = reg, C = c, tol = 0.0001, 
                                        dual = use_dual and reg == 'l2')
             model.fit(train, train_y)
             score = model.score(valid, valid_y)
             prob = model.predict_proba(valid)
+            valid_f1_score = f1_score(valid_y, model.predict(valid))
+            print(score)
+            print('Validation f1 score: ' + str(valid_f1_score))
             if score > best_score:
                 best = model
                 best_score = score
@@ -116,6 +132,9 @@ def main():
     print('Model (reg = {}, c = {}) training acc: {} valid accuracy: {} test accuracy: {}'.format(
         reg, c, best.score(train, train_y), best.score(valid, valid_y), best.score(test, test_y)))
 
+    test_pred = best.predict(test)
+    print (test_pred)
+
     # find precision/recall for cutoffs 
     cutoffs = [0.1, 0.25, 0.5, 0.75, 0.9]
     all_precisions = {}
@@ -124,7 +143,6 @@ def main():
     for cutoff in cutoffs:
         proba0 = best.predict_proba(test)[:,0]   # probability we predict first class (0)
         cutoff_preds = np.array(proba0 > cutoff, dtype=int)
-
         avg_precision = average_precision_score(test_y, cutoff_preds, average='weighted')
         all_precisions[cutoff] = avg_precision
 
@@ -150,18 +168,13 @@ def main():
 
 
 
-    with open('./models/glm-' + k + '-' + reg + '-' + str(c), 'wb') as outf:
-        pickle.dump(best, outf)
+#    with open('./models/glm-' + k + '-' + reg + '-' + str(c), 'wb') as outf:
+#        pickle.dump(best, outf)
 
 
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-
-
-
 
 
 
