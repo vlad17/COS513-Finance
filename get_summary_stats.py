@@ -1,6 +1,6 @@
 """
 Usage: python get_summary_stats.py infile outfile 
-Example: python get_summary_stats.py /n/fs/gcf/dchouren-repo/COS513-Finance/random_20000101.export.CSV /n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats
+Example: python get_summary_stats.py /n/fs/gcf/dchouren-repo/COS513-Finance/igmm_10000_20000101.export.CSV /n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats
 """
 
 import numpy as np
