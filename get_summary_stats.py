@@ -8,7 +8,7 @@ import sys
 import fileinput
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 3:
         print(__doc__)
         return 1
 
@@ -17,7 +17,7 @@ def main():
 
     print("Reading in", infile)
     fullarr = np.loadtxt(fileinput.input(infile), delimiter = '\t')[:,:-7]
-    
+
     stds = np.apply_along_axis(np.std, 0, fullarr)[:,np.newaxis].T
     means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
 
