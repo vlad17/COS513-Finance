@@ -40,8 +40,16 @@ def main():
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,:-7]
 
+
+    stds = np.apply_along_axis(np.std, 0, fullarr)[:,np.newaxis].T
+    means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
+    stds[stds == 0] = 1.0
+
     num_lines = 1000
     fullarr = fullarr[np.random.choice(fullarr.shape[0], num_lines, replace=True),:]
+
+    fullarr = (fullarr - means) / stds
+
 
     print("Parameter searching...")
     igmm = None

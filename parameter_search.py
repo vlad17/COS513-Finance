@@ -38,7 +38,7 @@ def main():
         igmm.fit(fullarr)
         score = igmm.score(fullarr)
         score = sum(score)/len(score)
-        print('{}: {} with {} clusters'.format(alpha,score,igmm.n_components))
+        print('{}: {} with {} clusters'.format(alpha, score, igmm.n_components))
 
         if score > best_score:
             best_score = score
