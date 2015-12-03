@@ -40,6 +40,9 @@ def main():
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')
 
+    num_lines = 1000
+    fullarr = fullarr[np.random.choice(fullarr.shape[0], num_lines, replace=True),:]
+
     print("Parameter searching...")
     igmm = None
     best_score = -1000
