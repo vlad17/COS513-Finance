@@ -38,7 +38,7 @@ def main():
     alpha = float(sys.argv[4])
 
     print("Reading in", len(infiles), "files")
-    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,:-7]
 
     num_lines = 1000
     fullarr = fullarr[np.random.choice(fullarr.shape[0], num_lines, replace=True),:]
