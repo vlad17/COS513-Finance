@@ -35,7 +35,7 @@ def main():
     infiles = glob(sys.argv[1])
     outfile = sys.argv[2]
     N = int(sys.argv[3])
-    alpha = int(sys.argv[4])
+    alpha = float(sys.argv[4])
 
     print("Reading in", len(infiles), "files")
     fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')
