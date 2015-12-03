@@ -34,7 +34,7 @@ def main():
     K = int(sys.argv[3])
 
     print("Reading in", len(infiles), "files")
-    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,7:]
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,:-7]
     # print(infiles[0])
     # if infiles[0] == 'random_sample_20000101':
 
