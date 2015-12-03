@@ -48,7 +48,7 @@ def main():
 
             # num_events = int(os.system('wc -l < {}'.format(inf_name)))
 
-            p = subprocess.Popen(["wc -l < {}".format(inf_name)], stdout=subprocess.PIPE)
+            p = subprocess.Popen(["wc -l < {}".format(inf_name)], stdout=subprocess.PIPE, shell=True)
             num_events = p.stdout.read()
             # print out
 
