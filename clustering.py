@@ -34,7 +34,16 @@ def main():
     K = int(sys.argv[3])
 
     print("Reading in", len(infiles), "files")
-    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,:-7]\
+    fullarr = np.loadtxt(fileinput.input(infiles), delimiter = '\t')[:,:-7]
+
+    summary_stats = None
+    stats_file = '/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats2'
+    with open(stats_file, 'rb') as inf:
+        summary_stats = np.loadtxt(inf)
+    stds = summary_stats[:len(summary_stats)/2]
+    means = summary_stats[len(summary_stats)/2:]
+
+    fullarr = (fullarr - means) / stds
 
     print("Learning MiniBatchKMeans with K =", K)
 
