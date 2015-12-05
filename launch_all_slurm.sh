@@ -194,7 +194,7 @@ full_days_summary=()
 # Note intentional for-loop-order inversion here so we can finish models sequentially.
 for j in $clusters; do
     for i in $(cat $all_days); do
-    full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
+    full_days_summary+=($(sbatch $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
   done
 done
 full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')
