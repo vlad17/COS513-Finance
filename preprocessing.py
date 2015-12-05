@@ -163,7 +163,11 @@ def bool_int(boolean):
 
 def parse_day(day):
     unix_epoch = datetime(1970, 1, 1)
-    parsed = datetime(int(day[:4]), int(day[4:6]), int(day[6:8]))
+    try:
+        parsed = datetime(int(day[:4]), int(day[4:6]), int(day[6:8]))
+    except:
+        parsed = ''
+        print('ERROR', day)
     return (parsed - unix_epoch).days
 
 def zerostr(s):
