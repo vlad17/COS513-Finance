@@ -4,7 +4,7 @@ Usage: python examine_clusters.py raw_data_dir preprocessed_dir expanded_dir mod
 
 Examines cluster model assignments by preprocessing, expanding, and then clustering some raw data according to a loaded model
 
-Example: python examine_clusters.py /n/fs/scratch/dchouren/examine_data/raw /n/fs/scratch/dchouren/examine_data/preprocessed/ /n/fs/scratch/dchouren/examine_data/expanded/ /n/fs/scratch/dchouren/models/1000.model
+Example: python examine_clusters.py /n/fs/scratch/dchouren/examine_data/raw /n/fs/scratch/dchouren/examine_data/preprocessed/ /n/fs/scratch/dchouren/examine_data/expanded/ /n/fs/gcf/dchouren-repo/COS513-Finance/models/1000.model
 """
 
 from glob import glob
@@ -39,7 +39,7 @@ def main():
         os.remove(f)
 
     for inf in raw_files:
-        os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + '/' + inf.split('/')[-1]))
+        os.system('python preprocessing.py {} {}'.format(inf, preprocessed_dir + inf.split('/')[-1]))
     
     preprocess_files = glob(preprocessed_dir + '/*')
 
@@ -57,18 +57,23 @@ def main():
     print()
     print('Examining')
     clusters = {}
+
+    save_stdout = sys.stdout
+    sys.stdout = open('trash', 'w')
     for raw_file, expanded_file in zip(raw_files, expanded_files):
         with open(raw_file, 'r') as raw_in, open(expanded_file, 'r') as expanded_in:
             for raw_line, expanded_line in zip(raw_in, expanded_in):
-                cluster = int(model.predict(expanded_line.split('\t'))[0])
+                cluster = int(model.predict(expanded_line.split('\t')[7:])[0])
                 try:
                     clusters[cluster].append(raw_line.split('\t')[-1])
                 except KeyError:
                     clusters[cluster] = [raw_line.split('\t')[-1]]
 
+    sys.stdout = save_stdout
+
     ipdb.set_trace()
 
-    with open('/n/fs/scratch/dchouren/models/clusters.pickle', 'wb') as handle:
+    with open('/n/fs/gcf/dchouren-repo/COS513-Finance/models/clusters.pickle', 'wb') as handle:
         pickle.dump(clusters, handle)
 
     return 0
