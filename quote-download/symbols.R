@@ -566,7 +566,7 @@ symbols = c("DX",
 "NYM",
 "SFR")
 
- symbols <- c("VIX", "SPY", "FTSE", "N225")
+symbols <- c("OIL")
 
 for(t in symbols) {
   cat(paste("Downloading", t, "\n"))

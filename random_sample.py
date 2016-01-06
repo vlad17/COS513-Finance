@@ -4,7 +4,7 @@ Usage: python random_sample.py infile_dir outfile N
 N = total number of events to sample
 R = total number of files to sample
 
-Examle: python random_sample.py /n/fs/gcf/raw-data /n/fs/scratch/dchouren/random_20000101.export.CSV 1000000
+Examle: python random_sample.py /n/fs/scratch/dchouren/expanded /n/fs/scratch/dchouren/random_20000101.export.CSV 1000000
 """
 
 import glob
@@ -13,6 +13,8 @@ import random
 import re
 import ipdb
 import os
+
+import subprocess
 
 
 def main():
@@ -43,8 +45,15 @@ def main():
 
             num_events = 0
             inf_name = str(inf)
-            with open(inf, 'r') as inf_open:
-                num_events = sum(1 for _ in inf_open)
+
+            # num_events = int(os.system('wc -l < {}'.format(inf_name)))
+
+            p = subprocess.Popen(["wc -l < {}".format(inf_name)], stdout=subprocess.PIPE, shell=True)
+            num_events = int(p.stdout.read())
+            # print out
+
+            # with open(inf, 'r') as inf_open:
+            #     num_events = sum(1 for _ in inf_open)
             total_num_events += num_events
 
             file_matches[inf_name] = num_events
