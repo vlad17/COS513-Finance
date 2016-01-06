@@ -13,10 +13,6 @@ if [[ "$#" -ne 9 && "$#" -ne 7 && "$#" -ne 8 ]]; then
     echo 'Uses code_dir to run the python files, if supplied. Defaults to'
     echo '/n/fs/gcf/COS513-Finance.'
     echo
-    echo 'Reads a list of cluster sizes from stdin. Uses the parameter sample-file'
-    echo 'to preprocess, expand, and learn a clustering model based on, which is then'
-    echo 'used for the day-summaries pipeline.'
-    echo 
     echo 'Generates a multiple sets set of up to N slurm scripts with 1 CPU per'
     echo 'task and a max runtime of a day.'
     echo
@@ -29,7 +25,7 @@ if [[ "$#" -ne 9 && "$#" -ne 7 && "$#" -ne 8 ]]; then
     echo "Optionally sends an email when everything's done."
     echo
     echo "Example:"
-    echo "echo 10 100 | ./launch_all_slurm.sh /n/fs/gcf/raw-data-20130401-20151021/20130401.export.CSV /n/fs/gcf/raw-data-20130401-20151021/ /n/fs/scratch/\$USER/models /n/fs/scratch/\$USER/summaries 20130601 20130703 CL \$USER@princeton.edu \$(pwd)"
+    echo "./launch_all_slurm.sh /n/fs/gcf/raw-data-20130401-20151021/20130401.export.CSV /n/fs/gcf/raw-data-20130401-20151021/ /n/fs/scratch/\$USER/models /n/fs/scratch/\$USER/summaries 20130601 20130703 CL \$USER@princeton.edu \$(pwd)"
     exit 1
 fi
 
@@ -85,8 +81,6 @@ $5
 srun /usr/bin/time -f '%E elapsed, %U user, %S system, %M memory, %x status' $3"
 }
 
-clusters=$(cat -)
-
 GCF=/n/fs/gcf
 FINANCE=$code_dir
 PYENV=$GCF/ionic-env/bin/activate
@@ -97,11 +91,12 @@ ls -1 $raw_data_dir | grep .export.CSV | cut -c1-8 | sort \
 
 echo "************************************************************"
 echo "STARTING CLUSTER LEARNING"
-echo "K = $clusters N =" $(wc -l < $all_days)
+echo "K = (IGMM) N =" $(wc -l < $all_days)
 echo "Rows in sample =" $(wc -l < $sample_file)
 echo "************************************************************"
 
-SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts
+SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts/$USER
+mkdir -p $SCRIPT_DIR
 
 num_components=5000
 alpha=0.4
