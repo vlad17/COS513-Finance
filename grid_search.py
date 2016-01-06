@@ -51,37 +51,111 @@ _INDICES = {
     'USDTHB': ('USD.THB', True),
     'USDTND': ('USD.TND', True),
     'USDZAR': ('USD.ZAR', True),
+    'CJ': ('CJ.Adjusted', True),
+    'CY': ('CY.Adjusted', True),
+    'CZ': ('CZ.Adjusted', True),
+    'D7L': ('D7L.Adjusted', True),
+    'DAC': ('DAC.Adjusted', True),
+    'DBL': ('DBL.Adjusted', True),
+    'DEN': ('DEN.Adjusted', True),
+    'DX': ('DX.Adjusted', True),
+    'EFM': ('EFM.Adjusted', True),
+    'EJ': ('EJ.Adjusted', True),
+    'ESK': ('ESK.Adjusted', True),
+    'EVC': ('EVC.Adjusted', True),
+    'EWN': ('EWN.Adjusted', True),
+    'EXR': ('EXR.Adjusted', True),
+    'FI': ('FI.Adjusted', True),
+    'GCU': ('GCU.Adjusted', True),
+    'GD': ('GD.Adjusted', True),
+    'GL': ('GL.Adjusted', True),
+    'GOC': ('GOC.Adjusted', True),
+    'GX': ('GX.Adjusted', True),
+    'HE': ('HE.Adjusted', True),
+    'HMO': ('HMO.Adjusted', True),
+    'HP': ('HP.Adjusted', True),
+    'IN': ('IN.Adjusted', True),
+    'IR': ('IR.Adjusted', True),
+    'IS': ('IS.Adjusted', True),
+    'KA': ('KA.Adjusted', True),
+    'KEO': ('KEO.Adjusted', True),
+    'KEP': ('KEP.Adjusted', True),
+    'KGB': ('KGB.Adjusted', True),
+    'KMF': ('KMF.Adjusted', True),
+    'KOL': ('KOL.Adjusted', True),
+    'KRA': ('KRA.Adjusted', True),
+    'KRK': ('KRK.Adjusted', True),
+    'KRU': ('KRU.Adjusted', True),
+    'KT': ('KT.Adjusted', True),
+    'LPE': ('LPE.Adjusted', True),
+    'LPS': ('LPS.Adjusted', True),
+    'M6J': ('M6J.Adjusted', True),
+    'MAE': ('MAE.Adjusted', True),
+    'MAS': ('MAS.Adjusted', True),
+    'MBE': ('MBE.Adjusted', True),
+    'MCC': ('MCC.Adjusted', True),
+    'MCD': ('MCD.Adjusted', True),
+    'MDB': ('MDB.Adjusted', True),
+    'MFB': ('MFB.Adjusted', True),
+    'MKC': ('MKC.Adjusted', True),
+    'MM': ('MM.Adjusted', True),
+    'MNC': ('MNC.Adjusted', True),
+    'MXB': ('MXB.Adjusted', True),
+    'NI': ('NI.Adjusted', True),
+    'NL': ('NL.Adjusted', True),
+    'NP': ('NP.Adjusted', True),
+    'NS': ('NS.Adjusted', True),
+    'OIL': ('OIL.Adjusted', True), 
+    'OMM': ('OMM.Adjusted', True),
+    'PGP': ('PGP.Adjusted', True),
+    'PH': ('PH.Adjusted', True),
+    'PLE': ('PLE.Adjusted', True),
+    'PZ': ('PZ.Adjusted', True),
+    'QI': ('QI.Adjusted', True),
+    'RB': ('RB.Adjusted', True),
+    'RG': ('RG.Adjusted', True),
+    'RL': ('RL.Adjusted', True),
+    'RM': ('RM.Adjusted', True),
+    'RMB': ('RMB.Adjusted', True),
+    'RT': ('RT.Adjusted', True),
+    'SD': ('SD.Adjusted', True),
+    'SF': ('SF.Adjusted', True),
+    'SI': ('SI.Adjusted', True),
+    'SIL': ('SIL.Adjusted', True),
+    'SIR': ('SIR.Adjusted', True),
+    'SMC': ('SMC.Adjusted', True),
+    'SP': ('SP.Adjusted', True),
     'SPY': ('SPY.Adjusted', True),
-    'VIX': ('VIX.Adjusted', False)
+    'SS': ('SS.Adjusted', True),
+    'STI': ('STI.Adjusted', True),
+    'STR': ('STR.Adjusted', True),
+    'STZ': ('STZ.Adjusted', True),
+    'TC': ('TC.Adjusted', True),
+    'TR': ('TR.Adjusted', True),
+    'TT': ('TT.Adjusted', True),
+    'TZ6': ('TZ6.Adjusted', True),
+    'UA': ('UA.Adjusted', True),
+    'UCM': ('UCM.Adjusted', True),
+    'UN': ('UN.Adjusted', True),
+    'VIX': ('VIX.Adjusted', True),
+    'ZN': ('ZN.Adjusted', True),
 }
 
 _INDICES = {
-    'USDINR': ('USD.INR', True),
-    'USDMXN': ('USD.MXN', True),
-    'USDHKD': ('USD.HKD', True),
-    'XAGUSD': ('XAG.USD', True),
-    'XAUUSD': ('XAU.USD', True),
-    'SPY': ('SPY.Adjusted', True),
-    'VIX': ('VIX.Adjusted', False),
-    'VP': ('VP.Adjusted', True),
-    'ZN': ('ZN.Adjusted', True),
-    'D7L': ('D7L.Adjusted', True),
-    'EXR': ('EXR.Adjusted', True),
-    'HE': ('HE.Adjusted', True),
-    'KG': ('KG.Adjusted', True),
-    'MEO': ('MEO.Adjusted', True),
-    'MWE': ('MWE.Adjusted', True),
-    'PA': ('PA.Adjusted', True),
-    'RH': ('RH.Adjusted', True),
+    'VIX': ('VIX.Adjusted', True),
+    'aabear': ('Mid Price', False),
+    'aabull': ('Mid Price', False),
+    'aaneut': ('Mid Price', False),
+    'gsci': ('Mid Price', True),
+    'US10': ('Mid Price', True),  
 }
-
+ 
 
 # _K_VALUES = [30, 100, 300, 1000]
 _K_VALUES = [30, 100, 300]
 
 # False means do not perform PCA
 _N_COMPONENTS = [10, 30, 100, 300, False]
-
 
 # Scale log returns by this number
 _SCALE = 1000000
@@ -90,7 +164,10 @@ _SCALE = 1000000
 _SPLIT_RATIOS = (60.0, 20.0, 20.0)
 _SPLIT_TOTAL = sum(_SPLIT_RATIOS)
 
-_RESULT_FILENAME = "grid_search_result3.csv"
+# Name of the CSV file to save as
+_RESULT_FILENAME = "grid_search_result.csv"
+if len(sys.argv) >= 2:
+    _RESULT_FILENAME = sys.argv[1]
 
 
 def get_price_info(price_filename, column, change_in_price=False):
@@ -101,13 +178,11 @@ def get_price_info(price_filename, column, change_in_price=False):
     """
     prices = []
     prices = pd.read_csv(price_filename, sep=' ', index_col=0)
-
     five_day_avg = pd.Series(pd.rolling_mean(prices[column], 5), name='five_day_avg')
     ten_day_avg = pd.Series(pd.rolling_mean(prices[column], 10), name='ten_day_avg')
     thirty_day_avg = pd.Series(pd.rolling_mean(prices[column], 30), name='thirty_day_avg')
-    
-    price_info = pd.DataFrame(pd.concat([prices[column], five_day_avg, ten_day_avg, thirty_day_avg], axis=1))
 
+    price_info = pd.DataFrame(pd.concat([prices[column], five_day_avg, ten_day_avg, thirty_day_avg], axis=1))
     if not change_in_price:
         return price_info, prices[column]
     else:
@@ -118,7 +193,7 @@ def get_price_info(price_filename, column, change_in_price=False):
 
 def main():
 
-    # Dictionary that maps (index, k, n) to (train_R^2, validation_R^2, test_R^2)
+    # Dictionary that maps (index, k, n) to (train_R^2, validation_R^2, test_R^2, baseline_train_R^2, baseline_validation_R^2, baseline_test_R^2, improvement)
     _R_SQUARED_VALUES = {}
 
     for k in _K_VALUES:
@@ -148,7 +223,9 @@ def main():
             price_info_slice = price_info[price_info.index.isin(dates)]
             index_time_series = index_time_series[index_time_series.index.isin(dates)]
             index_time_series = index_time_series[np.isfinite(index_time_series)]
-            all_features = all_days.join(price_info_slice)
+
+            # Calculate the R^2 values achieved by the baseline without using GDELT data
+            all_features = price_info_slice
             all_features = all_features[np.isfinite(all_features['thirty_day_avg'])]
             all_features = all_features.sort_index()
             index_time_series = index_time_series.sort_index()
@@ -157,6 +234,34 @@ def main():
             num_dates = len(all_features)
             train_end = int(_SPLIT_RATIOS[0] / _SPLIT_TOTAL * num_dates)
             valid_end = int((_SPLIT_RATIOS[0] + _SPLIT_RATIOS[1]) / _SPLIT_TOTAL * num_dates)
+            train_dates = all_features.index[:train_end]
+            valid_dates = all_features.index[train_end:valid_end]
+            test_dates = all_features.index[valid_end:]
+
+            # Partition into training, validation and test set
+            train = all_features[(all_features.index >= train_dates[0]) & (all_features.index <= train_dates[-1])]
+            train_y = index_time_series[(all_features.index >= train_dates[0]) & (all_features.index <= train_dates[-1])]
+
+            valid = all_features[(all_features.index >= valid_dates[0]) & (all_features.index <= valid_dates[-1])]
+            valid_y = index_time_series[(all_features.index >= valid_dates[0]) & (all_features.index <= valid_dates[-1])]
+
+            test = all_features[(all_features.index >= test_dates[0]) & (all_features.index <= test_dates[-1])]
+            test_y = index_time_series[(all_features.index >= test_dates[0]) & (all_features.index <= test_dates[-1])]
+
+            # Perform linear regression
+            model = LinearRegression(normalize=True, n_jobs=-1)
+            model.fit(train, train_y)
+            baseline_train_score = model.score(train, train_y)
+            baseline_valid_score = model.score(valid, valid_y)
+            baseline_test_score = model.score(test, test_y)
+
+            # Now actually calculate the R^2 values with GDELT data 
+            all_features = all_days.join(price_info_slice)
+            all_features = all_features[np.isfinite(all_features['thirty_day_avg'])]
+            all_features = all_features.sort_index()
+            index_time_series = index_time_series.sort_index()
+
+            # Obtain the dates for training, validation, and testing
             train_dates = all_features.index[:train_end]
             valid_dates = all_features.index[train_end:valid_end]
             test_dates = all_features.index[valid_end:]
@@ -191,17 +296,18 @@ def main():
                 print ("Train R^2: {}".format(train_score))
                 print ("Valid R^2: {}".format(valid_score))
                 print ("Test R^2: {}".format(test_score))
+
+                improvement = valid_score - baseline_valid_score
+                print ("Improvement over baseline: {}".format(improvement))
                 print ()
 
-                _R_SQUARED_VALUES[(index, k, n, num_dates)] = (train_score, valid_score, test_score)
-
+                _R_SQUARED_VALUES[(index, k, n, num_dates)] = (train_score, valid_score, test_score, baseline_train_score, baseline_valid_score, baseline_test_score, improvement)
 
     _R_SQUARED_VALUES = list(_R_SQUARED_VALUES.items())
     # Sort by the R^2 value on validation set
     _R_SQUARED_VALUES.sort(key = lambda x: x[1][1], reverse=True)
     print (_R_SQUARED_VALUES)
 
-    # TODO: take this as an argument
     # Save the results in a CSV file
     with open(_RESULT_FILENAME, 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
