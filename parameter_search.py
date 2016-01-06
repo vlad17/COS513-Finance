@@ -1,6 +1,6 @@
 """
 Usage: python parameter_search.py infile max_components num_random_lines
-Example: python parameter_search.py /n/fs/gcf/dchouren-repo/COS513-Finance/igmm_10000_20000101.export.CSV 1000 1000
+Example: python parameter_search.py /n/fs/gcf/dchouren-repo/COS513-Finance/igmm100k_2.export.CSV 10000 10000
 
 Infile should be an csv file of expanded rows
 
@@ -28,7 +28,7 @@ def main():
     means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
     stds[stds == 0] = 1.0
 
-    num_lines = 100000
+    num_lines = num_random
     fullarr = fullarr[np.random.choice(fullarr.shape[0], num_lines, replace=True),:]
 
     fullarr = (fullarr - means) / stds
