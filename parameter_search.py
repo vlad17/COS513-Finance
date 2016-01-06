@@ -28,7 +28,7 @@ def main():
     means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
     stds[stds == 0] = 1.0
 
-    num_lines = 1000
+    num_lines = 100000
     fullarr = fullarr[np.random.choice(fullarr.shape[0], num_lines, replace=True),:]
 
     fullarr = (fullarr - means) / stds
