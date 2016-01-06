@@ -1,10 +1,18 @@
 """
-Usage: python preprocessing.py inputfile outputfile [unique_cameo_codes] [unique_actor_type_codes]
+Usage: python preprocessing.py inputfile outputfile [stock] [unique_cameo_codes] [unique_actor_type_codes]
 
 Accepts tab-separated GDELT record files of NUM_FIELDS (or NUM_FIELDS - 1)
 columns (URL, column , and ouptuts a cleaned, preprocessed version to outputfile.
 
 Assumes basename for input file is of the form YYYYMMDD.export.CSV.
+
+stock should be 'EVERYTHING' or another supported symbol. Supported symbols are:
+
+XAU - gold
+XAG - silver
+CL - crude oil
+
+Setting the stock option filters out countries that are not top 5 exporters of the item.
 
 unique_cameo_codes is a file that defaults to
 /n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt
@@ -152,6 +160,18 @@ NUM_FIELDS = 58
 
 alpha3s = list_to_idx_dict(countries_by_alpha3.keys(), 1)
 
+valid_countries = None
+
+def name_to_alpha3(ls):
+    return {countries_by_name[i].alpha3 for i in ls}
+
+#http://www.worldstopexports.com/
+top_exporters = {
+    'XAU' : name_to_alpha3(['HONG KONG', 'MEXICO', 'UNITED KINGDOM', 'KOREA, REPUBLIC OF', 'GERMANY']),
+    'XAG' : name_to_alpha3(['SWITZERLAND', 'HONG KONG', 'UNITED KINGDOM', 'UNITED STATES', 'CANADA']),
+    'CL' : name_to_alpha3(['SAUDI ARABIA', 'RUSSIAN FEDERATION', 'UNITED ARAB EMIRATES', 'CANADA', 'IRAQ'])
+}
+
 def is_verbal(quadclass):
     return quadclass == 1 or quadclass == 3
 
@@ -218,6 +238,10 @@ def clean_row(row, day, cameos, unique_actor_type_codes):
     actor2cc = alpha3s[actor2cc] if actor2cc in alpha3s else 0
     new_row.append(actor2cc)
 
+    if valid_countries:
+        if actor1cc not in valid_countries and actor2cc not in valid_countries:
+            return None
+
     for col in ['Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type']:
         new_row.append(zerostr(row[column_idx[col]]))
 
@@ -246,6 +270,11 @@ def main():
 
     inputfile = sys.argv[1]
     outputfile = sys.argv[2]
+
+    if (len(sys.argv) >= 4):
+        symbol = sys.argv[3].upper()
+        if symbol != 'EVERYTHING':
+            valid_countries = top_exporters[symbol]
 
     cameofile = '/n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt'
     if (len(sys.argv) >= 4):
