@@ -13,7 +13,7 @@ then runs them through a DPGMM and prints the score.
 
 Serializes (via pickle) the GMM learned based on the input to outfile.
 
-Example: python infinite_gmm.py /n/fs/gcf/dchouren-repo/COS513-Finance/igmm_10000_20000101.export.CSV* /n/fs/gcf/dchouren-repo/COS513-Finance/models/igmm_alpha 10000 0.4
+Example: python infinite_gmm.py /n/fs/gcf/dchouren-repo/COS513-Finance/igmm100k_2.export.CSV* /n/fs/gcf/dchouren-repo/COS513-Finance/models/igmm_alpha 10000 0.4
 """
 
 from glob import glob
@@ -23,7 +23,7 @@ import pickle
 import sys
 from sklearn.mixture import DPGMM
 import itertools
-import ipdb
+# import ipdb
 
 TOPIC_COLUMNS = 938 
 
