@@ -119,7 +119,7 @@ import os
 import re
 import nltk
 from nltk.corpus import stopwords
-from iso3166 import countries_by_alpha3
+from iso3166 import countries_by_alpha3, countries_by_name
 
 nltk.data.path.append("/n/fs/gcf")
 stops = stopwords.words("english")
@@ -160,8 +160,6 @@ NUM_FIELDS = 58
 
 alpha3s = list_to_idx_dict(countries_by_alpha3.keys(), 1)
 
-valid_countries = None
-
 def name_to_alpha3(ls):
     return {countries_by_name[i].alpha3 for i in ls}
 
@@ -189,7 +187,7 @@ def parse_day(day):
 def zerostr(s):
     return s if s else "0"
 
-def clean_row(row, day, cameos, unique_actor_type_codes):
+def clean_row(row, day, cameos, unique_actor_type_codes, valid_countries):
     """ Performs the output schema -> input schema transformation described
         above. """
     
@@ -229,17 +227,17 @@ def clean_row(row, day, cameos, unique_actor_type_codes):
     new_row.append(bool_int(is_cooperation(quadclass)))
 
     # Actor1Country
-    actor1cc = row[column_idx['Actor1CountryCode']]
-    actor1cc = alpha3s[actor1cc] if actor1cc in alpha3s else 0
+    actor1cc3 = row[column_idx['Actor1CountryCode']]
+    actor1cc = alpha3s[actor1cc3] if actor1cc3 in alpha3s else 0
     new_row.append(actor1cc)
 
     # Actor2Country
-    actor2cc = row[column_idx['Actor2CountryCode']]
-    actor2cc = alpha3s[actor2cc] if actor2cc in alpha3s else 0
+    actor2cc3 = row[column_idx['Actor2CountryCode']]
+    actor2cc = alpha3s[actor2cc3] if actor2cc3 in alpha3s else 0
     new_row.append(actor2cc)
 
     if valid_countries:
-        if actor1cc not in valid_countries and actor2cc not in valid_countries:
+        if actor1cc3 not in valid_countries and actor2cc3 not in valid_countries:
             return None
 
     for col in ['Actor1Geo_Type', 'Actor2Geo_Type', 'ActionGeo_Type']:
@@ -264,28 +262,29 @@ def clean_row(row, day, cameos, unique_actor_type_codes):
 compatibleFile = re.compile('.*\d\d\d\d\d\d\d\d\.export\.CSV')
 
 def main():
-    if len(sys.argv) < 3 and len(sys.argv) > 5:
+    if len(sys.argv) < 3 or len(sys.argv) > 6:
         print(__doc__)
         return 1
 
     inputfile = sys.argv[1]
     outputfile = sys.argv[2]
 
+    valid_countries = None
     if (len(sys.argv) >= 4):
         symbol = sys.argv[3].upper()
         if symbol != 'EVERYTHING':
             valid_countries = top_exporters[symbol]
 
     cameofile = '/n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt'
-    if (len(sys.argv) >= 4):
-        cameofile = sys.argv[3]
+    if (len(sys.argv) >= 5):
+        cameofile = sys.argv[4]
 
     unique_cameos = [line.strip() for line in open(cameofile, 'r')]
     unique_cameos = list_to_idx_dict(unique_cameos, 1)
 
     actor_type_code_file = '/n/fs/gcf/raw-data-20130401-20151021/unique_actor_type_codes.txt'
-    if (len(sys.argv) >= 5):
-        actor_type_code_file = sys.argv[4]
+    if (len(sys.argv) >= 6):
+        actor_type_code_file = sys.argv[5]
 
     unique_actor_type_codes = [line.strip() for line in open(actor_type_code_file, 'r')]
     unique_actor_type_codes = list_to_idx_dict(unique_actor_type_codes, 1)
@@ -307,7 +306,9 @@ def main():
         writer = csv.writer(out_csv, delimiter='\t')
         for row in reader:
             tot_rows += 1
-            cleaned_row = clean_row(row, news_day, unique_cameos, unique_actor_type_codes)
+            cleaned_row = clean_row(row, news_day, unique_cameos, 
+                                    unique_actor_type_codes,
+                                    valid_countries)
             if cleaned_row:
                 writer.writerow(cleaned_row)
             else:
