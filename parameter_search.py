@@ -40,7 +40,7 @@ def main():
     best_score = -100000
     best_alpha = -1
     best_model = None
-    for alpha in [0.000001, 0.00001, 0.0001, 0.001, 0.01]: 
+    for alpha in [0.1, 1, 10, 100]: 
         print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
         output += "Learning infinite GMM with N={}, alpha={}".format(N, alpha)
         igmm = DPGMM(covariance_type='diag', n_components=N, alpha=alpha, init_params='wmc')
