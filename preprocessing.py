@@ -7,11 +7,11 @@ columns (URL, column , and ouptuts a cleaned, preprocessed version to outputfile
 Assumes basename for input file is of the form YYYYMMDD.export.CSV.
 
 unique_cameo_codes is a file that defaults to
-/n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt
+/n/fs/gcf/raw-data/unique_cameos.txt
 It should just be a file where each line is a unique cameo code.
 
 unique_actor_type_codes is a file that defaults to
-/n/fs/gcf/raw-data-20130401-20151021/unique_actor_type_codes.txt
+/n/fs/gcf/raw-data/unique_actor_type_codes.txt
 It should just be a file where each line is a unique Actor1Type1Code or Actor2Type1Code.
 
 NOTES:
@@ -240,21 +240,21 @@ def clean_row(row, day, cameos, unique_actor_type_codes):
 compatibleFile = re.compile('.*\d\d\d\d\d\d\d\d\.export\.CSV')
 
 def main():
-    if len(sys.argv) < 3 and len(sys.argv) > 5:
+    if len(sys.argv) < 3 or len(sys.argv) > 5:
         print(__doc__)
         return 1
 
     inputfile = sys.argv[1]
     outputfile = sys.argv[2]
 
-    cameofile = '/n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt'
+    cameofile = '/n/fs/gcf/raw-data/unique_cameos.txt'
     if (len(sys.argv) >= 4):
         cameofile = sys.argv[3]
 
     unique_cameos = [line.strip() for line in open(cameofile, 'r')]
     unique_cameos = list_to_idx_dict(unique_cameos, 1)
 
-    actor_type_code_file = '/n/fs/gcf/raw-data-20130401-20151021/unique_actor_type_codes.txt'
+    actor_type_code_file = '/n/fs/gcf/raw-data/unique_actor_type_codes.txt'
     if (len(sys.argv) >= 5):
         actor_type_code_file = sys.argv[4]
 

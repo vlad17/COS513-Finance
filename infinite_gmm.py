@@ -45,31 +45,10 @@ def main():
     means = np.apply_along_axis(np.mean, 0, fullarr)[:,np.newaxis].T
     stds[stds == 0] = 1.0
 
-    num_lines = 1000
+    num_lines = 10000
     fullarr = fullarr[np.random.choice(fullarr.shape[0], num_lines, replace=True),:]
 
     fullarr = (fullarr - means) / stds
-
-
-    print("Parameter searching...")
-    igmm = None
-    best_score = -1000
-    best_alpha = -1
-    best_model = None
-    for alpha in [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000]: 
-        print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
-        igmm = DPGMM(covariance_type='diag', n_components=N, alpha=alpha, init_params='wmc')
-        igmm.fit(fullarr)
-        score = igmm.score(fullarr)
-        score = sum(score)/len(score)
-        print('{}: {}'.format(alpha,score))
-
-        if score > best_score:
-            best_score = score
-            best_alpha = alpha
-            best_model = igmm
-
-    print("Best alpha={}".format(best_alpha))
 
 
     print("Learning infinite GMM with N={}, alpha={}".format(N, alpha))
@@ -79,7 +58,7 @@ def main():
 
     print("Infinite GMM trained, saving")
 
-    with open(outfile, 'wb') as out_model:
+    with open(outfile + '_' + num_lines, 'wb') as out_model:
         pickle.dump(igmm, out_model)
 
     print("Score:", igmm.score(fullarr))
