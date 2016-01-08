@@ -2,8 +2,8 @@
 
 set -e
 
-if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
-    echo 'Usage: echo [K1 K2 K3 ...] | launch_all_slurm.sh sample-file raw_data_dir models_dir summary_dir lo hi [email] [code_dir]'
+if [[ "$#" -ne 9 && "$#" -ne 7 && "$#" -ne 8 ]]; then
+    echo 'Usage: echo [K1 K2 K3 ...] | launch_all_slurm.sh sample-file raw_data_dir models_dir summary_dir lo hi stock [email] [code_dir]'
     echo
     echo 'NOTE: THIS CAN ONLY BE RUN ONCE AT A TIME PER USER'
     echo
@@ -13,10 +13,6 @@ if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
     echo 'Uses code_dir to run the python files, if supplied. Defaults to'
     echo '/n/fs/gcf/COS513-Finance.'
     echo
-    echo 'Reads a list of cluster sizes from stdin. Uses the parameter sample-file'
-    echo 'to preprocess, expand, and learn a clustering model based on, which is then'
-    echo 'used for the day-summaries pipeline.'
-    echo 
     echo 'Generates a multiple sets set of up to N slurm scripts with 1 CPU per'
     echo 'task and a max runtime of a day.'
     echo
@@ -29,7 +25,7 @@ if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
     echo "Optionally sends an email when everything's done."
     echo
     echo "Example:"
-    echo "echo 10 100 | ./launch_all_slurm.sh /n/fs/gcf/raw-data-20130401-20151021/20130401.export.CSV /n/fs/gcf/raw-data-20130401-20151021/ /n/fs/scratch/\$USER/models /n/fs/scratch/\$USER/summaries 20130601 20130703 \$USER@princeton.edu \$(pwd)"
+    echo "./launch_all_slurm.sh /n/fs/gcf/raw-data-20130401-20151021/20130401.export.CSV /n/fs/gcf/raw-data-20130401-20151021/ /n/fs/scratch/\$USER/models /n/fs/scratch/\$USER/summaries 20130601 20130703 CL \$USER@princeton.edu \$(pwd)"
     exit 1
 fi
 
@@ -42,8 +38,9 @@ models_dir=$(readlink -f "$3")
 summary_dir=$(readlink -f "$4")
 lo="$5"
 hi="$6"
-email="$7"
-code_dir="$8"
+stock="$7"
+email="$8"
+code_dir="$9"
 
 sample_dir=/n/fs/scratch/$USER/sample
 pre_sample_dir=/n/fs/scratch/$USER/sample-preprocessed
@@ -84,8 +81,6 @@ $5
 srun /usr/bin/time -f '%E elapsed, %U user, %S system, %M memory, %x status' $3"
 }
 
-clusters=$(cat -)
-
 GCF=/n/fs/gcf
 FINANCE=$code_dir
 PYENV=$GCF/ionic-env/bin/activate
@@ -96,11 +91,12 @@ ls -1 $raw_data_dir | grep .export.CSV | cut -c1-8 | sort \
 
 echo "************************************************************"
 echo "STARTING CLUSTER LEARNING"
-echo "K = $clusters N =" $(wc -l < $all_days)
+echo "K = (IGMM) N =" $(wc -l < $all_days)
 echo "Rows in sample =" $(wc -l < $sample_file)
 echo "************************************************************"
 
-SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts
+SCRIPT_DIR=/n/fs/gcf/generated-slurm-scripts/$USER
+mkdir -p $SCRIPT_DIR
 
 num_components=5000
 alpha=0.4
@@ -110,7 +106,7 @@ slurm_header "05:00:00" "46G" "/bin/bash -c \"
   set -e
   mkdir -p $pre_sample_dir $exp_sample_dir
   source $PYENV
-  python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre.csv
+  python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre.csv $stock
   python $FINANCE/expand.py $pre_sample_dir/sample-pre.csv $exp_sample_dir/sample-exp.csv
   python $FINANCE/infinite_gmm.py \\\"$exp_sample_dir/sample-exp.csv\\\" $models_dir/igmm.model $num_components $alpha
   rm -rf $pre_sample_dir/sample-pre.csv
@@ -123,7 +119,7 @@ for i in $(cat $all_days); do
     set -e
     mkdir -p $pre_dir $exp_dir
     source $PYENV
-    python $FINANCE/preprocessing.py $raw_data_dir/$i.export.CSV $pre_dir/$i.csv
+    python $FINANCE/preprocessing.py $raw_data_dir/$i.export.CSV $pre_dir/$i.csv $stock
     cd $FINANCE # TODO ugly dep for models/
     python $FINANCE/expand.py $pre_dir/$i.csv $exp_dir/$i.csv
     if [ ! -s $exp_dir/$i.csv ]; then
