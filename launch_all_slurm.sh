@@ -2,8 +2,8 @@
 
 set -e
 
-if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
-    echo 'Usage: echo [K1 K2 K3 ...] | launch_all_slurm.sh sample-file raw_data_dir models_dir summary_dir lo hi [email] [code_dir]'
+if [[ "$#" -ne 7 && "$#" -ne 8 && "$#" -ne 9 ]]; then
+    echo 'Usage: echo [K1 K2 K3 ...] | launch_all_slurm.sh sample-file raw_data_dir models_dir summary_dir lo hi [stock] [email] [code_dir]'
     echo
     echo 'NOTE: THIS CAN ONLY BE RUN ONCE AT A TIME PER USER'
     echo
@@ -24,12 +24,14 @@ if [[ "$#" -ne 6 && "$#" -ne 7 && "$#" -ne 8 ]]; then
     echo 'Makes sure dates within the interval [lo, hi] are the only'
     echo 'ones selected.'
     echo
+    echo 'stock filters by countries that are top exporters of the commodity, use EVERYTHING for everything'
+    echo
     echo 'Writes out the fully-summarized files to summary_dir in YYYYMMDD.csv'
     echo
     echo "Optionally sends an email when everything's done."
     echo
     echo "Example:"
-    echo "echo 10 100 | ./launch_all_slurm.sh /n/fs/gcf/raw-data-20130401-20151021/20130401.export.CSV /n/fs/gcf/raw-data-20130401-20151021/ /n/fs/scratch/\$USER/models /n/fs/scratch/\$USER/summaries 20130601 20130703 \$USER@princeton.edu \$(pwd)"
+    echo "echo 10 100 | ./launch_all_slurm.sh /n/fs/gcf/raw-data-20130401-20151021/20130401.export.CSV /n/fs/gcf/raw-data-20130401-20151021/ /n/fs/scratch/\$USER/models /n/fs/scratch/\$USER/summaries 20130601 20130703 CL \$USER@princeton.edu \$(pwd)"
     exit 1
 fi
 
@@ -42,8 +44,9 @@ models_dir=$(readlink -f "$3")
 summary_dir=$(readlink -f "$4")
 lo="$5"
 hi="$6"
-email="$7"
-code_dir="$8"
+stock="$7"
+email="$8"
+code_dir="$9"
 
 sample_dir=/n/fs/scratch/$USER/sample
 pre_sample_dir=/n/fs/scratch/$USER/sample-preprocessed
@@ -108,7 +111,7 @@ for i in $clusters; do
     set -e
     mkdir -p $pre_sample_dir $exp_sample_dir
     source $PYENV
-    python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre-$i.csv
+    python $FINANCE/preprocessing.py $sample_file $pre_sample_dir/sample-pre-$i.csv $stock
     python $FINANCE/expand.py $pre_sample_dir/sample-pre-$i.csv $exp_sample_dir/sample-exp-$i.csv
     python $FINANCE/clustering.py \\\"$exp_sample_dir/sample-exp-$i.csv\\\" $models_dir/$i.model $i
     rm -rf $pre_sample_dir/sample-pre-$i.csv
@@ -122,7 +125,7 @@ for i in $(cat $all_days); do
     set -e
     mkdir -p $pre_dir $exp_dir
     source $PYENV
-    python $FINANCE/preprocessing.py $raw_data_dir/$i.export.CSV $pre_dir/$i.csv
+    python $FINANCE/preprocessing.py $raw_data_dir/$i.export.CSV $pre_dir/$i.csv $stock
     cd $FINANCE # TODO ugly dep for models/
     python $FINANCE/expand.py $pre_dir/$i.csv $exp_dir/$i.csv
     if [ ! -s $exp_dir/$i.csv ]; then
@@ -171,7 +174,7 @@ echo "************************************************************"
 
 full_days_exp=()
 for i in $(cat $all_days); do
-    full_days_exp+=($(sbatch --dependency=afterany:$model_learn  $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
+    full_days_exp+=($(sbatch --dependency=afterany:$model_learn $SCRIPT_DIR/day-expand-$i.slurm | cut -f4 -d' '))
 done
 full_days_exp=$(echo ${full_days_exp[@]} | tr ' ' ':')
 echo "SLURM JOBS" $full_days_exp
@@ -194,7 +197,7 @@ full_days_summary=()
 # Note intentional for-loop-order inversion here so we can finish models sequentially.
 for j in $clusters; do
     for i in $(cat $all_days); do
-    full_days_summary+=($(sbatch $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
+    full_days_summary+=($(sbatch --dependency=afterany:$full_days_exp $SCRIPT_DIR/day-summary-$i-$j.slurm | cut -f4 -d' '))
   done
 done
 full_days_summary=$(echo ${full_days_summary[@]} | tr ' ' ':')

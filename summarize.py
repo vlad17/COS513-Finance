@@ -13,7 +13,7 @@ import sys
 from contextlib import contextmanager
 from timeit import default_timer
 import time 
-import ipdb
+# import ipdb
 
 @contextmanager
 def elapsed_timer():
@@ -49,10 +49,9 @@ def main():
     print('{}s'.format(elapsed()))
 
 
-    # FOR NORMALIZING EXPANDED STUFF #
     print('Normalizing')
     summary_stats = None
-    stats_file = '/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats'
+    stats_file = '/n/fs/gcf/dchouren-repo/COS513-Finance/summary_stats/stats2'
     with open(stats_file, 'rb') as inf:
         summary_stats = np.loadtxt(inf)
     stds = summary_stats[:len(summary_stats)/2]
