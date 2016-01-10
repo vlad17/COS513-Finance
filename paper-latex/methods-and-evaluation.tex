@@ -5,7 +5,7 @@ Our data pipeline was designed to provide day-wise parallelism over our data set
 
 \subsection{Model}
 
-Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. For topics, a mix of numeric and categorical fields are extracted. Importance columns are saved for use in a further step. Next, in the \textbf{expansion} stage, we project each row of topic features to a purely real space by using one-hot encoding for categorical values. For each category, one-hot encoding assigns an integer to each unique value in that category. Finally, in the \textbf{summary} stage, $K$-means clustering is performed on this purely numeric representation of the data. Euclidean distance is used as the distance metric for $K$-means. A range of values between 10 and 5000 are used for $K$.
+Every news event in GDELT is stored as a row in a file for that day's report. Every set of rows may undergo a series of transformations. First, in the \textbf{preprocessing} stage, we extract relevant topic- and importance- related columns. For topics, a mix of numeric and categorical fields are extracted. Importance columns are saved for use in a further step. Next, in the \textbf{expansion} stage, we project each row of topic features to a purely real space by using one-hot encoding for categorical values. For each category, one-hot encoding produces $n$ dummy boolean variables, where $n$ is the number of unique categories. Finally, in the \textbf{summary} stage, $K$-means clustering is performed on this purely numeric representation of the data. Euclidean distance is used as the distance metric for $K$-means. Many clustering models are created with a range of $K$ from 10 to 5000.
 
 The day summaries are then conglomerated in a time series $\{\textbf{d}_i\}$. For a day-indexed time series of a commodity's price, $\{p_i\}$, we have the corresponding sequence of binary labels indicating whether price has increased the next day, $y_i=1_{p_{i+1}>p_i}$.
 
@@ -15,7 +15,56 @@ Thus, our model assumes that:
 \item $\mathbb{P}(p_{i+1}>p_i)$ may be determined by a regression over summaries $\textbf{d}_i$. 
 \end{enumerate}
 
-Both of these are strong assumptions. The first may be weakened by adapting a dynamic clustering model, such as an infinite Gaussian Mixture Model or an HDP. The second requires $\textbf{d}_i$ to be both contain a sufficient amount of information to predict price behavior, which is a matter of appropriate feature extraction, and the assumption that we do not lose too much predictive power in summarizing a day by aggregating over the clusters to which its news events belonged to.
+Both of these are strong assumptions. The first may be weakened by adapting a dynamic clustering model, such as an infinite Gaussian Mixture Model or a Hierarchical Dirichlet Process. The second requires $\textbf{d}_i$ to be both contain a sufficient amount of information to predict price behavior, which is a matter of appropriate feature extraction, and the assumption that we do not lose too much predictive power in summarizing a day by aggregating over the clusters to which its news events belonged.
+
+\subsection{Execution}
+
+Our current implementation uses $K$-means for clustering and logistic regression for classification. We trained, validated, and sampled from the days between 2006-01-01 and 2015-07-31. Recent days were used for testing.
+
+For tractability reasons, we use a random sample of one million events to create the clustering models which are used in the main pipeline. This sample goes through the same preprocessing and expansion pipeline as the day summaries which are used in the regression except its output is used to create a clustering model. The sample is drawn uniformly from all events without any recency bias.
+
+The raw data starts with $X=58$ columns. Each day has around $N=100,000$ rows. The total size of the set is about 60GB. %TODO precise mean and stddev.
+
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[scale=0.15]{images/preprocess_vertical.png}}
+\caption{Preprocessing stage}
+\end{center}
+\vskip -0.2in
+\label{fig:preprocess}
+\end{figure}
+
+The preprocessing step does standard data cleaning, removes all but 19 of the original columns, and also groups them into $T=12$ topic-related columns and $I=9$ importance columns. The topic columns are in a compressed format, with categorical variables represented as integers. String columns are sanitized and have stop words removed.
+
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[scale=0.15]{images/expand_vertical.png}}
+\caption{Expansion stage}
+\end{center}
+\vskip -0.2in
+\label{fig:exapand}
+\end{figure}
+
+The expansion step one-hot encodes categorical features, such as the event CAMEO codes,  producing $n$ dummy boolean variables, where $n$ is the number of unique categories.
+
+%TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
+
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[scale=0.15]{images/cluster_and_transform_vertical.png}}
+\caption{Summary stage}
+\end{center}
+\vskip -0.2in
+\label{fig:summarization}
+\end{figure}
+
+Because of the padded $1$s in the $K+1$x$N$ and $N$x$I+1$ matrices from \ref{summarization}, their multiplication conveniently extracts the sum of importance-weighted events belonging to certain topics. Note that this model is extensible to a mixture model, where each event's contribution to a topic's importance for that day is weighed by the probability of belonging to that topic's class. Furthermore, the aggregation creates a uniform description of every day, a flattened vector of dimension dependent on the cluster count.
+
+These daily summaries are then enriched with historical pricing data before being fed into the linear model. The pricing data added are the 5, 10, and 30 day rolling averages of the commodity price. %TODO hyperparam selection of rolling mean.
+
 
 \subsubsection{Autoregressive Models: ARMA}
 We started our exploratory analysis with binary classification. We used diverse classification techniques such as Linear Regression and SVM on the sign of the change of the returns from a day to the next. However, our accuracy results were sub-par. Therefore, we decided to employ Autoregressive models which combine the news data with the time series data in order to produce continuous predictions of next-day time series values. %%TODO: TOM
@@ -67,50 +116,3 @@ We split our data into training and testing windows of varying sizes as can be s
 Accordingly, moving-window training would have a higher predictive power than a simple fixed window technique since the model changes as the window moves and thus carries more weight as the predictions go further in time. With a fixed window, the further the predictions are from the window, the less relevant is the model from the fixed window since it's based on data that is too old. %%TODO GHASSEN: maybe reword this paragraph
 Eventually, we ended up implementing a moving-window training strategy that looks ahead one step at a time and re-estimates the coefficients at each time but uses the same orders (number of lags and ma coefficients). We then collect the mean absolute error and the binary accuracy over all the iterations and average them to evaluate the model for a given hyper-parameter. In our case, the main hyper-parameters was the size of the training window.
 
-\subsection{Execution}
-
-Our current implementation uses $K$-means for clustering and logistic regression for classification. We trained, validated, and sampled from the days between 2006-01-01 and 2015-07-31. Recent days were used for testing.
-
-For our random sample, we sampled one million total events, with rate from a day's file proportional to the number of events in that day. The random sample undergoes the same preprocessing and expansion pipeline as described below for the day summaries to be used in the regression, but its output is fed into a clustering model, that is then used in the main pipeline. We are forced to use a sample for tractability.
-
-Raw data starts with 58 columns. Each day typically has 100K rows. The total size of the set is about 60GB. %TODO precise mean and stddev.
-
-\begin{figure}[ht]
-\vskip 0.2in
-\begin{center}
-\centerline{\includegraphics[scale=0.15]{images/preprocess_vertical.png}}
-\caption{Preprocessing stage}
-\end{center}
-\vskip -0.2in
-\label{fig:preprocess}
-\end{figure}
-
-After preprocessing, we are left with $T=12$ topic-related columns and $I=9$ importance columns, where the topic columns are in a compressed format, with categorical variables represented as integers and strings still as strings (though now sanitized and with stop words removed).
-
-\begin{figure}[ht]
-\vskip 0.2in
-\begin{center}
-\centerline{\includegraphics[scale=0.15]{images/expand_vertical.png}}
-\caption{Expansion stage}
-\end{center}
-\vskip -0.2in
-\label{fig:exapand}
-\end{figure}
-
-Expansion uses one-hot encoding on categorical features, such as the event CAMEO codes.
-
-%TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
-
-\begin{figure}[ht]
-\vskip 0.2in
-\begin{center}
-\centerline{\includegraphics[scale=0.15]{images/cluster_and_transform_vertical.png}}
-\caption{Summary stage}
-\end{center}
-\vskip -0.2in
-\label{fig:summarization}
-\end{figure}
-
-The matrix multiplication above conveniently extracts the sum of importance-weighted events belonging to certain topics. Note that this model is extensible to a mixture model, where each event's contribution to a topic's importance for that day is weighed by the probability of belonging to that topic's class. Furthermore, the aggregation creates a uniform description of every day, a flattened vector of dimension dependent on the cluster count.
-
-These daily summaries were then enriched with historical pricing data before being fed into the linear model. The pricing data added was the 5, 10, and 30 day rolling average of the commodity price. %TODO hyperparam selection of rolling mean.
