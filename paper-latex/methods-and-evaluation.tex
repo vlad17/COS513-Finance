@@ -67,6 +67,7 @@ These daily summaries are then enriched with historical pricing data before bein
 
 
 \subsubsection{Autoregressive Models: ARMA}
+%TODO ghassen add a transitioning sentence
 We started our exploratory analysis with binary classification. We used diverse classification techniques such as Linear Regression and SVM on the sign of the change of the returns from a day to the next. However, our accuracy results were sub-par. Therefore, we decided to employ Autoregressive models which combine the news data with the time series data in order to produce continuous predictions of next-day time series values. %%TODO: TOM
 Autoregressive models are some of the most flexible and easy to use models for time series. The future value of a variable, in an AR model, is assumed to be a linear function of several past observations and random errors. Accordingly, AR models have proven to be especially useful for describing the dynamic behavior of economic and financial time series and for forecasting \cite{tsay, VAR}. Recent literature proved their superiority in financial modeling to most other techniques such as Neural Nets and SVM. %%TODO: G reference
 \\
