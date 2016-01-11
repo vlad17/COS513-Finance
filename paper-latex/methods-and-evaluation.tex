@@ -35,7 +35,7 @@ The raw data starts with $X=58$ columns. Each day has around $N=100,000$ rows. T
 \label{fig:preprocess}
 \end{figure}
 
-The preprocessing step does standard data cleaning, removes all but 19 of the original columns, and also groups them into $T=12$ topic-related columns and $I=9$ importance columns. The topic columns are in a compressed format, with categorical variables represented as integers. String columns are sanitized and have stop words removed.
+The preprocessing step does standard data cleaning such as removing malformed rows but more importantly removes all but 19 of the original columns, and also groups the remaining into $T=12$ topic-related columns and $I=9$ importance columns. The removed columns have either redundant data or data deemed insufficiently relevant to commodity prediction. The topic columns are in a compressed format, with categorical variables represented as integers. String columns are sanitized and have stop words removed.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -47,7 +47,7 @@ The preprocessing step does standard data cleaning, removes all but 19 of the or
 \label{fig:exapand}
 \end{figure}
 
-The expansion step one-hot encodes categorical features, such as the event CAMEO codes,  producing $n$ dummy boolean variables, where $n$ is the number of unique categories.
+The expansion step one-hot encodes categorical features, such as the event CAMEO codes,  producing $n$ dummy boolean variables, where $n$ is the number of unique categories. The 19 feature columns are expanded to 938.
 
 %TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
 
@@ -61,7 +61,7 @@ The expansion step one-hot encodes categorical features, such as the event CAMEO
 \label{fig:summarization}
 \end{figure}
 
-Because of the padded $1$s in the $K+1$x$N$ and $N$x$I+1$ matrices from \ref{summarization}, their multiplication conveniently extracts the sum of importance-weighted events belonging to certain topics. Note that this model is extensible to a mixture model, where each event's contribution to a topic's importance for that day is weighed by the probability of belonging to that topic's class. Furthermore, the aggregation creates a uniform description of every day, a flattened vector of dimension dependent on the cluster count.
+As mentioned, the random sample is used to generate $K$-means models. These models are then used to cluster each day's data. We extract the $N$x$K$ clustered data and separate it into two matrices containing clustered topic data and clustered importance data and pad these matrices with $1$s, as in \ref{summarization}. We then multiply the tranposed topic and importance matrices together. Because of the padded $1$s, their multiplication conveniently extracts the sum of importance-weighted events belonging to certain topics. Note that this model is extensible to a mixture model, where each event's contribution to a topic's importance for that day is weighed by the probability of belonging to that topic's class. Furthermore, the aggregation accomplished by the multiplication creates a highly reduced and uniform description of every day which is a flattened vector of dimension dependent on the cluster count.
 
 These daily summaries are then enriched with historical pricing data before being fed into the linear model. The pricing data added are the 5, 10, and 30 day rolling averages of the commodity price. %TODO hyperparam selection of rolling mean.
 
