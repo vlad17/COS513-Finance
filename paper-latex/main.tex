@@ -17,7 +17,7 @@
 % this with the following command.
 %\newcommand{\theHalgorithm}{\arabic{algorithm}}
 
-\usepackage{hyperref}
+\usepackage[draft]{hyperref}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{paralist}
@@ -125,7 +125,7 @@
 
 \begin{abstract} 
 
-We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weighs each day's news events with an extracted importance metric. We use the GDELT news database to extract raw news attributes and sentiment evaluations of the articles. With a $K$-means model for clustering news data feeding into a lasso regression model we predict the log returns of several commodity prices but mainly silver where we achieved a 0.65 binary accuracy rate and a 0.37 mean absolute error. When using a Kelly criterion based trading strategy, with training on 563 days and testing on 221, we made 0.7\% returns.
+We propose a new method for predicting commodity price data through the use of aggregated daily non-macroeconomic news. Our method creates a static clustering to extract topics and weighs each day's news events with an extracted importance metric. We use the GDELT news database to extract raw news attributes and sentiment evaluations of the articles. With a $K$-means model for clustering news data feeding into a lasso regression model we predict the log returns of several commodity prices, finding the most success on silver, where we achieved a 0.65 binary accuracy rate and a 0.37 mean absolute error. When using a Kelly criterion based trading strategy, with training on 563 days and testing on 221, we made 0.7\% returns [TODO for comparison, add single-direction guess baseline and ARIMA no external baseline].
 \end{abstract} 
 
 %TODO review below
@@ -171,7 +171,7 @@ Given a risk-free rate for borrowing leverage, $r$, the Kelly Criterion states t
 \caption{Portfolio performance for $r=0$ over time on the test set. Note mistakes (when the net value of our assets, in purple, falls) typically occur from poorly predicting upswings. At the above rate, we make 0.7\% returns on the given investment. We choose an artificial starting investment of \$15 (allowing for partial stock purchases) to keep the scales the same. The black line is the no-risk play.}
 \end{center}
 \vskip -0.2in
-\label{fig:preprocess}
+\label{fig:eval}
 \end{figure}
 
 We don't use the S\&P as a metric for the risk-free rate over this time because it actually fell 1.2\% over the testing period. Using instead a generous estimate of the yearly U.S. Treasury bond yield for the year of the test set, at 0.5\% (but modified to be compounded daily to fit with the per-day trading strategy), we still have some improvement.
