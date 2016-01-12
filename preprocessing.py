@@ -15,11 +15,11 @@ CL - crude oil
 Setting the stock option filters out countries that are not top 5 exporters of the item.
 
 unique_cameo_codes is a file that defaults to
-/n/fs/gcf/raw-data-20130401-20151021/unique_cameos.txt
+/n/fs/gcf/raw-data/unique_cameos.txt
 It should just be a file where each line is a unique cameo code.
 
 unique_actor_type_codes is a file that defaults to
-/n/fs/gcf/raw-data-20130401-20151021/unique_actor_type_codes.txt
+/n/fs/gcf/raw-data/unique_actor_type_codes.txt
 It should just be a file where each line is a unique Actor1Type1Code or Actor2Type1Code.
 
 NOTES:
@@ -262,14 +262,22 @@ def clean_row(row, day, cameos, unique_actor_type_codes, valid_countries):
 compatibleFile = re.compile('.*\d\d\d\d\d\d\d\d\.export\.CSV')
 
 def main():
+<<<<<<< HEAD
+    if len(sys.argv) < 3 or len(sys.argv) > 5:
+=======
     if len(sys.argv) < 3 or len(sys.argv) > 6:
+>>>>>>> de209869ef6b67a7da79f99d42543b4bbeb96729
         print(__doc__)
         return 1
 
     inputfile = sys.argv[1]
     outputfile = sys.argv[2]
 
+<<<<<<< HEAD
+    cameofile = '/n/fs/gcf/raw-data/unique_cameos.txt'
+=======
     valid_countries = None
+>>>>>>> de209869ef6b67a7da79f99d42543b4bbeb96729
     if (len(sys.argv) >= 4):
         symbol = sys.argv[3].upper()
         if symbol != 'EVERYTHING':
@@ -282,9 +290,15 @@ def main():
     unique_cameos = [line.strip() for line in open(cameofile, 'r')]
     unique_cameos = list_to_idx_dict(unique_cameos, 1)
 
+<<<<<<< HEAD
+    actor_type_code_file = '/n/fs/gcf/raw-data/unique_actor_type_codes.txt'
+    if (len(sys.argv) >= 5):
+        actor_type_code_file = sys.argv[4]
+=======
     actor_type_code_file = '/n/fs/gcf/raw-data-20130401-20151021/unique_actor_type_codes.txt'
     if (len(sys.argv) >= 6):
         actor_type_code_file = sys.argv[5]
+>>>>>>> de209869ef6b67a7da79f99d42543b4bbeb96729
 
     unique_actor_type_codes = [line.strip() for line in open(actor_type_code_file, 'r')]
     unique_actor_type_codes = list_to_idx_dict(unique_actor_type_codes, 1)
