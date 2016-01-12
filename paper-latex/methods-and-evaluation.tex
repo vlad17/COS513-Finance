@@ -23,7 +23,7 @@ Our current implementation uses $K$-means for clustering and logistic regression
 
 For tractability reasons, we use a random sample of one million events to create the clustering models which are used in the main pipeline. This sample goes through the same preprocessing and expansion pipeline as the day summaries which are used in the regression except its output is used to create a clustering model. The sample is drawn uniformly from all events without any recency bias.
 
-The raw data starts with $X=58$ columns. Each day has around $N=100,000$ rows. The total size of the set is about 60GB. %TODO precise mean and stddev.
+The raw data starts with $X=58$ columns. Each day has around $N=100,000$ rows, but this is variable between days. The total size of the set is about 60GB.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -47,9 +47,8 @@ The preprocessing step does standard data cleaning such as removing malformed ro
 \label{fig:exapand}
 \end{figure}
 
-The expansion step one-hot encodes categorical features, such as the event CAMEO codes,  producing $n$ dummy boolean variables, where $n$ is the number of unique categories. The 19 feature columns are expanded to 938.
+The expansion step one-hot encodes categorical features, such as the event CAMEO codes, producing $n$ dummy boolean variables, where $n$ is the number of unique categories. If the data for a categorical column is missing, its corresponding one-hot vector is the zero vector. The 19 feature columns are expanded to 938.
 
-%TODO mention here that we do sample-mean and sample-std-dev-based scaling, once we actually do that
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -106,7 +105,7 @@ ARIMAX is simpler and more efficient, in literature and from our experience, esp
 \subsubsection{Column Selection of News Data}
 However, a large number of columns in the news data (800 in the case of 100 clusters of GDELT data) can easily cause overfitting since the large number of variables could fit arbitrary data points to the noisy news columns. Accordingly, our out-of-sample testing results would suffer.\\
 Another problem with a large number of columns is that ARIMA (the original implementation) and Ordinary Least Squares regression require the number of features to be less than or equal to the number of observations. This can be limiting as we would like to test different numbers of training days. Therefore, we recurred to Principal Component Analysis (among other methods that we tried) to reduce the dimensions. PCA converts a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components.\cite{PCA} One can select a fixed number of principal components that express most of the variance in a certain data set. In our case, we selected a number of principal components that accounted for $99\%$ of the variance in our data and used those principal components of the news data for the training as exogenous factors, instead of the original news columns. \\
-\subsubsection{L1-regularizatio: Lasso Regression}
+\subsubsection{L1-regularization: Lasso Regression}
 We also tried L1-regularization with Lasso regression since it inherently handles overfitting by enforcing sparsity, as compared to preemptively regularizing based on the variance, as in the case of PCA. \cite{glmnet}
 \begin{figure}[ht]
 	\vskip 0.2in
