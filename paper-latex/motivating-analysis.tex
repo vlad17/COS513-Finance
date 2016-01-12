@@ -28,7 +28,7 @@ As Figure \ref{fig:actors-per-actor} demonstrates, actor count is a heavily skew
 \label{fig:events-per-actor}
 \end{figure} 
 
-Because of the sparsity that is present, we wish to reduce the dimension of our data, which originally consists of over 300 million points in $\mathbb{R^{58}}$ for three reasons: 1) to more accurately represent it, 2) so we can generate models in a continuous space of reduced-dimension tuples of real values (instead of having some categorical values), and 3) so our data pipeline only has to handle a reduced data size.
+Because of the sparsity that is present, we wish to reduce the dimension of our data, which originally consists of over 300 million points in a space spanned by 58 numeric, categorical, and string columns for three reasons: 1) to more accurately represent it, 2) so we can generate models in a continuous space of reduced-dimension tuples of real values (instead of having some categorical values), and 3) so our data pipeline only has to handle a reduced data size.
 
 We found that classical dimensionality reduction was not tractable to apply to a dataset of this size - the highly categorical nature of the dataset results in a large dimensional expansion when preparing numeric inputs to the algorithms. Because of this, and because of our dataset's observed sparsity, we turned to a clustering based approach. 
 
