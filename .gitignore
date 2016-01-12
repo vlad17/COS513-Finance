@@ -123,3 +123,5 @@ leveldb_feeder
 leveldb_kmedoids
 
 models/*
+
+quote-download/*
